@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace SupermarketZlagoda.Components.Pages.Forms;
+namespace SupermarketZlagoda.Components.Forms;
 
 public partial class RegistrationForm
 {

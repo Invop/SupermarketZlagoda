@@ -1,0 +1,21 @@
+﻿@using SupermarketZlagoda.Components.Forms
+
+@if (isLogin)
+{
+    <LoginForm/>
+    <p>Don't have an account? <a @onclick="@ToggleForm">Sign up</a></p>
+}
+else
+{
+    <RegistrationForm/>
+    <p>Already have an account? <a @onclick="@ToggleForm">Sign In</a></p>
+}
+
+@code {
+    bool isLogin = true;
+
+    private void ToggleForm()
+    {
+        isLogin = !isLogin;
+    }
+}
