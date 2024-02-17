@@ -1,0 +1,28 @@
+﻿
+@using SupermarketZlagoda.Data.Model
+<h3>RegistrationForm</h3>
+<EditForm Model="@_newUser" OnValidSubmit="@HandleValidSubmit" FormName="user_fluent_entry" novalidate>
+    <DataAnnotationsValidator />
+    <FluentValidationSummary />
+
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <div>
+            <FluentTextField Name="UserName" @bind-Value="_newUser.login" Label="User Name" Required />
+            <FluentValidationMessage For="@(() => _newUser.login)" />
+        </div>
+        <div>
+            <FluentTextField Name="Password" @bind-Value="_newUser.hash_password" Label="Password" Required  TextFieldType="TextFieldType.Password"/>
+            <FluentValidationMessage For="@(() => _newUser.hash_password)" />
+        </div>
+        
+        <div>
+            <FluentSelect name="class" Id="classification" @bind-Value="@_roleType" TOption="string" Required Label="User role">
+                <FluentOption Value="@UserRoleType.Cashier.ToString()" Selected="true">Cashier</FluentOption>
+                <FluentOption Value="@UserRoleType.Manager.ToString()">Manager</FluentOption>
+            </FluentSelect>
+        </div>
+        
+        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">Submit</FluentButton>
+    </FluentStack>
+</EditForm>

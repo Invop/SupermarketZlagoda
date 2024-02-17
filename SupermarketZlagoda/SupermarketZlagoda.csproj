@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Model\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Data\Zlagoda.db" />
     <Content Include="Data\Zlagoda.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

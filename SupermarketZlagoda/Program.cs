@@ -10,7 +10,7 @@ namespace SupermarketZlagoda
     {
         public static void Main(string[] args)
         {   
-            //SqliteDataAccess.TestConnection();
+            SqliteDataAccess.TestConnection();
 
             var builder = WebApplication.CreateBuilder(args);
             

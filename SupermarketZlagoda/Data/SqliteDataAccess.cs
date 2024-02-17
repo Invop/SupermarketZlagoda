@@ -9,12 +9,10 @@ public class SqliteDataAccess
     {
         using var connection = new SqliteConnection(ConnectionString);
         connection.Open();
- 
+
         var command = new SqliteCommand();
         command.Connection = connection;
-        command.CommandText = "CREATE TABLE Users(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Age INTEGER NOT NULL)";
+        command.CommandText = "CREATE TABLE IF NOT EXISTS User (user_id INTEGER PRIMARY KEY,login TEXT NOT NULL,hash_password TEXT NOT NULL,role_type TEXT CHECK(role_type IN ('Cashier', 'Manager')) NOT NULL);";
         command.ExecuteNonQuery();
- 
-        Console.WriteLine("Table Users created");
     }
 }
