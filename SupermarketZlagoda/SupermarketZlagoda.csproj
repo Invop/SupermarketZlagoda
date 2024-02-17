@@ -10,4 +10,14 @@
 	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.*-* " />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.*-* " />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\SQLite\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Zlagoda.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
