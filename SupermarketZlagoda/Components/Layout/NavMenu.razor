@@ -4,15 +4,36 @@
     <label for="navmenu-toggle" class="navmenu-icon"><FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill" /></label>
     <nav class="sitenav" aria-labelledby="main-menu" onclick="document.getElementById('navmenu-toggle').click();">
         <FluentNavMenu Id="main-menu" Collapsible="true" Width="250" Title="Navigation menu" @bind-Expanded="expanded">
-            <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink>
-            <FluentNavLink Href="counter" Icon="@(new Icons.Regular.Size20.NumberSymbolSquare())" IconColor="Color.Accent">Counter</FluentNavLink>
-            <FluentNavLink Href="weather" Icon="@(new Icons.Regular.Size20.WeatherPartlyCloudyDay())" IconColor="Color.Accent">Weather</FluentNavLink>
+            <FluentNavMenuLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavMenuLink>
+            <FluentNavGroup Title="Менеджер" Tooltip="Item tooltip" Icon="@(new Icons.Regular.Size24.EarthLeaf())" >
+                <FluentNavGroup Title="Управління даними">
+                    <!--BTNS-->
+                </FluentNavGroup>
+                <FluentNavGroup Title="Звіти">
+                    <!--BTNS-->
+                </FluentNavGroup>
+                <FluentNavGroup Title="Пошук інформації">
+                    <!--BTNS-->
+                </FluentNavGroup>
+            </FluentNavGroup>
+            <FluentNavGroup Title="Касир">
+                <FluentNavLink>Товари</FluentNavLink>
+                <FluentNavLink>Товари у магазині</FluentNavLink>
+                <FluentNavLink>Постійні клієнти</FluentNavLink>
+                <FluentNavLink>Чек</FluentNavLink>
+                <FluentNavLink>Інформація про себе</FluentNavLink>
+            </FluentNavGroup> 
         </FluentNavMenu>
     </nav>
 </div>
 
 @code {
     private bool expanded = true;
+
+    private void OnClick()
+    {
+        throw new NotImplementedException();
+    }
 
 }
 
