@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Dialogs\" />
     <Folder Include="Data\Model\" />
   </ItemGroup>
 
