@@ -1,28 +1,35 @@
-﻿
-<div class="navmenu">
-    <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon" />
-    <label for="navmenu-toggle" class="navmenu-icon"><FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill" /></label>
+﻿<div class="navmenu">
+    <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon"/>
+    <label for="navmenu-toggle" class="navmenu-icon">
+        <FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill"/>
+    </label>
     <nav class="sitenav" aria-labelledby="main-menu" onclick="document.getElementById('navmenu-toggle').click();">
-        <FluentNavMenu Id="main-menu" Collapsible="true" Width="250" Title="Navigation menu" @bind-Expanded="expanded">
-            <FluentNavMenuLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavMenuLink>
-            <FluentNavGroup Title="Менеджер" Tooltip="Item tooltip" Icon="@(new Icons.Regular.Size24.EarthLeaf())" >
+        <FluentNavMenu Id="main-menu" Collapsible="true" Width="380" Title="Navigation menu" @bind-Expanded="expanded">
+            <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink >
+            <FluentNavGroup Title="Менеджер" Tooltip="Навігаційне меню менеджера" Icon="@(new Icons.Regular.Size24.EarthLeaf())">
                 <FluentNavGroup Title="Управління даними">
-                    <!--BTNS-->
+                    <FluentNavLink >Працівник</FluentNavLink>
+                    <FluentNavLink >Постійні Клієнти</FluentNavLink>
+                    <FluentNavLink >Категорії товарів</FluentNavLink>
+                    <FluentNavLink >Товари</FluentNavLink>
+                    <FluentNavLink>Товари у магазині</FluentNavLink>
+                    <FluentNavLink >Чеки</FluentNavLink>
                 </FluentNavGroup>
-                <FluentNavGroup Title="Звіти">
-                    <!--BTNS-->
-                </FluentNavGroup>
-                <FluentNavGroup Title="Пошук інформації">
-                    <!--BTNS-->
+                <FluentNavGroup Title="Профіль">
+                    <FluentNavLink Tooltip="Інформація особу касира">Особиста Інформація</FluentNavLink>
                 </FluentNavGroup>
             </FluentNavGroup>
-            <FluentNavGroup Title="Касир">
-                <FluentNavLink>Товари</FluentNavLink>
-                <FluentNavLink>Товари у магазині</FluentNavLink>
-                <FluentNavLink>Постійні клієнти</FluentNavLink>
-                <FluentNavLink>Чек</FluentNavLink>
-                <FluentNavLink>Інформація про себе</FluentNavLink>
-            </FluentNavGroup> 
+            <FluentNavGroup Title="Касир" Tooltip="Навігаційне меню касира" Icon="@(new Icons.Regular.Size24.EarthLeaf())">
+                <FluentNavGroup Title="Управління даними">
+                    <FluentNavLink >Товари</FluentNavLink>
+                    <FluentNavLink >Товари у магазині</FluentNavLink>
+                    <FluentNavLink >Постійні Клієнти</FluentNavLink>
+                    <FluentNavLink >Чеки</FluentNavLink>
+                </FluentNavGroup>
+                <FluentNavGroup Title="Профіль">
+                    <FluentNavLink Tooltip="Інформація особу касира">Особиста Інформація</FluentNavLink>
+                </FluentNavGroup>
+            </FluentNavGroup>
         </FluentNavMenu>
     </nav>
 </div>
@@ -36,4 +43,3 @@
     }
 
 }
-
