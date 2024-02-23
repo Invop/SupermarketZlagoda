@@ -1,5 +1,10 @@
-﻿<h3>ProjectTable</h3>
+﻿<FluentToolbar id="toolbar-fluent-components">
+    <FluentButton Appearance="Appearance.Accent">Add new product</FluentButton>
+    <FluentRadioGroup @bind-Value="_sortType">
+        <FluentRadio Value="@(0)" Checked="true">Sort by</FluentRadio>
+        <FluentRadio Value="@(1)">Sort by</FluentRadio>
+        <FluentRadio Value="@(2)">Sort by</FluentRadio>
+    </FluentRadioGroup>
+    <FluentTextField @bind-Value="_searchTerm" Placeholder="Search"></FluentTextField>
+</FluentToolbar>
 
-@code {
-    
-}
