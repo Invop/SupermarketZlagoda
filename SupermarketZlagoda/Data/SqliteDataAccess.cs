@@ -1,20 +1,23 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
+
 namespace SupermarketZlagoda.Data;
 
-public class SqliteDataAccess
+public static class SqliteDataAccess
 {
-    private const string ConnectionString = "Data Source=Data\\Zlagoda.db;Foreign Keys=True;";
-
     public static void TestConnection()
     {
-        using var connection = new SqliteConnection(ConnectionString);
+        string connectionString = "Server=localhost;"+
+                                  "Database=master;"+
+                                  "Integrated Security=True;" +
+                                  "TrustServerCertificate=True;";
+
+        using SqlConnection connection = new SqlConnection(connectionString);
         connection.Open();
- 
-        var command = new SqliteCommand();
-        command.Connection = connection;
-        command.CommandText = "CREATE TABLE Users(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Age INTEGER NOT NULL)";
+        Console.WriteLine("Connected successfully.");
+        string dbName = "zlagoda";
+        using var command = new SqlCommand($"IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{dbName}') CREATE DATABASE {dbName}", connection);
         command.ExecuteNonQuery();
- 
-        Console.WriteLine("Table Users created");
+        Console.WriteLine($"Database '{dbName}' ensured. It's created if it was not existing.");
     }
 }
