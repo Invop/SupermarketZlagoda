@@ -17,11 +17,4 @@
     <Folder Include="Data\Model\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Data\Zlagoda.db" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Data\Zlagoda.db" />
-  </ItemGroup>
 </Project>
