@@ -7,7 +7,7 @@ namespace SupermarketZlagoda.Components.Pages;
 
 public partial class StoreProductTable
 {
-    private bool IsManager { get; set; } = false;
+    private bool IsManager { get; set; } = true;
     
     private string _searchTerm = string.Empty;
     private int _sortType = 0;
@@ -25,10 +25,12 @@ public partial class StoreProductTable
         // ... other category options
     };
     
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
-        return base.OnInitializedAsync();
+        var itemsList = await SqliteDataAccess.FetchStoreProductsData();
+        _items = itemsList.AsQueryable();
+        StateHasChanged();
     }
     
     private void HandleSelectCategoryChange(List<SelectOption> selectedOptions)
@@ -37,26 +39,5 @@ public partial class StoreProductTable
         {
             Console.WriteLine(selectedOption.Value);
         }
-    }
-
-    private IQueryable<StoreProduct> GenerateSampleGridData(int size)
-    {
-        StoreProduct[] data = new StoreProduct[size];
-
-        for (int i = 0; i < size; i++)
-        {
-            data[i] = new StoreProduct(
-                "123456789012",
-                "123456789012",
-                i,
-                100.00M,
-                100,
-                i % 2 == 0);
-        }
-        return data.AsQueryable();
-    }
-    protected override void OnInitialized()
-    {
-        _items = GenerateSampleGridData(5000);
     }
 }

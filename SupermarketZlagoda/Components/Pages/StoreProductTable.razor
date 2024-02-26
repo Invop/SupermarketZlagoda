@@ -29,11 +29,11 @@
             <FluentIcon Value="new Icons.Regular.Size32.CheckmarkCircle()"/>
         }
     </TemplateColumn>
-    @if(IsManager)
+    @if (IsManager)
     {
         <TemplateColumn Title="Actions" Align="@Align.End">
-            <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))" />
-            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))"/>
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
         </TemplateColumn>
     }
 </FluentDataGrid>

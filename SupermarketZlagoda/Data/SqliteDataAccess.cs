@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
+using SupermarketZlagoda.Data.Model;
 
 namespace SupermarketZlagoda.Data;
 
@@ -9,6 +10,8 @@ public static class SqliteDataAccess
                                             "Database=master;"+
                                             "Integrated Security=True;" +
                                             "TrustServerCertificate=True;";
+
+    #region InitDatabaseAndTables
     public static void InitDatabaseAndTables()
     {
         using var connection = new SqlConnection(ConnectionString);
@@ -174,5 +177,41 @@ public static class SqliteDataAccess
     {
         using var command = new SqlCommand(commandText, connection);
         command.ExecuteNonQuery();
+    }
+    #endregion
+     public static async Task<List<StoreProduct>> FetchStoreProductsData()
+    {
+        var storeProducts = new List<StoreProduct>();
+         const string connectionString = "Server=localhost;"+
+                                         "Database=zlagoda;"+
+                                         "Integrated Security=True;" +
+                                         "TrustServerCertificate=True;";
+         await using var connection = new SqlConnection(connectionString);
+        const string sqlQuery = """
+                                SELECT UPC, UPC_prom, id_product, selling_price, products_number, promotional_product
+                                FROM Store_Products
+                                """;
+
+        await using var command = new SqlCommand(sqlQuery, connection);
+        await connection.OpenAsync();
+
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            var upcProm = reader.IsDBNull(1) ? null : reader.GetString(1);
+
+            var storeProduct = new StoreProduct(
+                reader.GetString(0),
+                upcProm,
+                reader.GetInt32(2),
+                reader.GetDecimal(3),
+                reader.GetInt32(4),
+                reader.GetBoolean(5)
+            );
+    
+            storeProducts.Add(storeProduct);
+        }
+
+        return storeProducts;
     }
 }
