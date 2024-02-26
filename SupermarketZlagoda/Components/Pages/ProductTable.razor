@@ -1,0 +1,37 @@
+﻿@page "/products"
+@using SupermarketZlagoda.Data
+@inject UserState UserState
+<FluentToolbar id="toolbar-fluent-components">
+    @if(IsManager)
+    {
+        <FluentButton Appearance="Appearance.Accent">Add new product</FluentButton>
+    }
+    <FluentRadioGroup @bind-Value="_sortType">
+        <FluentRadio Value="@(0)" Checked="true">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
+        <FluentRadio Value="@(1)">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
+    </FluentRadioGroup>
+    <MultiselectDropdown/>
+    @* <FluentTextField @bind-Value="_searchTerm" Placeholder="Search by UPC"></FluentTextField> *@
+</FluentToolbar>
+
+<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
+    <PropertyColumn Property="@(c => c.IdProduct)"/>
+    <PropertyColumn Property="@(c => c.CategoryNumber)" />
+    <PropertyColumn Property="@(c => c.ProductName)" Align="Align.Center" />
+    <PropertyColumn Property="@(c => c.Characteristics)" Align="Align.End" />
+    @if(IsManager)
+    {
+        <TemplateColumn Title="Actions" Align="@Align.End">
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))" />
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
+        </TemplateColumn>
+    }
+</FluentDataGrid>
+<FluentPaginator State="@_pagination">
+    <SummaryTemplate>
+        There are <strong>@(_pagination.TotalItemCount ?? 0)</strong> rows
+    </SummaryTemplate>
+    <PaginationTextTemplate>
+        This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
+    </PaginationTextTemplate>
+</FluentPaginator>

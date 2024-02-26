@@ -1,6 +1,3 @@
 ﻿namespace SupermarketZlagoda.Data.Model;
 
-public class Product
-{
-    
-}
+public record Product(int IdProduct, int CategoryNumber, string ProductName, string Characteristics);

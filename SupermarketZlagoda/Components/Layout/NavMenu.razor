@@ -1,4 +1,6 @@
-﻿<div class="navmenu">
+﻿@using SupermarketZlagoda.Data
+@inject UserState UserState
+<div class="navmenu">
     <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon"/>
     <label for="navmenu-toggle" class="navmenu-icon">
         <FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill"/>
@@ -11,7 +13,7 @@
                     <FluentNavLink >Працівник</FluentNavLink>
                     <FluentNavLink >Постійні Клієнти</FluentNavLink>
                     <FluentNavLink >Категорії товарів</FluentNavLink>
-                    <FluentNavLink >Товари</FluentNavLink>
+                    <FluentNavLink Href="/products">Товари</FluentNavLink>
                     <FluentNavLink>Товари у магазині</FluentNavLink>
                     <FluentNavLink >Чеки</FluentNavLink>
                 </FluentNavGroup>
@@ -36,6 +38,11 @@
 
 @code {
     private bool expanded = true;
+    protected override void OnInitialized()
+    {
+        UserState.IsManager= false;
+        base.OnInitialized();
+    }
 
     private void OnClick()
     {

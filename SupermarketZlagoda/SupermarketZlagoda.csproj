@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Data\Zlagoda.db" />
-    <Content Include="Data\Zlagoda.db">
+    <Content Update="wwwroot\multiselect-dropdown.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  
 </Project>
