@@ -13,7 +13,6 @@
     <MultiselectDropdown/>
     @* <FluentTextField @bind-Value="_searchTerm" Placeholder="Search by UPC"></FluentTextField> *@
 </FluentToolbar>
-
 <FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
     <PropertyColumn Property="@(c => c.IdProduct)"/>
     <PropertyColumn Property="@(c => c.CategoryNumber)" />
