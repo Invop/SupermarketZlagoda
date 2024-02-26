@@ -223,3 +223,17 @@ function MultiselectDropdown(options){
 window.addEventListener('load',()=>{
     MultiselectDropdown(window.MultiselectDropdownOptions);
 });
+window.getSelectedValues = function(element) {
+    let result = [];
+    let options = element && element.options;
+    let opt;
+
+    for (let i=0, iLen=options.length; i<iLen; i++) {
+        opt = options[i];
+
+        if (opt.selected && opt.value !== undefined) {
+            result.push(opt.value);
+        }
+    }
+    return result;
+}
