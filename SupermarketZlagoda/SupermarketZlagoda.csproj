@@ -17,4 +17,9 @@
     <Folder Include="Data\Model\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\multiselect-dropdown.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
