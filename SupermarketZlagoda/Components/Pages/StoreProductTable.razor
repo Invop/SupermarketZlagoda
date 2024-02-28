@@ -1,4 +1,4 @@
-﻿@page "/products-in-the-store"
+﻿@page "/store-products"
 @using SupermarketZlagoda.Data
 @inject UserState UserState
 <FluentToolbar id="toolbar-fluent-components">
@@ -17,7 +17,7 @@
     <MultiselectDropdown Options="CategoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
     <FluentTextField @bind-Value="_searchTerm" Placeholder="Search by UPC" Style="margin-top: 10px;"></FluentTextField>
 </FluentToolbar>
-<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
+<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 1fr" Style="height: 600px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Upc)"/>
     <PropertyColumn Property="@(c => c.UpcProm)"/>
     <PropertyColumn Property="@(c => c.IdProduct)"/>

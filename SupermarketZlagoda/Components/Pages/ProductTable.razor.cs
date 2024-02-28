@@ -23,10 +23,12 @@ public partial class ProductTable
         new() { Value = "6", Text = "Education" },
         // ... other category options
     };
-    protected override Task OnInitializedAsync()
+
+    protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
-        return base.OnInitializedAsync();
+        var items = await SqliteDataAccess.FetchProductsData();
+        _items = items.AsQueryable();
     }
     
     private void HandleSelectCategoryChange(List<SelectOption> selectedOptions)
@@ -36,19 +38,5 @@ public partial class ProductTable
             Console.WriteLine(selectedOption.Value);
         }
     }
-
-    private IQueryable<Product> GenerateSampleGridData(int size)
-    {
-        Product[] data = new Product[size];
-
-        for (int i = 0; i < size; i++)
-        {
-            data[i] = new Product(i, i, $"Product {i}", $"Char {i}");
-        }
-        return data.AsQueryable();
-    }
-    protected override void OnInitialized()
-    {
-        _items = GenerateSampleGridData(5000);
-    }
+    
 }
