@@ -1,0 +1,61 @@
+﻿@page "/customer-card"
+@using SupermarketZlagoda.Data
+@inject UserState UserState
+<FluentToolbar id="toolbar-fluent-components">
+    @if (IsManager)
+    {
+        <FluentButton Appearance="Appearance.Accent">Add new card customer</FluentButton>
+    }
+    <FluentRadioGroup @bind-Value="_sortType">
+        <FluentRadio Value="@(0)" Checked="true">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
+        <FluentRadio Value="@(1)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
+    </FluentRadioGroup>
+    @if (IsManager)
+    {
+
+        <FluentSelect Items=@PercentageOptions
+                      TOption="Option<int>"
+                      Label="Select a discount percentage"
+                      Width="100px"
+                      OptionText="@(i => i.Text.ToString())"
+                      OptionValue="@(i => i.Value.ToString())"
+                      @bind-SelectedOption="@selectedPercentageOption"
+                      @bind-Value="@percentageValue"/>
+    }
+    <FluentTextField @bind-Value="_surnameSearchTerm" Placeholder="Search by surname"></FluentTextField>
+</FluentToolbar>
+<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 2fr 1fr 1fr 2fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
+    <PropertyColumn Property="@(c => c.NumberCardCustomer)"/>
+    @* <TemplateColumn Title="FullName"> *@
+    @*     <FluentTextArea ReadOnly="true" Resize="TextAreaResize.Both" *@
+    @*                     Value="@($"{context.CustomerSurname} {context.CustomerName} {context.CustomerPatronymic}")"/> *@
+    @* </TemplateColumn> *@
+    <TemplateColumn Title="FullName"  Style="white-space: normal;">
+            @context.CustomerSurname @context.CustomerName @context.CustomerPatronymic
+        </TemplateColumn>
+    <PropertyColumn Property="@(c => c.CustomerPhone)" />
+    <PropertyColumn Property="@(c => c.CustomerPercentage)" />
+    @* <TemplateColumn Title="Address"> *@
+    @*     <FluentTextArea ReadOnly="true" Resize="TextAreaResize.Both"  *@
+    @*                     Value="@($"{context.CustomerCity}, {context.CustomerStreet}, {context.CustomerIndex}")"/> *@
+    @* </TemplateColumn> *@
+    <TemplateColumn Title="Address" Style="white-space: normal;">
+                @context.CustomerCity, @context.CustomerStreet, @context.CustomerIndex
+            </TemplateColumn>
+    <TemplateColumn Title="Actions" Align="@Align.End">
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))"/>
+        @if (IsManager)
+        {
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
+        }
+    </TemplateColumn>
+
+</FluentDataGrid>
+<FluentPaginator State="@_pagination">
+    <SummaryTemplate>
+        There are <strong>@(_pagination.TotalItemCount ?? 0)</strong> rows
+    </SummaryTemplate>
+    <PaginationTextTemplate>
+        This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
+    </PaginationTextTemplate>
+</FluentPaginator>
