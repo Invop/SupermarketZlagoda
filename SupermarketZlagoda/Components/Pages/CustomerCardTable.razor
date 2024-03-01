@@ -12,7 +12,6 @@
     </FluentRadioGroup>
     @if (IsManager)
     {
-
         <FluentSelect Items=@PercentageOptions
                       TOption="Option<int>"
                       Label="Select a discount percentage"
@@ -24,24 +23,17 @@
     }
     <FluentTextField @bind-Value="_surnameSearchTerm" Placeholder="Search by surname"></FluentTextField>
 </FluentToolbar>
-<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 2fr 1fr 1fr 2fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
-    <PropertyColumn Property="@(c => c.NumberCardCustomer)"/>
-    @* <TemplateColumn Title="FullName"> *@
-    @*     <FluentTextArea ReadOnly="true" Resize="TextAreaResize.Both" *@
-    @*                     Value="@($"{context.CustomerSurname} {context.CustomerName} {context.CustomerPatronymic}")"/> *@
-    @* </TemplateColumn> *@
-    <TemplateColumn Title="FullName"  Style="white-space: normal;">
-            @context.CustomerSurname @context.CustomerName @context.CustomerPatronymic
-        </TemplateColumn>
-    <PropertyColumn Property="@(c => c.CustomerPhone)" />
-    <PropertyColumn Property="@(c => c.CustomerPercentage)" />
-    @* <TemplateColumn Title="Address"> *@
-    @*     <FluentTextArea ReadOnly="true" Resize="TextAreaResize.Both"  *@
-    @*                     Value="@($"{context.CustomerCity}, {context.CustomerStreet}, {context.CustomerIndex}")"/> *@
-    @* </TemplateColumn> *@
-    <TemplateColumn Title="Address" Style="white-space: normal;">
-                @context.CustomerCity, @context.CustomerStreet, @context.CustomerIndex
-            </TemplateColumn>
+<FluentDataGrid Items="@_items" ResizableColumns="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1.1fr 1fr 1.2fr 1fr 1.2fr 0.9fr 1fr 1fr 0.6fr"
+                Style="height: 600px; width: 1500px; overflow:auto;">
+    <PropertyColumn Property="@(c => c.IdCardCustomer)"/>
+    <PropertyColumn Property="@(c => c.CustomerSurname)"/>
+    <PropertyColumn Property="@(c => c.CustomerName)"/>
+    <PropertyColumn Property="@(c => c.CustomerPatronymic)"/>
+    <PropertyColumn Property="@(c => c.CustomerPhone)"/>
+    <PropertyColumn Property="@(c => c.CustomerPercentage)"/>
+    <PropertyColumn Property="@(c => c.CustomerCity)"/>
+    <PropertyColumn Property="@(c => c.CustomerStreet)"/>
+    <PropertyColumn Property="@(c => c.CustomerIndex)"/>
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))"/>
         @if (IsManager)
