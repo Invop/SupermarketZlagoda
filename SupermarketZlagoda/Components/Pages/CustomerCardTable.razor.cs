@@ -40,17 +40,8 @@ public partial class CustomerCardTable
     private IQueryable<CustomerCard> GenerateSampleGridData(int size)
     {
         CustomerCard[] data = new CustomerCard[size];
-        string p = ""; 
         for (int i = 0; i < size; i++)
         {
-            // if (i % 2 == 0)
-            // {
-            //     p = $"patronymic{i}";
-            // }
-            // else
-            // {
-            //     p = "";
-            // }
             data[i] = new CustomerCard($"{i}", $"surnameeeeeeeeeeeeeee{i}", $"name{i}", $"patronymic{i}",
                 "+380000000000", $"city nameeeeeeeeeeeeeeeee{i}", $"street {i}",$"396{i}", 10);
         }
