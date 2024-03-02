@@ -10,24 +10,22 @@
     <FluentCheckbox @bind-Value="@_cashiersOnly">Cashiers only</FluentCheckbox>
     <FluentTextField @bind-Value="_surnameSearchTerm" Placeholder="Search by surname"></FluentTextField>
 </FluentToolbar>
-<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination"
-                GridTemplateColumns="1fr 2fr 1fr 1fr 1fr 1fr 1fr 2fr 1fr"
+<FluentDataGrid ResizableColumns="true" Items="@_items" ItemSize="54" Pagination="@_pagination"
+                GridTemplateColumns="1.4fr 1.9fr 1.7fr 2fr 0.9fr 1fr 1.4fr 1.4fr 1.6fr 0.8fr 1fr 1.2fr 1.3fr"
                 Style="height: 600px; width: 1500px; overflow:auto; ">
     <PropertyColumn Property="@(c => c.IdEmployee)"/>
-    
-    <TemplateColumn Title="Name" Align="Align.Start" Style="white-space: normal;">
-        @context.EmployeeSurname @context.EmployeeName @context.EmployeePatronymic
-    </TemplateColumn>
-    
+    <PropertyColumn Property="@(c => c.EmployeeSurname)"/>
+    <PropertyColumn Property="@(c => c.EmployeeName)"/>
+    <PropertyColumn Property="@(c => c.EmployeePatronymic)"/>
     <PropertyColumn Property="@(c => c.Role)"/>
     <PropertyColumn Property="@(c => c.Salary)"/>
     <PropertyColumn Property="@(c => c.DateOfStart)"/>
     <PropertyColumn Property="@(c => c.DateOfBirth)"/>
     <PropertyColumn Property="@(c => c.PhoneNumber)"/>
+    <PropertyColumn Property="@(c => c.City)"/>
+    <PropertyColumn Property="@(c => c.Street)"/>
+    <PropertyColumn Property="@(c => c.ZipCode)"/>
     
-    <TemplateColumn Title="Address" Align="Align.Start" Style="white-space: normal;">
-        @context.City @context.Street @context.ZipCode
-    </TemplateColumn>
     <TemplateColumn Title="Actions">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))"/>
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
