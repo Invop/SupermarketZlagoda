@@ -1,0 +1,59 @@
+﻿@page "/check"
+@using SupermarketZlagoda.Data
+@inject UserState UserState
+<FluentToolbar id="toolbar-fluent-components">
+    @if (!IsManager)
+    {
+        <FluentButton Appearance="Appearance.Accent">Add new check</FluentButton>
+        <FluentTextField @bind-Value="CheckSearchTerm" Placeholder="Search by Id"></FluentTextField>
+    }
+    @if (IsManager)
+    {
+        <FluentSelect Items=@employeeOptions
+                      TOption="Option<string>"
+                      Label="Select an employee"
+                      Width="100px"
+                      OptionText="@(i => i.Text.ToString())"
+                      OptionValue="@(i => i.Value.ToString())"
+                      @bind-SelectedOption="@selectedEmployeeOption"
+                      @bind-Value="@employeeValue"/>
+    }
+    <FluentDivider Style="height: 30px;" Role="DividerRole.Separator" Orientation="Orientation.Vertical"></FluentDivider>
+    <span>Select dates</span>
+    <FluentDatePicker @bind-Value="@DateFromValue"/>
+    <FluentDatePicker @bind-Value="@DateToValue"/>
+    <FluentButton Icon="CalendarToday" OnClick="@(() => Console.WriteLine("Date Today"))">Today</FluentButton>
+    <FluentButton Icon="CalendarToday" OnClick="@(() => Console.WriteLine("Reset Date"))">Reset Date</FluentButton>
+
+</FluentToolbar>
+<FluentDataGrid Items="@_items" ResizableColumns="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr 1fr 1fr"
+                Style="height: 600px; width: 1500px; overflow:auto;">
+    <PropertyColumn Property="@(c => c.IdCheck)"/>
+    <PropertyColumn Property="@(c => c.IdEmployee)"/>
+    <PropertyColumn Property="@(c => c.IdCardCustomer)"/>
+    <PropertyColumn Property="@(c => c.PrintDate)"/>
+    <PropertyColumn Property="@(c => c.SumTotal)"/>
+    <PropertyColumn Property="@(c => c.Vat)"/>
+    <TemplateColumn Title="Actions" Align="@Align.End">
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Open())" OnClick="@(() => Console.WriteLine("Open clicked"))"/>
+        @if (IsManager)
+        {
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
+        }
+    </TemplateColumn>
+
+</FluentDataGrid>
+<FluentPaginator State="@_pagination">
+    <SummaryTemplate>
+        There are <strong>@(_pagination.TotalItemCount ?? 0)</strong> rows
+    </SummaryTemplate>
+    <PaginationTextTemplate>
+        This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
+    </PaginationTextTemplate>
+</FluentPaginator>
+@if (IsManager)
+{
+    <div style="font-size: larger;  font-weight: bold; display: flex; justify-content: center;">
+        Total for @selectedEmployeeOption.Text is @TotalSum
+    </div>
+}
