@@ -9,8 +9,6 @@ public partial class CheckTable
     private bool IsManager { get; set; } = false;
     private string CheckSearchTerm = string.Empty;
     private int _sortType = 0;
-
-    private string? PeriodValue = "all";
     
     private decimal TotalSum;
     private string? employeeValue;
