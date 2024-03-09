@@ -11,7 +11,7 @@
             <FluentNavGroup Title="Менеджер" Tooltip="Навігаційне меню менеджера" Icon="@(new Icons.Regular.Size24.EarthLeaf())">
                 <FluentNavGroup Title="Управління даними">
                     <FluentNavLink Href="/employee">Працівник</FluentNavLink>
-                    <FluentNavLink >Постійні Клієнти</FluentNavLink>
+                    <FluentNavLink Href="/customer-card">Постійні Клієнти</FluentNavLink>
                     <FluentNavLink >Категорії товарів</FluentNavLink>
                     <FluentNavLink Href="/products">Товари</FluentNavLink>
                     <FluentNavLink>Товари у магазині</FluentNavLink>
@@ -40,7 +40,7 @@
     private bool expanded = true;
     protected override void OnInitialized()
     {
-        UserState.IsManager = true;
+        UserState.IsManager= true;
         base.OnInitialized();
     }
 
