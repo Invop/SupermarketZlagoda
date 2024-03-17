@@ -21,5 +21,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Components\Pages\CategoryTable.rezor.cs">
+      <DependentUpon>CategoryTable.razor</DependentUpon>
+    </Compile>
+  </ItemGroup>
   
 </Project>
