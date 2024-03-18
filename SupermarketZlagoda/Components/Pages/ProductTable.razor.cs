@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
+using SupermarketZlagoda.Components.Dialogs;
 using SupermarketZlagoda.Data;
 using SupermarketZlagoda.Data.Model;
 
@@ -50,5 +51,41 @@ public partial class ProductTable
     protected override void OnInitialized()
     {
         _items = GenerateSampleGridData(5000);
+    }
+
+    private async Task OpenEditDialogAsync(Product context)
+    {
+            var dialog = await DialogService.ShowDialogAsync<CreateEditProductDialog>(context, new DialogParameters()
+            {
+                Height = "400px",
+                Title = $"Updating the {context.ProductName}",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+            });
+
+            var result = await dialog.Result;
+            if (result is { Cancelled: false, Data: not null })
+            {
+                //Update DB
+            }
+            
+    }
+    private async Task OpenCreateDialogAsync()
+    {   
+        var context = new Product(0, 0, string.Empty, string.Empty);
+        var dialog = await DialogService.ShowDialogAsync<CreateEditProductDialog>(context, new DialogParameters()
+        {
+            Height = "400px",
+            Title = $"Updating the {context.ProductName}",
+            PreventDismissOnOverlayClick = true,
+            PreventScroll = true,
+        });
+
+        var result = await dialog.Result;
+        if (result is { Cancelled: false, Data: not null })
+        {
+            //Update DB
+        }
+            
     }
 }
