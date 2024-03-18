@@ -1,0 +1,68 @@
+﻿@using SupermarketZlagoda.Data.Model
+@using SupermarketZlagoda.Data
+@using SupermarketZlagoda.Components.Pages
+@implements IDialogContentComponent<Product>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentTextField @bind-Value="@Content.ProductName">Name:</FluentTextField>
+    <br/><br/>
+    <FluentSelect Items="@stringOptions1"
+               OptionText="@(i => i.Text)"
+               OptionValue="@(i => i.Value)"
+               OptionSelected="@(i => i.Selected)"
+               @bind-Value="@stringValue" />
+    <br/><br/>
+    <FluentTextArea  style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea >
+</FluentDialogBody>
+
+@code {
+    
+    string? stringValue;
+    [Parameter]
+    public Product Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+    
+    //Will be changed
+    static List<Option<string>> stringOptions1 =
+    [
+        new Option<string> { Value = "9", Text = "Nine" },
+        new Option<string> { Value = "8", Text = "Eight", Selected = true },
+        new Option<string> { Value = "7", Text = "Seven" },
+        new Option<string> { Value = "6", Text = "Six" },
+        new Option<string> { Value = "5", Text = "Five" },
+        new Option<string> { Value = "4", Text = "Four" },
+        new Option<string> { Value = "3", Text = "Three" },
+        new Option<string> { Value = "2", Text = "Two" },
+        new Option<string> { Value = "1", Text = "One" }
+    ];
+    private async Task SaveAsync()
+    {
+        Content.CategoryNumber = int.Parse(stringValue);
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+    
+}
