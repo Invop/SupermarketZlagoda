@@ -5,14 +5,15 @@ using SupermarketZlagoda.Data.Model;
 
 namespace SupermarketZlagoda.Components.Pages;
 
-public partial class ProductTable
+public partial class StoreProductTable
 {
-    private bool IsManager { get; set; } = false;
+    private bool IsManager { get; set; } = true;
     
     private string _searchTerm = string.Empty;
     private int _sortType = 0;
+    private bool _hidePromotional = false, _hideNonPromotional = false;
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
-    private IQueryable<Product>? _items = Enumerable.Empty<Product>().AsQueryable();
+    private IQueryable<StoreProduct>? _items = Enumerable.Empty<StoreProduct>().AsQueryable();
     private List<SelectOption> CategoryOptions = new List<SelectOption>()
     {
         new() { Value = "1", Text = "Technology", Selected = true },
@@ -23,12 +24,13 @@ public partial class ProductTable
         new() { Value = "6", Text = "Education" },
         // ... other category options
     };
-
+    
     protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
-        var items = await SqliteDataAccess.FetchProductsData();
-        _items = items.AsQueryable();
+        var itemsList = await SqliteDataAccess.FetchStoreProductsData();
+        _items = itemsList.AsQueryable();
+        StateHasChanged();
     }
     
     private void HandleSelectCategoryChange(List<SelectOption> selectedOptions)
@@ -38,5 +40,4 @@ public partial class ProductTable
             Console.WriteLine(selectedOption.Value);
         }
     }
-    
 }

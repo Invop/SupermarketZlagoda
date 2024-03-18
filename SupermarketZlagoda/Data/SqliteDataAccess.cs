@@ -1,17 +1,24 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
+using SupermarketZlagoda.Data.Model;
 
 namespace SupermarketZlagoda.Data;
 
 public static class SqliteDataAccess
 {
-    private const string ConnectionString = "Server=localhost;"+
+    private const string ConnectionStringMaster = "Server=localhost;"+
                                             "Database=master;"+
                                             "Integrated Security=True;" +
                                             "TrustServerCertificate=True;";
+    private const string ConnectionStringZlagoda = "Server=localhost;"+
+                                                  "Database=zlagoda;"+
+                                                  "Integrated Security=True;" +
+                                                  "TrustServerCertificate=True;";
+
+    #region InitDatabaseAndTables
     public static void InitDatabaseAndTables()
     {
-        using var connection = new SqlConnection(ConnectionString);
+        using var connection = new SqlConnection(ConnectionStringMaster);
         connection.Open();
         Console.WriteLine("Connected successfully.");
         CreateDatabaseIfNotExists(connection);
@@ -174,5 +181,59 @@ public static class SqliteDataAccess
     {
         using var command = new SqlCommand(commandText, connection);
         command.ExecuteNonQuery();
+    }
+    #endregion
+     public static async Task<List<StoreProduct>> FetchStoreProductsData()
+    {
+        var storeProducts = new List<StoreProduct>();
+         await using var connection = new SqlConnection(ConnectionStringZlagoda);
+        const string sqlQuery = """
+                                SELECT UPC, UPC_prom, id_product, selling_price, products_number, promotional_product
+                                FROM Store_Products
+                                """;
+
+        await using var command = new SqlCommand(sqlQuery, connection);
+        await connection.OpenAsync();
+
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            var upcProm = reader.IsDBNull(1) ? null : reader.GetString(1);
+
+            var storeProduct = new StoreProduct(
+                reader.GetString(0),
+                upcProm,
+                reader.GetInt32(2),
+                reader.GetDecimal(3),
+                reader.GetInt32(4),
+                reader.GetBoolean(5)
+            );
+    
+            storeProducts.Add(storeProduct);
+        }
+
+        return storeProducts;
+    }
+
+    public static async Task<List<Product>> FetchProductsData()
+    {
+        var products = new List<Product>();
+        const string productsFetchQuery = "SELECT id_product, category_number, product_name, characteristics FROM Products";
+        await using var connection = new SqlConnection(ConnectionStringZlagoda);
+        await connection.OpenAsync();
+        await using var command = new SqlCommand(productsFetchQuery, connection);
+        var reader = await command.ExecuteReaderAsync();
+
+        while(await reader.ReadAsync())
+        {
+            var idProduct = reader.GetInt32(0);
+            var categoryNumber = reader.GetInt32(1);
+            var productName = reader.GetString(2);
+            var characteristics = reader.IsDBNull(3) ? null : reader.GetString(3);
+                
+            products.Add(new Product(idProduct, categoryNumber, productName, characteristics));
+        }
+
+        return products;
     }
 }
