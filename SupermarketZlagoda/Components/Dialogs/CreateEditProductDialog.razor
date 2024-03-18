@@ -27,7 +27,8 @@
                OptionText="@(i => i.Text)"
                OptionValue="@(i => i.Value)"
                OptionSelected="@(i => i.Selected)"
-               @bind-Value="@stringValue" />
+               @bind-Value="@stringValue" 
+               Label="Category:"/>
     <br/><br/>
     <FluentTextArea  style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea >
 </FluentDialogBody>
