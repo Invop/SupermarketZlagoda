@@ -24,9 +24,9 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.Products.Get)]
-    public async Task<IActionResult> Get([FromRoute] Guid guid)
+    public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-        var product = await _productRepository.GetByIdAsync(guid);
+        var product = await _productRepository.GetByIdAsync(id);
         if (product == null)
         {
             return NotFound();
