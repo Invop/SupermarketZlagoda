@@ -140,6 +140,7 @@ namespace Zlagoda.Application.Database;
                                                           )
                                                   """;
         await ExecuteNonQueryAsync(connection, categoriesTableCreateQuery);
+        
     }
 
     private async Task CreateSaleTableIfNotExists(SqlConnection connection)
