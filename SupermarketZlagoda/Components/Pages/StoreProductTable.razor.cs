@@ -28,8 +28,6 @@ public partial class StoreProductTable
     protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
-        var itemsList = await SqliteDataAccess.FetchStoreProductsData();
-        _items = itemsList.AsQueryable();
         StateHasChanged();
     }
     

@@ -1,8 +1,9 @@
 ﻿namespace SupermarketZlagoda.Data.Model;
 
-public record Product(int IdProduct, int CategoryNumber, string ProductName, string Characteristics)
+public record Product
 {
-    public int CategoryNumber { get; set; } = CategoryNumber;
-    public string ProductName { get; set; } = ProductName;
-    public string Characteristics { get; set; } = Characteristics;
+    public Guid Id { get; init; }
+    public int CategoryId { get; set; }
+    public string Name { get; set; }
+    public string Characteristics { get; set; }
 }
