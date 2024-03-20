@@ -1,4 +1,22 @@
-POST https://localhost:5001/api/products HTTP/1.1
+GET https://localhost:5001/api/products/{GUID}
+Accept: application/json
+###
+GET https://localhost:5001/api/products
+Accept: application/json
+###
+PUT https://localhost:5001/api/products/{GUID}
+Content-Type: application/json
+
+{
+  "Name": "Updated product name",
+  "CategoryId": 1,
+  "Characteristics": "Updated Char 0"
+}
+###
+DELETE https://localhost:5001/api/products/{GUID}
+Accept: application/json
+###
+POST https://localhost:5001/api/products
 Content-Type: application/json
 
 {
