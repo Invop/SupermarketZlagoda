@@ -12,20 +12,20 @@ namespace Zlagoda.Application.Database;
     public async Task InitializeAsync()
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        CreateTablesIfNotExists(connection);
+        await CreateTablesIfNotExists(connection);
     }
-    private void CreateTablesIfNotExists(SqlConnection connection)
+    private async Task CreateTablesIfNotExists(SqlConnection connection)
     {
-        CreateCategoryTableIfNotExists(connection);
-        CreateProductTableIfNotExists(connection);
-        CreateStoreProductTableIfNotExists(connection);
-        CreateEmployeeTableIfNotExists(connection);
-        CreateCustomerCardTableIfNotExists(connection);
-        CreateCheckTableIfNotExists(connection);
-        CreateSaleTableIfNotExists(connection);
+        await CreateCategoryTableIfNotExists(connection);
+        await CreateProductTableIfNotExists(connection);
+        await CreateStoreProductTableIfNotExists(connection);
+        await CreateEmployeeTableIfNotExists(connection);
+        await CreateCustomerCardTableIfNotExists(connection);
+        await CreateCheckTableIfNotExists(connection);
+        await CreateSaleTableIfNotExists(connection);
     }
 
-    private void CreateCheckTableIfNotExists(SqlConnection connection)
+    private async Task CreateCheckTableIfNotExists(SqlConnection connection)
     {
         const string checksTableCreateQuery = """
                                               
@@ -41,10 +41,10 @@ namespace Zlagoda.Application.Database;
                                                   )
                                               """;
 
-        ExecuteNonQuery(connection, checksTableCreateQuery);
+        await ExecuteNonQueryAsync(connection, checksTableCreateQuery);
     }
 
-    private void CreateCustomerCardTableIfNotExists(SqlConnection connection)
+    private async Task CreateCustomerCardTableIfNotExists(SqlConnection connection)
     {
         const string customerCardsTableCreateQuery = """
                                                      
@@ -63,11 +63,11 @@ namespace Zlagoda.Application.Database;
                                                              )
                                                      """;
     
-        ExecuteNonQuery(connection, customerCardsTableCreateQuery);
+        await ExecuteNonQueryAsync(connection, customerCardsTableCreateQuery);
         
     }
 
-    private void CreateEmployeeTableIfNotExists(SqlConnection connection)
+    private async Task CreateEmployeeTableIfNotExists(SqlConnection connection)
     {
         const string employeesTableCreateQuery = """
                                                  
@@ -89,10 +89,10 @@ namespace Zlagoda.Application.Database;
                                                          )
                                                  """;
      
-        ExecuteNonQuery(connection, employeesTableCreateQuery);
+        await ExecuteNonQueryAsync(connection, employeesTableCreateQuery);
     }
 
-    private void CreateProductTableIfNotExists(SqlConnection connection)
+    private async Task CreateProductTableIfNotExists(SqlConnection connection)
     {
         const string productsTableCreateQuery = """
                                                 
@@ -105,12 +105,12 @@ namespace Zlagoda.Application.Database;
                                                             characteristics VARCHAR(100) NOT NULL
                                                         )
                                                 """;
-        ExecuteNonQuery(connection, productsTableCreateQuery);
+        await ExecuteNonQueryAsync(connection, productsTableCreateQuery);
         
     }
     
     //must be updated by yourself UPC_prom On update NO ACTION ON DELETE NO ACTION
-    private void CreateStoreProductTableIfNotExists(SqlConnection connection)
+    private async Task CreateStoreProductTableIfNotExists(SqlConnection connection)
     {
         const string storeProductsTableCreateQuery = """
                                                      
@@ -125,10 +125,10 @@ namespace Zlagoda.Application.Database;
                                                              promotional_product BIT NOT NULL
                                                          )
                                                      """;
-        ExecuteNonQuery(connection, storeProductsTableCreateQuery);
+        await ExecuteNonQueryAsync(connection, storeProductsTableCreateQuery);
     }
 
-    private void CreateCategoryTableIfNotExists(SqlConnection connection)
+    private async Task CreateCategoryTableIfNotExists(SqlConnection connection)
     {
         const string categoriesTableCreateQuery = """
                                                   
@@ -139,10 +139,10 @@ namespace Zlagoda.Application.Database;
                                                               category_name VARCHAR(50) NOT NULL
                                                           )
                                                   """;
-        ExecuteNonQuery(connection, categoriesTableCreateQuery);
+        await ExecuteNonQueryAsync(connection, categoriesTableCreateQuery);
     }
 
-    private void CreateSaleTableIfNotExists(SqlConnection connection)
+    private async Task CreateSaleTableIfNotExists(SqlConnection connection)
     {
         const string salesTableCreateQuery = """
                                              
@@ -157,11 +157,11 @@ namespace Zlagoda.Application.Database;
                                                  )
                                              """;
 
-        ExecuteNonQuery(connection, salesTableCreateQuery);
+        await ExecuteNonQueryAsync(connection, salesTableCreateQuery);
     }
-    private void ExecuteNonQuery(SqlConnection connection, string commandText)
+    private async Task ExecuteNonQueryAsync(SqlConnection connection, string commandText)
     {
         using var command = new SqlCommand(commandText, connection);
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
  }
