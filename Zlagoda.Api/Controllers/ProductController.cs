@@ -20,7 +20,7 @@ public class ProductController : ControllerBase
     {
         var product = request.MapToProduct();
         await _productRepository.CreateAsync(product);
-        return CreatedAtAction(nameof(Get), new { idOrSlug = product.Id }, product);
+        return CreatedAtAction(nameof(Get), new { id = product.Id }, product);
     }
 
     [HttpGet(ApiEndpoints.Products.Get)]
@@ -38,8 +38,8 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var products = await _productRepository.GetAllAsync();
-        var movieResponses = products.MapToResponse();
-        return Ok(movieResponses);
+        var productsResponse = products.MapToResponse();
+        return Ok(productsResponse);
     }
 
 
