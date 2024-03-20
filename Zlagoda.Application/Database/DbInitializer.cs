@@ -96,14 +96,14 @@ namespace Zlagoda.Application.Database;
     {
         const string productsTableCreateQuery = """
                                                 
-                                                        IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='Products')
-                                                        CREATE TABLE Products
-                                                        (
-                                                            id_product INT PRIMARY KEY NOT NULL,
-                                                            category_number INT FOREIGN KEY REFERENCES Categories(category_number) ON UPDATE CASCADE ON DELETE NO ACTION,
-                                                            product_name VARCHAR(50) NOT NULL,
-                                                            characteristics VARCHAR(100) NOT NULL
-                                                        )
+                                                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='Products')
+                                                    CREATE TABLE Products
+                                                    (
+                                                        id_product UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
+                                                        category_number INT FOREIGN KEY REFERENCES Categories(category_number) ON UPDATE CASCADE ON DELETE NO ACTION,
+                                                        product_name VARCHAR(50) NOT NULL,
+                                                        characteristics VARCHAR(100) NOT NULL
+                                                    )
                                                 """;
         await ExecuteNonQueryAsync(connection, productsTableCreateQuery);
         
@@ -119,7 +119,7 @@ namespace Zlagoda.Application.Database;
                                                          (
                                                              UPC VARCHAR(12) PRIMARY KEY NOT NULL,
                                                              UPC_prom VARCHAR(12) FOREIGN KEY REFERENCES Store_Products(UPC) ON UPDATE NO ACTION ON DELETE NO ACTION,
-                                                             id_product INT FOREIGN KEY REFERENCES Products(id_product) ON UPDATE CASCADE ON DELETE NO ACTION,
+                                                             id_product UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Products(id_product) ON UPDATE CASCADE ON DELETE NO ACTION,
                                                              selling_price DECIMAL(13,4) NOT NULL,
                                                              products_number INT NOT NULL,
                                                              promotional_product BIT NOT NULL
