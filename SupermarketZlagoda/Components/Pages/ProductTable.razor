@@ -14,16 +14,16 @@
     <MultiselectDropdown Options="CategoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
     @* <FluentTextField @bind-Value="_searchTerm" Placeholder="Search by UPC"></FluentTextField> *@
 </FluentToolbar>
-<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
-    <PropertyColumn Property="@(c => c.IdProduct)"/>
-    <PropertyColumn Property="@(c => c.CategoryNumber)" />
-    <PropertyColumn Property="@(c => c.ProductName)" Align="Align.Center" />
+<FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
+    <PropertyColumn Property="@(c => c.Id)"/>
+    <PropertyColumn Property="@(c => c.CategoryId)" />
+    <PropertyColumn Property="@(c => c.Name)" Align="Align.Center" />
     <PropertyColumn Property="@(c => c.Characteristics)" Align="Align.End" />
     @if(IsManager)
     {
         <TemplateColumn Title="Actions" Align="@Align.End">
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))" />
         </TemplateColumn>
     }
 </FluentDataGrid>

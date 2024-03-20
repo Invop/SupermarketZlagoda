@@ -21,7 +21,7 @@
 
 @* Body *@
 <FluentDialogBody>
-    <FluentTextField @bind-Value="@Content.ProductName">Name:</FluentTextField>
+    <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
     <br/><br/>
     <FluentSelect Items="@stringOptions1"
                OptionText="@(i => i.Text)"
@@ -57,7 +57,7 @@
     ];
     private async Task SaveAsync()
     {
-        Content.CategoryNumber = int.Parse(stringValue);
+        Content.CategoryId = int.Parse(stringValue);
         await Dialog.CloseAsync(Content);
     }
 
