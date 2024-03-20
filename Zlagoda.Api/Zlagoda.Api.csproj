@@ -12,11 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\" />
-      <Folder Include="Mapping\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Zlagoda.Application\Zlagoda.Application.csproj" />
       <ProjectReference Include="..\Zlagoda.Contracts\Zlagoda.Contracts.csproj" />
     </ItemGroup>
