@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zlagoda.Api.Mapping;
 using Zlagoda.Application.Repositories;
+using Zlagoda.Application.Services;
 using Zlagoda.Contracts.Requests;
 
 namespace Zlagoda.Api.Controllers;
@@ -8,25 +9,25 @@ namespace Zlagoda.Api.Controllers;
 [ApiController]
 public class ProductController : ControllerBase
 {
-    private readonly IProductRepository _productRepository;
+    private readonly IProductService _productService;
 
-    public ProductController(IProductRepository productRepository)
+    public ProductController(IProductService productService)
     {
-        _productRepository = productRepository;
+        _productService = productService;
     }
     
     [HttpPost(ApiEndpoints.Products.Create)]
     public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
     {
         var product = request.MapToProduct();
-        await _productRepository.CreateAsync(product);
+        await _productService.CreateAsync(product);
         return CreatedAtAction(nameof(Get), new { id = product.Id }, product);
     }
 
     [HttpGet(ApiEndpoints.Products.Get)]
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-        var product = await _productRepository.GetByIdAsync(id);
+        var product = await _productService.GetByIdAsync(id);
         if (product == null)
         {
             return NotFound();
@@ -37,7 +38,7 @@ public class ProductController : ControllerBase
     [HttpGet(ApiEndpoints.Products.GetAll)]
     public async Task<IActionResult> GetAll()
     {
-        var products = await _productRepository.GetAllAsync();
+        var products = await _productService.GetAllAsync();
         var productsResponse = products.MapToResponse();
         return Ok(productsResponse);
     }
@@ -48,8 +49,8 @@ public class ProductController : ControllerBase
         [FromBody] UpdateProductRequest request)
     {
         var product = request.MapToProduct(id);
-        var updated = await _productRepository.UpdateAsync(product);
-        if (!updated)
+        var updatedProduct = await _productService.UpdateAsync(product);
+        if (updatedProduct is null)
         {
             return NotFound();
         }
@@ -62,7 +63,7 @@ public class ProductController : ControllerBase
     [HttpDelete(ApiEndpoints.Products.Delete)]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        var deleted = await _productRepository.DeleteByIdAsync(id);
+        var deleted = await _productService.DeleteByIdAsync(id);
         if (!deleted)
         {
             return NotFound();
