@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Zlagoda.Application.Repositories;
-
+using Zlagoda.Application.Database;
 namespace Zlagoda.Application;
 
 public static class ApplicationServiceCollectionExtensions
