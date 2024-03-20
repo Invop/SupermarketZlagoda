@@ -14,7 +14,7 @@ namespace Zlagoda.Application.Database;
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         CreateTablesIfNotExists(connection);
     }
-    private static void CreateTablesIfNotExists(SqlConnection connection)
+    private void CreateTablesIfNotExists(SqlConnection connection)
     {
         CreateCategoryTableIfNotExists(connection);
         CreateProductTableIfNotExists(connection);
@@ -25,7 +25,7 @@ namespace Zlagoda.Application.Database;
         CreateSaleTableIfNotExists(connection);
     }
 
-    private static void CreateCheckTableIfNotExists(SqlConnection connection)
+    private void CreateCheckTableIfNotExists(SqlConnection connection)
     {
         const string checksTableCreateQuery = """
                                               
@@ -44,7 +44,7 @@ namespace Zlagoda.Application.Database;
         ExecuteNonQuery(connection, checksTableCreateQuery);
     }
 
-    private static void CreateCustomerCardTableIfNotExists(SqlConnection connection)
+    private void CreateCustomerCardTableIfNotExists(SqlConnection connection)
     {
         const string customerCardsTableCreateQuery = """
                                                      
@@ -67,7 +67,7 @@ namespace Zlagoda.Application.Database;
         
     }
 
-    private static void CreateEmployeeTableIfNotExists(SqlConnection connection)
+    private void CreateEmployeeTableIfNotExists(SqlConnection connection)
     {
         const string employeesTableCreateQuery = """
                                                  
@@ -92,7 +92,7 @@ namespace Zlagoda.Application.Database;
         ExecuteNonQuery(connection, employeesTableCreateQuery);
     }
 
-    private static void CreateProductTableIfNotExists(SqlConnection connection)
+    private void CreateProductTableIfNotExists(SqlConnection connection)
     {
         const string productsTableCreateQuery = """
                                                 
@@ -110,7 +110,7 @@ namespace Zlagoda.Application.Database;
     }
     
     //must be updated by yourself UPC_prom On update NO ACTION ON DELETE NO ACTION
-    private static void CreateStoreProductTableIfNotExists(SqlConnection connection)
+    private void CreateStoreProductTableIfNotExists(SqlConnection connection)
     {
         const string storeProductsTableCreateQuery = """
                                                      
@@ -128,7 +128,7 @@ namespace Zlagoda.Application.Database;
         ExecuteNonQuery(connection, storeProductsTableCreateQuery);
     }
 
-    private static void CreateCategoryTableIfNotExists(SqlConnection connection)
+    private void CreateCategoryTableIfNotExists(SqlConnection connection)
     {
         const string categoriesTableCreateQuery = """
                                                   
@@ -142,7 +142,7 @@ namespace Zlagoda.Application.Database;
         ExecuteNonQuery(connection, categoriesTableCreateQuery);
     }
 
-    private static void CreateSaleTableIfNotExists(SqlConnection connection)
+    private void CreateSaleTableIfNotExists(SqlConnection connection)
     {
         const string salesTableCreateQuery = """
                                              
@@ -159,7 +159,7 @@ namespace Zlagoda.Application.Database;
 
         ExecuteNonQuery(connection, salesTableCreateQuery);
     }
-    private static void ExecuteNonQuery(SqlConnection connection, string commandText)
+    private void ExecuteNonQuery(SqlConnection connection, string commandText)
     {
         using var command = new SqlCommand(commandText, connection);
         command.ExecuteNonQuery();
