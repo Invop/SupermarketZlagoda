@@ -5,6 +5,12 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupermarketZlagoda", "SupermarketZlagoda\SupermarketZlagoda.csproj", "{E9885461-8D86-47AC-9F02-51FA71F94F91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zlagoda.Api", "Zlagoda.Api\Zlagoda.Api.csproj", "{5E9AE630-A1E7-4B6F-9DDD-4A1532000BC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zlagoda.Application", "Zlagoda.Application\Zlagoda.Application.csproj", "{22DC29D2-889C-40F1-8C58-D03CB3FBA502}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zlagoda.Contracts", "Zlagoda.Contracts\Zlagoda.Contracts.csproj", "{46112EFF-A7B5-416A-AA04-130D854102C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{E9885461-8D86-47AC-9F02-51FA71F94F91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9885461-8D86-47AC-9F02-51FA71F94F91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9885461-8D86-47AC-9F02-51FA71F94F91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E9AE630-A1E7-4B6F-9DDD-4A1532000BC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E9AE630-A1E7-4B6F-9DDD-4A1532000BC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E9AE630-A1E7-4B6F-9DDD-4A1532000BC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E9AE630-A1E7-4B6F-9DDD-4A1532000BC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22DC29D2-889C-40F1-8C58-D03CB3FBA502}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22DC29D2-889C-40F1-8C58-D03CB3FBA502}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22DC29D2-889C-40F1-8C58-D03CB3FBA502}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22DC29D2-889C-40F1-8C58-D03CB3FBA502}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46112EFF-A7B5-416A-AA04-130D854102C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46112EFF-A7B5-416A-AA04-130D854102C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46112EFF-A7B5-416A-AA04-130D854102C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46112EFF-A7B5-416A-AA04-130D854102C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
