@@ -46,4 +46,38 @@ public static class ContractMapping
             Characteristics = request.Characteristics
         };
     }
+    
+    
+    public static StoreProduct MapToProduct(this CreateStoreProductRequest request)
+    {
+        throw new NotImplementedException();
+        // return new StoreProduct
+        // {
+        // };
+    }
+
+    public static StoreProductResponse MapToResponse(this StoreProduct movie)
+    {
+        throw new NotImplementedException();
+        // return new StoreProductResponse()
+        // {
+        // };
+    }
+    
+    public static StoreProductsResponse MapToResponse(this IEnumerable<StoreProduct> movies)
+    {   
+        throw new NotImplementedException();
+        // return new StoreProductsResponse
+        // {
+        //     Items = movies.Select(MapToResponse)
+        // };
+    }
+
+    public static StoreProduct MapToProduct(this UpdateStoreProductRequest request,Guid id)
+    {   
+        throw new NotImplementedException();
+        // return new StoreProduct
+        // {   
+        // };
+    }
 }
