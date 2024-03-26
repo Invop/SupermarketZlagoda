@@ -1,8 +1,7 @@
 ﻿@page "/employee"
-@using SupermarketZlagoda.Data
-@inject UserState UserState
+@inject IDialogService DialogService
 <FluentToolbar id="toolbar-fluent-components">
-    <FluentButton Appearance="Appearance.Accent">Add new employee</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new employee</FluentButton>
     <FluentRadioGroup @bind-Value="_sortType">
         <FluentRadio Value="@(0)" Checked="true">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
@@ -27,7 +26,7 @@
     <PropertyColumn Property="@(c => c.ZipCode)"/>
     
     <TemplateColumn Title="Actions">
-        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))"/>
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
     </TemplateColumn>
 </FluentDataGrid>
