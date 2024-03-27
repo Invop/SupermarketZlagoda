@@ -23,7 +23,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.Employees.Get)]
-    public async Task<IActionResult> Get([FromRoute] string id)
+    public async Task<IActionResult> Get([FromRoute] Guid id)
     {
         var employee = await _employeeService.GetByIdAsync(id);
         if (employee == null)
@@ -43,7 +43,7 @@ public class EmployeeController : ControllerBase
 
 
     [HttpPut(ApiEndpoints.Employees.Update)]
-    public async Task<IActionResult> Update([FromRoute] string id,
+    public async Task<IActionResult> Update([FromRoute] Guid id,
         [FromBody] UpdateEmployeeRequest request)
     {
         var employee = request.MapToEmployee(id);
@@ -54,7 +54,7 @@ public class EmployeeController : ControllerBase
     
     
     [HttpDelete(ApiEndpoints.Employees.Delete)]
-    public async Task<IActionResult> Delete([FromRoute] string id)
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var deleted = await _employeeService.DeleteByIdAsync(id);
         if (!deleted) return NotFound();

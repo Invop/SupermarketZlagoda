@@ -17,7 +17,7 @@ public class EmployeeService : IEmployeeService
         return await _employeeRepository.CreateAsync(employee);
     }
 
-    public async Task<Employee?> GetByIdAsync(string id)
+    public async Task<Employee?> GetByIdAsync(Guid id)
     {
         return await _employeeRepository.GetByIdAsync(id);
     }
@@ -35,7 +35,7 @@ public class EmployeeService : IEmployeeService
         return employee;
     }
 
-    public async Task<bool> DeleteByIdAsync(string id)
+    public async Task<bool> DeleteByIdAsync(Guid id)
     {
         return await _employeeRepository.DeleteByIdAsync(id);
     }

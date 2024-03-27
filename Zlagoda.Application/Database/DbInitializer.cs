@@ -33,7 +33,7 @@ namespace Zlagoda.Application.Database;
                                                   CREATE TABLE Checks
                                                   (
                                                       check_number VARCHAR(10) PRIMARY KEY NOT NULL,
-                                                      id_employee VARCHAR(10) FOREIGN KEY REFERENCES Employees(id_employee) ON UPDATE CASCADE ON DELETE NO ACTION,
+                                                      id_employee UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Employees(id_employee) ON UPDATE CASCADE ON DELETE NO ACTION,
                                                       card_number VARCHAR(13) FOREIGN KEY REFERENCES Customer_Cards(card_number) ON UPDATE CASCADE ON DELETE NO ACTION,
                                                       print_date DATETIME NOT NULL,
                                                       sum_total DECIMAL(13,4) NOT NULL,
@@ -74,7 +74,7 @@ namespace Zlagoda.Application.Database;
                                                          IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='Employees')
                                                          CREATE TABLE Employees
                                                          (
-                                                             id_employee VARCHAR(10) PRIMARY KEY NOT NULL,
+                                                             id_employee UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
                                                              empl_surname VARCHAR(50) NOT NULL,
                                                              empl_name VARCHAR(50) NOT NULL,
                                                              empl_patronymic VARCHAR(50),

@@ -51,7 +51,7 @@ public static class ContractMapping
     {
         return new Employee
         {
-            Id = Employee.Increment(),
+            Id = Guid.NewGuid(),
             Surname = request.Surname,
             Name = request.Name,
             Patronymic = request.Patronymic,
@@ -93,7 +93,7 @@ public static class ContractMapping
         };
     }
 
-    public static Employee MapToEmployee(this UpdateEmployeeRequest request, string id)
+    public static Employee MapToEmployee(this UpdateEmployeeRequest request, Guid id)
     {
         return new Employee
         {   

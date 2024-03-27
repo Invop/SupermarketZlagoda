@@ -2,9 +2,7 @@
 
 public class Employee
 {
-    private static long _counter = 0;
-    public static string Increment() { return $"{_counter++}"; }
-    public required string Id { get; init; }
+    public required Guid Id { get; init; }
     public required string Surname { get; set; }
     public required string Name { get; set; }
     public string? Patronymic { get; set; }

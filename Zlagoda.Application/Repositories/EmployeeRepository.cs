@@ -40,7 +40,7 @@ public class EmployeeRepository : IEmployeeRepository
         return result > 0;
     }
 
-    public async Task<Employee?> GetByIdAsync(string id)
+    public async Task<Employee?> GetByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText = $"SELECT * FROM Employees WHERE id_employee = {id}";
@@ -50,7 +50,7 @@ public class EmployeeRepository : IEmployeeRepository
         {
             var employee = new Employee
             {
-                Id = reader.GetString(reader.GetOrdinal("id_employee")),
+                Id = reader.GetGuid(reader.GetOrdinal("id_employee")),
                 Surname = reader.GetString(reader.GetOrdinal("empl_surname")),
                 Name = reader.GetString(reader.GetOrdinal("empl_name")),
                 Role = reader.GetString(reader.GetOrdinal("empl_role")),
@@ -82,7 +82,7 @@ public class EmployeeRepository : IEmployeeRepository
         {
             var employee = new Employee
             {
-                Id = reader.GetString(reader.GetOrdinal("id_employee")),
+                Id = reader.GetGuid(reader.GetOrdinal("id_employee")),
                 Surname = reader.GetString(reader.GetOrdinal("empl_surname")),
                 Name = reader.GetString(reader.GetOrdinal("empl_name")),
                 Role = reader.GetString(reader.GetOrdinal("empl_role")),
@@ -126,7 +126,7 @@ public class EmployeeRepository : IEmployeeRepository
         return result > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(string id)
+    public async Task<bool> DeleteByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText = "DELETE FROM Employees WHERE id_employee = @Id";
@@ -136,7 +136,7 @@ public class EmployeeRepository : IEmployeeRepository
         return result > 0;
     }
 
-    public async Task<bool> ExistsByIdAsync(string id)
+    public async Task<bool> ExistsByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText = "SELECT COUNT(*) FROM Employees WHERE id_product = @Id";
