@@ -4,10 +4,11 @@ namespace Zlagoda.Application.Repositories;
 
 public interface IStoreProductRepository
 {
-    Task<bool> CreateAsync(Product product);
-    Task<Product?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Product>> GetAllAsync();
-    Task<bool> UpdateAsync(Product product);
-    Task<bool> DeleteByIdAsync(Guid id);
-    Task<bool> ExistsByIdAsync(Guid id);
+    Task<bool> CreateAsync(StoreProduct storeProduct);
+    Task<StoreProduct?> GetByUPCAsync(string upc);
+    Task<IEnumerable<StoreProduct>> GetAllAsync();
+    Task<bool> UpdatePromProductsAsync(string prevUpc, string newUpc);
+    Task<bool> UpdateAsync(StoreProduct product);
+    Task<bool> DeleteByUPCAsync(string upc);
+    Task<bool> ExistsByUPCAsync(string upc);
 }

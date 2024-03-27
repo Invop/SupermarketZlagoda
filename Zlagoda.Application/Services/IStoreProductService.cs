@@ -4,9 +4,9 @@ namespace Zlagoda.Application.Services;
 
 public interface IStoreProductService
 {
-    Task<bool> CreateAsync(Product product);
-    Task<Product?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Product>> GetAllAsync();
-    Task<Product?> UpdateAsync(Product product);
-    Task<bool> DeleteByIdAsync(Guid id);
+    Task<bool> CreateAsync(StoreProduct storeProduct);
+    Task<StoreProduct?> GetByUPCAsync(string upc);
+    Task<IEnumerable<StoreProduct>> GetAllAsync();
+    Task<StoreProduct?> UpdateAsync(StoreProduct product,string prevUpc);
+    Task<bool> DeleteByUPCAsync(string upc);
 }

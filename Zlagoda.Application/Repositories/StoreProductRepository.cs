@@ -7,39 +7,132 @@ namespace Zlagoda.Application.Repositories;
 public class StoreProductRepository : IStoreProductRepository
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
-
-    public StoreProductRepository(IDbConnectionFactory dbConnectionFactory)
+    private readonly IProductRepository _productRepository;
+    public StoreProductRepository(IDbConnectionFactory dbConnectionFactory, IProductRepository productRepository)
     {
         _dbConnectionFactory = dbConnectionFactory;
+        _productRepository = productRepository;
     }
 
-    public async Task<bool> CreateAsync(Product product)
+    private async Task<bool> IsProductExists(StoreProduct storeProduct)
+    {
+        var productExists = await _productRepository.ExistsByIdAsync(storeProduct.ProductId);
+        return productExists;
+    }
+    public async Task<bool> CreateAsync(StoreProduct storeProduct)
+    {
+        var isProductExist = await IsProductExists(storeProduct);
+        if (!isProductExist)
+            return false;
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        using var command = new SqlCommand(
+            "INSERT INTO Store_Products (UPC, UPC_prom, id_product, selling_price, products_number, promotional_product) " +
+            "VALUES (@UPC, @UPC_prom, @id_product, @selling_price, @products_number, @Promotional_Product)",
+            connection);
+        command.Parameters.AddWithValue("@UPC", storeProduct.Upc);
+        if(string.IsNullOrEmpty(storeProduct.UpcProm))
+            command.Parameters.AddWithValue("@UPC_prom", DBNull.Value);
+        else
+            command.Parameters.AddWithValue("@UPC_prom", storeProduct.UpcProm);
+        command.Parameters.AddWithValue("@id_product", storeProduct.ProductId);
+        command.Parameters.AddWithValue("@selling_price", storeProduct.Price);
+        command.Parameters.AddWithValue("@products_number", storeProduct.Quantity);
+        command.Parameters.AddWithValue("@promotional_product", storeProduct.IsPromotional);
+        var result = await command.ExecuteNonQueryAsync();
+        return result > 0;
+    }
+
+    public async Task<StoreProduct?> GetByUPCAsync(string upc)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = "SELECT * FROM Store_Products WHERE UPC = @Upc";
+        using var command = new SqlCommand(commandText, connection);
+        command.Parameters.AddWithValue("@Upc", upc);
+        using var reader = await command.ExecuteReaderAsync();
+        if (await reader.ReadAsync())
+        {
+            var storeProduct = new StoreProduct
+            {
+                Upc = reader.GetString(reader.GetOrdinal("UPC")),
+                UpcProm = reader.GetString(reader.GetOrdinal("UPC_prom")),
+                ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
+                Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
+                Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
+                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
+            };
+            return storeProduct;
+        }
+        return null;
+    }
+
+    public async Task<IEnumerable<StoreProduct>> GetAllAsync()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = "SELECT * FROM Store_Products";
+        using var command = new SqlCommand(commandText, connection);
+        using var reader = await command.ExecuteReaderAsync();
+        var storeProducts = new List<StoreProduct>();
+        while (await reader.ReadAsync())
+        {
+            var storeProduct = new StoreProduct
+            {
+                Upc = reader.GetString(reader.GetOrdinal("UPC")),
+                UpcProm = reader.GetString(reader.GetOrdinal("UPC_prom")),
+                ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
+                Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
+                Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
+                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
+            };
+            storeProducts.Add(storeProduct);
+        }
+        return storeProducts;
+    }
+
+    public async Task<bool> UpdatePromProductsAsync(string prevUpc,string newUpc)
+    {   
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        const string queryString = "UPDATE Store_Products SET UPC_prom = @newUpc WHERE UPC_prom = @prevUpc;";
+        using var command = new SqlCommand(queryString, connection);
+        command.Parameters.AddWithValue("@newUpc", newUpc);
+        command.Parameters.AddWithValue("@prevUpc", prevUpc);
+        var result = await command.ExecuteNonQueryAsync();
+
+        return result > 0;
+    }
+
+    public async Task<bool> UpdateAsync(StoreProduct product)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        const string queryString =
+            "UPDATE Store_Products SET UPC = @UPC, UPC_prom = @UPC_prom, id_product = @id_product, selling_price = @selling_price, products_number = @products_number, promotional_product = @promotional_product WHERE UPC = @UPC";
+        using var command = new SqlCommand(queryString, connection);
+        command.Parameters.AddWithValue("@UPC", product.Upc);
+        if (string.IsNullOrEmpty(product.UpcProm))
+            command.Parameters.AddWithValue("@UPC_prom", DBNull.Value);
+        else
+            command.Parameters.AddWithValue("@UPC_prom", product.UpcProm);
+        command.Parameters.AddWithValue("@id_product", product.ProductId);
+        command.Parameters.AddWithValue("@selling_price", product.Price);
+        command.Parameters.AddWithValue("@products_number", product.Quantity);
+        command.Parameters.AddWithValue("@promotional_product", product.IsPromotional);
+        var result = await command.ExecuteNonQueryAsync();
+        return result > 0;
+    }
+
+    public async Task<bool> DeleteByUPCAsync(string upc)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Product?> GetByIdAsync(Guid id)
+    public async Task<bool> ExistsByUPCAsync(string upc)
     {
-        throw new NotImplementedException();
-    }
-
-    public async Task<IEnumerable<Product>> GetAllAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<bool> UpdateAsync(Product product)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<bool> DeleteByIdAsync(Guid id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<bool> ExistsByIdAsync(Guid id)
-    {
-        throw new NotImplementedException();
+        
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        const string queryString = "SELECT COUNT(*) FROM Store_Products WHERE UPC = @Upc";
+        using var command = new SqlCommand(queryString, connection);
+        command.Parameters.AddWithValue("@Upc", upc);
+        var result = await command.ExecuteScalarAsync();
+        return (int)result > 0;
+        
     }
 }

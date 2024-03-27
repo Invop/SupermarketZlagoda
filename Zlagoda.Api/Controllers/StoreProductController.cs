@@ -17,53 +17,53 @@ public class StoreProductController : ControllerBase
     }
     
     [HttpPost(ApiEndpoints.StoreProducts.Create)]
-    public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateStoreProductRequest request)
     {
-        var product = request.MapToProduct();
+        var product = request.MapToStoreProduct();
         await _productService.CreateAsync(product);
-        return CreatedAtAction(nameof(Get), new { id = product.Id }, product);
+        return CreatedAtAction(nameof(Get), new { upc = product.Upc }, product);
     }
 
     [HttpGet(ApiEndpoints.StoreProducts.Get)]
-    public async Task<IActionResult> Get([FromRoute] Guid id)
+    public async Task<IActionResult> Get([FromRoute] string upc)
     {
-        var product = await _productService.GetByIdAsync(id);
+        var product = await _productService.GetByUPCAsync(upc);
         if (product == null)
         {
             return NotFound();
         }
-        return Ok(product.MapToResponse());
+        return Ok(product.MapToStoreProductResponse());
     }
     
     [HttpGet(ApiEndpoints.StoreProducts.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         var products = await _productService.GetAllAsync();
-        var productsResponse = products.MapToResponse();
+        var productsResponse = products.MapToStoreProductResponse();
         return Ok(productsResponse);
     }
 
 
     [HttpPut(ApiEndpoints.StoreProducts.Update)]
-    public async Task<IActionResult> Update([FromRoute] Guid id,
-        [FromBody] UpdateProductRequest request)
+    public async Task<IActionResult> Update([FromRoute] string prevUpc,
+        [FromBody] UpdateStoreProductRequest request)
     {
-        var product = request.MapToProduct(id);
-        var updatedProduct = await _productService.UpdateAsync(product);
+        var product = request.MapToStoreProduct();
+        var updatedProduct = await _productService.UpdateAsync(product,prevUpc);
         if (updatedProduct is null)
         {
             return NotFound();
         }
 
-        var response = product.MapToResponse();
+        var response = product.MapToStoreProductResponse();
         return Ok(response);
     }
     
     
     [HttpDelete(ApiEndpoints.StoreProducts.Delete)]
-    public async Task<IActionResult> Delete([FromRoute] Guid id)
+    public async Task<IActionResult> Delete([FromRoute] string upc)
     {
-        var deleted = await _productService.DeleteByIdAsync(id);
+        var deleted = await _productService.DeleteByUPCAsync(upc);
         if (!deleted)
         {
             return NotFound();

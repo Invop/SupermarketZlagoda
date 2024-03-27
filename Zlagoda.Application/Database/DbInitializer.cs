@@ -12,10 +12,11 @@ namespace Zlagoda.Application.Database;
     public async Task InitializeAsync()
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        //dropDatabase(connection);
         await CreateTablesIfNotExists(connection);
     }
     private async Task CreateTablesIfNotExists(SqlConnection connection)
-    {
+    {   
         await CreateCategoryTableIfNotExists(connection);
         await CreateProductTableIfNotExists(connection);
         await CreateStoreProductTableIfNotExists(connection);
@@ -25,6 +26,14 @@ namespace Zlagoda.Application.Database;
         await CreateSaleTableIfNotExists(connection);
     }
 
+    private async Task dropDatabase(SqlConnection connection)
+    {
+        string databaseName = "zlagoda";
+        string dropDatabaseQuery = $"DROP DATABASE [{databaseName}]";
+        
+        await ExecuteNonQueryAsync(connection, dropDatabaseQuery);
+    }
+    
     private async Task CreateCheckTableIfNotExists(SqlConnection connection)
     {
         const string checksTableCreateQuery = """
@@ -110,24 +119,24 @@ namespace Zlagoda.Application.Database;
     }
     
     //must be updated by yourself UPC_prom On update NO ACTION ON DELETE NO ACTION
+    //OnUpdateCascade
+    //On delete set NUll
     private async Task CreateStoreProductTableIfNotExists(SqlConnection connection)
     {
         const string storeProductsTableCreateQuery = """
-                                                     
-                                                         IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='Store_Products')
-                                                         CREATE TABLE Store_Products
-                                                         (
-                                                             UPC VARCHAR(12) PRIMARY KEY NOT NULL,
-                                                             UPC_prom VARCHAR(12) FOREIGN KEY REFERENCES Store_Products(UPC) ON UPDATE NO ACTION ON DELETE NO ACTION,
-                                                             id_product UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Products(id_product) ON UPDATE CASCADE ON DELETE NO ACTION,
-                                                             selling_price DECIMAL(13,4) NOT NULL,
-                                                             products_number INT NOT NULL,
-                                                             promotional_product BIT NOT NULL
-                                                         )
+                                                     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='Store_Products')
+                                                     CREATE TABLE Store_Products
+                                                     (
+                                                         UPC VARCHAR(12) PRIMARY KEY NOT NULL,
+                                                         UPC_prom VARCHAR(12),
+                                                         id_product UNIQUEIDENTIFIER NOT NULL FOREIGN KEY REFERENCES Products(id_product) ON UPDATE CASCADE ON DELETE NO ACTION,
+                                                         selling_price DECIMAL(13,4) NOT NULL,
+                                                         products_number INT NOT NULL,
+                                                         promotional_product BIT NOT NULL
+                                                     )
                                                      """;
         await ExecuteNonQueryAsync(connection, storeProductsTableCreateQuery);
     }
-
     private async Task CreateCategoryTableIfNotExists(SqlConnection connection)
     {
         const string categoriesTableCreateQuery = """

@@ -17,7 +17,7 @@ public static class ContractMapping
         };
     }
 
-    public static ProductResponse MapToResponse(this Product movie)
+    public static ProductResponse MapToProductResponse(this Product movie)
     {
         return new ProductResponse()
         {
@@ -28,11 +28,11 @@ public static class ContractMapping
         };
     }
     
-    public static ProductsResponse MapToResponse(this IEnumerable<Product> movies)
+    public static ProductsResponse MapToProductResponse(this IEnumerable<Product> movies)
     {
         return new ProductsResponse
         {
-            Items = movies.Select(MapToResponse)
+            Items = movies.Select(MapToProductResponse)
         };
     }
 
@@ -48,36 +48,50 @@ public static class ContractMapping
     }
     
     
-    public static StoreProduct MapToProduct(this CreateStoreProductRequest request)
+    public static StoreProduct MapToStoreProduct(this CreateStoreProductRequest request)
     {
-        throw new NotImplementedException();
-        // return new StoreProduct
-        // {
-        // };
+        return new StoreProduct
+        {
+            Upc = request.Upc,
+            UpcProm = request.UpcProm,
+            ProductId = request.ProductId,
+            Price = request.Price,
+            Quantity = request.Quantity,
+            IsPromotional = request.IsPromotional
+        };
     }
 
-    public static StoreProductResponse MapToResponse(this StoreProduct movie)
+    public static StoreProductResponse MapToStoreProductResponse(this StoreProduct request)
     {
-        throw new NotImplementedException();
-        // return new StoreProductResponse()
-        // {
-        // };
+        return new StoreProductResponse
+        {
+            Upc = request.Upc,
+            UpcProm = request.UpcProm,
+            ProductId = request.ProductId,
+            Price = request.Price,
+            Quantity = request.Quantity,
+            IsPromotional = request.IsPromotional
+        };
     }
     
-    public static StoreProductsResponse MapToResponse(this IEnumerable<StoreProduct> movies)
+    public static StoreProductsResponse MapToStoreProductResponse(this IEnumerable<StoreProduct> storeProducts)
     {   
-        throw new NotImplementedException();
-        // return new StoreProductsResponse
-        // {
-        //     Items = movies.Select(MapToResponse)
-        // };
+        return new StoreProductsResponse
+        {
+            Items = storeProducts.Select(MapToStoreProductResponse)
+        };
     }
 
-    public static StoreProduct MapToProduct(this UpdateStoreProductRequest request,Guid id)
+    public static StoreProduct MapToStoreProduct(this UpdateStoreProductRequest request)
     {   
-        throw new NotImplementedException();
-        // return new StoreProduct
-        // {   
-        // };
+        return new StoreProduct
+        {
+            Upc = request.Upc,
+            UpcProm = request.UpcProm,
+            ProductId = request.ProductId,
+            Price =request.Price,
+            Quantity = request.Quantity,
+            IsPromotional = request.IsPromotional
+        };
     }
 }

@@ -5,41 +5,40 @@ namespace Zlagoda.Application.Services;
 
 public class StoreProductService : IStoreProductService
 {
-    private readonly IProductRepository _productRepository;
+    private readonly IStoreProductRepository _storeProductRepository;
 
-    public StoreProductService(IProductRepository productRepository)
+    public StoreProductService(IStoreProductRepository storeProductRepository)
     {
-        _productRepository = productRepository;
-    }
-    
-    public async Task<bool> CreateAsync(Product product)
-    {
-        return await _productRepository.CreateAsync(product);
+        _storeProductRepository = storeProductRepository;
     }
 
-    public async Task<Product?> GetByIdAsync(Guid id)
+    public async Task<bool> CreateAsync(StoreProduct storeProduct)
     {
-        return await _productRepository.GetByIdAsync(id);
+       return await _storeProductRepository.CreateAsync(storeProduct);
     }
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<StoreProduct?> GetByUPCAsync(string upc)
     {
-        return await _productRepository.GetAllAsync();
+        throw new NotImplementedException();
     }
 
-    public async Task<Product?> UpdateAsync(Product product)
+    public async Task<IEnumerable<StoreProduct>> GetAllAsync()
     {
-        var productExists = await _productRepository.ExistsByIdAsync(product.Id);
-        if (!productExists)
-        {
+       return await _storeProductRepository.GetAllAsync();
+    }
+
+    public async Task<StoreProduct?> UpdateAsync(StoreProduct product,string prevUpc)
+    {
+        var storeProductExists = await _storeProductRepository.ExistsByUPCAsync(prevUpc);
+        if (!storeProductExists) 
             return null;
-        }
-        await _productRepository.UpdateAsync(product);
-        return product;
+        await _storeProductRepository.UpdateAsync(product);
+        var isCascadeUpdateDone = await _storeProductRepository.UpdatePromProductsAsync(prevUpc, product.Upc);
+        return !isCascadeUpdateDone ? null : product;
     }
 
-    public async Task<bool> DeleteByIdAsync(Guid id)
+    public async Task<bool> DeleteByUPCAsync(string upc)
     {
-        return await _productRepository.DeleteByIdAsync(id);
+        throw new NotImplementedException();
     }
 }

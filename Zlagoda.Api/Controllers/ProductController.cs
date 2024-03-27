@@ -32,14 +32,14 @@ public class ProductController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(product.MapToResponse());
+        return Ok(product.MapToProductResponse());
     }
     
     [HttpGet(ApiEndpoints.Products.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         var products = await _productService.GetAllAsync();
-        var productsResponse = products.MapToResponse();
+        var productsResponse = products.MapToProductResponse();
         return Ok(productsResponse);
     }
 
@@ -55,7 +55,7 @@ public class ProductController : ControllerBase
             return NotFound();
         }
 
-        var response = product.MapToResponse();
+        var response = product.MapToProductResponse();
         return Ok(response);
     }
     
