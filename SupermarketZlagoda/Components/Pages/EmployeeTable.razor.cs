@@ -25,8 +25,8 @@ public partial class EmployeeTable
     {
         var context = new Employee()
         {
-            EmployeeSurname = "",
-            EmployeeName = "",
+            Surname = "",
+            Name = "",
             Role = "",
             Salary = 0,
             DateOfBirth = DateOnly.FromDateTime(DateTime.Today),
@@ -90,7 +90,7 @@ public partial class EmployeeTable
         var dialog = await DialogService.ShowDialogAsync<CreateEditEmployeeDialog>(context, new DialogParameters()
         {
             Height = "1020px",
-            Title = $"Updating {context.EmployeeSurname} {context.EmployeeName} {context.EmployeePatronymic}",
+            Title = $"Updating {context.Surname} {context.Name} {context.Patronymic}",
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
         });
@@ -115,7 +115,7 @@ public partial class EmployeeTable
         var content = new StringContent(productJson, Encoding.UTF8, "application/json");
 
         var response
-            = await client.PutAsync($"https://localhost:5001/api/employees/{employee.IdEmployee}", content);
+            = await client.PutAsync($"https://localhost:5001/api/employees/{employee.Id}", content);
 
         Console.WriteLine(response.IsSuccessStatusCode
             ? "Employee successfully updated."
@@ -130,7 +130,7 @@ public partial class EmployeeTable
             {
                 Title = "Warning",
                 MarkupMessage = new MarkupString(@$"Are you sure you want to delete
-{context.EmployeeSurname} {context.EmployeeName} {context.EmployeePatronymic}?"),
+{context.Surname} {context.Name} {context.Patronymic}?"),
                 Icon = new Icons.Regular.Size24.Warning(),
                 IconColor = Color.Error,
             },
@@ -142,12 +142,12 @@ public partial class EmployeeTable
         var canceled = result.Cancelled;
         if (!canceled)
         {
-            await DeleteEmployeeAsync(context.IdEmployee);
+            await DeleteEmployeeAsync(context.Id);
             await UpdateTable();
         }
     }
     
-    private async Task DeleteEmployeeAsync(string id)
+    private async Task DeleteEmployeeAsync(Guid id)
     {
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Accept.Clear();

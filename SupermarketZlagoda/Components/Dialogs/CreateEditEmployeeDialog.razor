@@ -19,11 +19,11 @@
 
 @* Body *@
 <FluentDialogBody>
-    <FluentTextField @bind-Value="@Content.EmployeeSurname">Surname:</FluentTextField>
+    <FluentTextField @bind-Value="@Content.Surname">Surname:</FluentTextField>
     <br/><br/>
-    <FluentTextField @bind-Value="@Content.EmployeeName">Name:</FluentTextField>
+    <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
     <br/><br/>
-    <FluentTextField @bind-Value="@Content.EmployeePatronymic">Patronymic:</FluentTextField>
+    <FluentTextField @bind-Value="@Content.Patronymic">Patronymic:</FluentTextField>
     <br/><br/>
     <FluentSelect Items="@StringOptions"
                OptionText="@(i => i.Text)"
