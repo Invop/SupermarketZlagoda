@@ -1,0 +1,61 @@
+﻿@using SupermarketZlagoda.Data.Model
+@using SupermarketZlagoda.Data
+@using SupermarketZlagoda.Components.Pages
+@implements IDialogContentComponent<CustomerCard>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.CustomerSurname">Surname:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.CustomerName">Name:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.CustomerPatronymic">Patronymic:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.CustomerPhone">Phone:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.CustomerCity">City:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.CustomerStreet">Street:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.CustomerIndex">Index:</FluentTextField>
+    <br/><br/>
+    <FluentNumberField style="width: 100%;" @bind-Value="@Content.CustomerPercentage">Percentage:</FluentNumberField>
+    @* <FluentTextArea  style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea > *@
+</FluentDialogBody>
+
+@code {
+    
+    string? stringValue;
+    [Parameter]
+    public CustomerCard Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+    
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+    
+}
