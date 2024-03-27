@@ -106,13 +106,14 @@ public class EmployeeRepository : IEmployeeRepository
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText =
             @"UPDATE Employees
-              SET empl_surname = @Surname, empl_name = @Name, empl_role = @Role,
+              SET empl_surname = @Surname, empl_name = @Name, empl_patronymic = @Patronymic, empl_role = @Role,
                   salary = @Salary, date_of_birth = @DateOfBirth, date_of_start = @DateOfStart,
                   phone_number = @PhoneNumber, city = @City, street = @Street, zip_code = @Code
               WHERE id_employee = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Surname", em.Surname);
         command.Parameters.AddWithValue("@Name", em.Name);
+        command.Parameters.AddWithValue("@Patronymic", em.Patronymic);
         command.Parameters.AddWithValue("@Role", em.Role);
         command.Parameters.AddWithValue("@Salary", em.Salary);
         command.Parameters.AddWithValue("@DateOfBirth", em.DateOfBirth);
@@ -139,7 +140,7 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<bool> ExistsByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT COUNT(*) FROM Employees WHERE id_product = @Id";
+        var commandText = "SELECT COUNT(*) FROM Employees WHERE id_employee = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", id);
         var result = await command.ExecuteScalarAsync();
