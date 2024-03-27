@@ -1,0 +1,81 @@
+﻿@using SupermarketZlagoda.Data.Model
+@implements IDialogContentComponent<Employee>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentTextField @bind-Value="@Content.EmployeeSurname">Surname:</FluentTextField>
+    <br/><br/>
+    <FluentTextField @bind-Value="@Content.EmployeeName">Name:</FluentTextField>
+    <br/><br/>
+    <FluentTextField @bind-Value="@Content.EmployeePatronymic">Patronymic:</FluentTextField>
+    <br/><br/>
+    <FluentSelect Items="@StringOptions"
+               OptionText="@(i => i.Text)"
+               OptionValue="@(i => i.Value)"
+               OptionSelected="@(i => i.Selected)"
+               @bind-Value="@Content.Role" 
+               Label="Role:"/>
+    <br/><br/>
+    <FluentNumberField @bind-Value="@Content.Salary">Salary:</FluentNumberField>
+    <br/><br/>
+    <FluentDatePicker Value="@Content.DateOfStart.ToDateTime(TimeOnly.MinValue)"
+                          ValueChanged="@(e => Content.DateOfStart = DateOnly.FromDateTime((DateTime)e))"
+                          Label="Date of start"/>
+    <br/><br/>
+    <FluentDatePicker Value="@Content.DateOfBirth.ToDateTime(TimeOnly.MinValue)"
+                      ValueChanged="@(e => Content.DateOfBirth = DateOnly.FromDateTime((DateTime)e))"
+                      Label="Date of birth"/>
+    <br/><br/>
+    <FluentTextField @bind-Value="@Content.PhoneNumber">Phone number:</FluentTextField>
+    <br/><br/>
+    <FluentTextField @bind-Value="@Content.City">City:</FluentTextField>
+    <br/><br/>
+    <FluentTextField @bind-Value="@Content.Street">Street:</FluentTextField>
+    <br/><br/>
+    <FluentTextField @bind-Value="@Content.ZipCode">Zip code:</FluentTextField>
+    <style>
+        .fluent-dialog-body * {
+            width: 100%;
+        }
+    </style>
+</FluentDialogBody>
+
+@code {
+    [Parameter]
+    public Employee Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    static readonly List<Option<string>> StringOptions =
+    [
+        new Option<string> { Value = "Manager", Text = "Manager" },
+        new Option<string> { Value = "Cashier", Text = "Cashier", Selected = true }
+    ];
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+
+}
