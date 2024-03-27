@@ -33,7 +33,7 @@ public class EmployeeController : ControllerBase
         return Ok(employee.MapToResponse());
     }
     
-    [HttpGet(ApiEndpoints.Products.GetAll)]
+    [HttpGet(ApiEndpoints.Employees.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         var employees = await _employeeService.GetAllAsync();
@@ -42,7 +42,7 @@ public class EmployeeController : ControllerBase
     }
 
 
-    [HttpPut(ApiEndpoints.Products.Update)]
+    [HttpPut(ApiEndpoints.Employees.Update)]
     public async Task<IActionResult> Update([FromRoute] string id,
         [FromBody] UpdateEmployeeRequest request)
     {
@@ -53,7 +53,7 @@ public class EmployeeController : ControllerBase
     }
     
     
-    [HttpDelete(ApiEndpoints.Products.Delete)]
+    [HttpDelete(ApiEndpoints.Employees.Delete)]
     public async Task<IActionResult> Delete([FromRoute] string id)
     {
         var deleted = await _employeeService.DeleteByIdAsync(id);

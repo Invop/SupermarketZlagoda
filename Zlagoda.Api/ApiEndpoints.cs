@@ -17,9 +17,9 @@ public class ApiEndpoints
     {
         private const string Base = $"{ApiBase}/employees";
         public const string Create = Base;
-        public const string Get = $"{Base}/{{id:string}}";
+        public const string Get = $"{Base}/{{id}}";
         public const string GetAll = Base;
-        public const string Update = $"{Base}/{{id:string}}";
-        public const string Delete = $"{Base}/{{id:string}}";
+        public const string Update = $"{Base}/{{id}}";
+        public const string Delete = $"{Base}/{{id}}";
     }
 }

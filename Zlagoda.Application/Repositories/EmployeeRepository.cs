@@ -15,14 +15,27 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<bool> CreateAsync(Employee em)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var empl_patronymic = em.Patronymic is null ? "" : ", empl_patronymic";
-        var patronymic = em.Patronymic is null ? "" : $", '{em.Patronymic}'";
         var commandText =
-            $@"INSERT INTO Employees (id_employee, empl_surname, empl_name{empl_patronymic}, empl_role,
+            $@"INSERT INTO Employees (id_employee, empl_surname, empl_name, empl_patronymic, empl_role,
                        salary, date_of_birth, date_of_start, phone_number, city, street, zip_code)
-             VALUES ({em.Id}, '{em.Name}', '{em.Surname}'{patronymic}, '{em.Role}', {em.Salary}, '{em.DateOfBirth}',
-                     '{em.DateOfStart}', '{em.PhoneNumber}', '{em.City}', '{em.Street}', '{em.ZipCode}')";
+             VALUES (@Id, @Name, @Surname, @Patronymic, @Role, @Salary, @DateOfBirth,
+                     @DateOfStart, @PhoneNumber, @City, @Street, @ZipCode)";
         using var command = new SqlCommand(commandText, connection);
+        command.Parameters.AddWithValue("@Id", em.Id);
+        command.Parameters.AddWithValue("@Surname", em.Surname);
+        command.Parameters.AddWithValue("@Name", em.Name);
+        if(string.IsNullOrEmpty(em.Patronymic))
+            command.Parameters.AddWithValue("@Patronymic", DBNull.Value);
+        else
+            command.Parameters.AddWithValue("@Patronymic", em.Patronymic);
+        command.Parameters.AddWithValue("@Role", em.Role);
+        command.Parameters.AddWithValue("@Salary", em.Salary);
+        command.Parameters.AddWithValue("@DateOfBirth", em.DateOfBirth);
+        command.Parameters.AddWithValue("@DateOfStart", em.DateOfStart);
+        command.Parameters.AddWithValue("@PhoneNumber", em.PhoneNumber);
+        command.Parameters.AddWithValue("@City", em.City);
+        command.Parameters.AddWithValue("@Street", em.Street);
+        command.Parameters.AddWithValue("@ZipCode", em.ZipCode);
         var result = await command.ExecuteNonQueryAsync();
         return result > 0;
     }

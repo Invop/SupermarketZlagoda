@@ -3,7 +3,7 @@ using Zlagoda.Application.Repositories;
 
 namespace Zlagoda.Application.Services;
 
-public class EmployeeService //: IEmployeeService
+public class EmployeeService : IEmployeeService
 {
     private readonly IEmployeeRepository _employeeRepository;
 
