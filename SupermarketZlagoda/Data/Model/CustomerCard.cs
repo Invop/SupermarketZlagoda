@@ -1,4 +1,16 @@
 ﻿namespace SupermarketZlagoda.Data.Model;
 
-public record CustomerCard(string IdCardCustomer, string CustomerSurname, string CustomerName, string CustomerPatronymic, 
-string CustomerPhone, string CustomerCity, string CustomerStreet, string CustomerIndex, int CustomerPercentage);
+public record CustomerCard()
+    {
+        
+    public Guid Id { get; init; }
+    public string Surname { get; set; }
+    public string Name { get; set; }
+    public string? Patronymic { get; set; }
+    public string Phone { get; set; }
+    public string? City { get; set; }
+    public string? Street { get; set; }
+    public string? Index { get; set; }
+    public int Percentage { get; set; }
+    
+}

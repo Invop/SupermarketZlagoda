@@ -1,8 +1,7 @@
-﻿@page "/employee"
-@using SupermarketZlagoda.Data
-@inject UserState UserState
+﻿@page "/employees"
+@inject IDialogService DialogService
 <FluentToolbar id="toolbar-fluent-components">
-    <FluentButton Appearance="Appearance.Accent">Add new employee</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new employee</FluentButton>
     <FluentRadioGroup @bind-Value="_sortType">
         <FluentRadio Value="@(0)" Checked="true">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
@@ -10,13 +9,13 @@
     <FluentCheckbox @bind-Value="@_cashiersOnly">Cashiers only</FluentCheckbox>
     <FluentTextField @bind-Value="_surnameSearchTerm" Placeholder="Search by surname"></FluentTextField>
 </FluentToolbar>
-<FluentDataGrid ResizableColumns="true" Items="@_items" ItemSize="54" Pagination="@_pagination"
+<FluentDataGrid ResizableColumns="true" Items="@_items" ItemSize="54" Pagination="@_pagination" Virtualize="true"
                 GridTemplateColumns="1.4fr 1.9fr 1.7fr 2fr 0.9fr 1fr 1.4fr 1.4fr 1.6fr 0.8fr 1fr 1.2fr 1.3fr"
                 Style="height: 600px; width: 1500px; overflow:auto; ">
-    <PropertyColumn Property="@(c => c.IdEmployee)"/>
-    <PropertyColumn Property="@(c => c.EmployeeSurname)"/>
-    <PropertyColumn Property="@(c => c.EmployeeName)"/>
-    <PropertyColumn Property="@(c => c.EmployeePatronymic)"/>
+    <PropertyColumn Property="@(c => c.Id)"/>
+    <PropertyColumn Property="@(c => c.Surname)"/>
+    <PropertyColumn Property="@(c => c.Name)"/>
+    <PropertyColumn Property="@(c => c.Patronymic)"/>
     <PropertyColumn Property="@(c => c.Role)"/>
     <PropertyColumn Property="@(c => c.Salary)"/>
     <PropertyColumn Property="@(c => c.DateOfStart)"/>
@@ -27,8 +26,8 @@
     <PropertyColumn Property="@(c => c.ZipCode)"/>
     
     <TemplateColumn Title="Actions">
-        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))"/>
-        <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialogAsync(context))"/>
     </TemplateColumn>
 </FluentDataGrid>
 <FluentPaginator State="@_pagination">

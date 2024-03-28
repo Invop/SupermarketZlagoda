@@ -24,41 +24,82 @@ Content-Type: application/json
   "CategoryId": 1,
   "Characteristics": "Char 0"
 }
-
-
 ###
-POST https://localhost:5001/api/store-products
+GET https://localhost:5001/api/customer-card/{GUID}
+Accept: application/json
+###
+GET https://localhost:5001/api/customer-card
+Accept: application/json
+###
+PUT https://localhost:5001/api/customer-card/{GUID}
 Content-Type: application/json
 
 {
-  "Upc": "123456789012",
-  "UpcProm": null,
-  "ProductId": "0ce7436c-aa16-4eea-8b23-01fdf1744f2e",
-  "Price": 9.99,
-  "Quantity": 100,
-  "IsPromotional": false
+  "Surname": "surname",
+  "Name": "name",
+  "Patronymic": null,
+  "Phone": "+380000000000",
+  "City": null,
+  "Street": null,
+  "Index": null,
+  "Percentage": 0
 }
 ###
-POST https://localhost:5001/api/store-products
+DELETE https://localhost:5001/api/customer-card/{GUID}
+Accept: application/json
+###
+POST https://localhost:5001/api/customer-card
 Content-Type: application/json
 
 {
-  "Upc": "123456789022",
-  "UpcProm": "123456789012",
-  "ProductId": "0ce7436c-aa16-4eea-8b23-01fdf1744f2e",
-  "Price": 5.99,
-  "Quantity": 100,
-  "IsPromotional": true
+  "Surname": "surname",
+  "Name": "name",
+  "Patronymic": null,
+  "Phone": "+380000000000",
+  "City": null,
+  "Street": null,
+  "Index": null,
+  "Percentage": 0
+}###
+GET https://localhost:5001/api/employees/{GUID}
+Accept: application/json
+###
+GET https://localhost:5001/api/employees
+Accept: application/json
+###
+PUT https://localhost:5001/api/employees/{GUID}
+Content-Type: application/json
+
+{
+  "Surname": "Surname",
+  "Name": "Name",
+  "Patronymic": null,
+  "Role": "Role",
+  "Salary": 0,
+  "DateOfBirth": "",
+  "DateOfStart": "",
+  "PhoneNumber": "+380000000000",
+  "City": "City",
+  "Street": "Street",
+  "ZipCode": "ZipCode"
 }
 ###
-PUT https://localhost:5001/api/store-products/123456789012
+DELETE https://localhost:5001/api/employees/{GUID}
+Accept: application/json
+###
+POST https://localhost:5001/api/employees
 Content-Type: application/json
 
 {
-  "Upc": "123456789014",
-  "UpcProm": null,
-  "ProductId": "0ce7436c-aa16-4eea-8b23-01fdf1744f2e",
-  "Price": 12.99,
-  "Quantity": 120,
-  "IsPromotional": false
+  "Surname": "Surname",
+  "Name": "Name",
+  "Patronymic": null,
+  "Role": "Role",
+  "Salary": 0,
+  "DateOfBirth": "",
+  "DateOfStart": "",
+  "PhoneNumber": "+380000000000",
+  "City": "City",
+  "Street": "Street",
+  "ZipCode": "ZipCode"
 }

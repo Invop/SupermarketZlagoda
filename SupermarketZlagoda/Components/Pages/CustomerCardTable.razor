@@ -1,10 +1,12 @@
 ﻿@page "/customer-card"
 @using SupermarketZlagoda.Data
 @inject UserState UserState
+@inject IDialogService DialogService
+
 <FluentToolbar id="toolbar-fluent-components">
     @if (IsManager)
     {
-        <FluentButton Appearance="Appearance.Accent">Add new card customer</FluentButton>
+        <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new card customer</FluentButton>
     }
     <FluentRadioGroup @bind-Value="_sortType">
         <FluentRadio Value="@(0)" Checked="true">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
@@ -23,22 +25,22 @@
     }
     <FluentTextField @bind-Value="_surnameSearchTerm" Placeholder="Search by surname"></FluentTextField>
 </FluentToolbar>
-<FluentDataGrid Items="@_items" ResizableColumns="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1.1fr 1fr 1.2fr 1fr 1.2fr 0.9fr 1fr 1fr 0.6fr"
+<FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1.1fr 1fr 1.2fr 1fr 1.2fr 0.9fr 1fr 1fr 0.6fr"
                 Style="height: 600px; width: 1500px; overflow:auto;">
-    <PropertyColumn Property="@(c => c.IdCardCustomer)"/>
-    <PropertyColumn Property="@(c => c.CustomerSurname)"/>
-    <PropertyColumn Property="@(c => c.CustomerName)"/>
-    <PropertyColumn Property="@(c => c.CustomerPatronymic)"/>
-    <PropertyColumn Property="@(c => c.CustomerPhone)"/>
-    <PropertyColumn Property="@(c => c.CustomerPercentage)"/>
-    <PropertyColumn Property="@(c => c.CustomerCity)"/>
-    <PropertyColumn Property="@(c => c.CustomerStreet)"/>
-    <PropertyColumn Property="@(c => c.CustomerIndex)"/>
+    <PropertyColumn Property="@(c => c.Id)"/>
+    <PropertyColumn Property="@(c => c.Surname)"/>
+    <PropertyColumn Property="@(c => c.Name)"/>
+    <PropertyColumn Property="@(c => c.Patronymic)"/>
+    <PropertyColumn Property="@(c => c.Phone)"/>
+    <PropertyColumn Property="@(c => c.Percentage)"/>
+    <PropertyColumn Property="@(c => c.City)"/>
+    <PropertyColumn Property="@(c => c.Street)"/>
+    <PropertyColumn Property="@(c => c.Index)"/>
     <TemplateColumn Title="Actions" Align="@Align.End">
-        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => Console.WriteLine("Edit clicked"))"/>
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
         @if (IsManager)
         {
-            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>
         }
     </TemplateColumn>
 

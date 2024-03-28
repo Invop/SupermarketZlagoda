@@ -1,0 +1,60 @@
+﻿@using SupermarketZlagoda.Data.Model
+@using SupermarketZlagoda.Data
+@using SupermarketZlagoda.Components.Pages
+@implements IDialogContentComponent<CustomerCard>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.Surname">Surname:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.Name">Name:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.Patronymic">Patronymic:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.Phone">Phone:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.City">City:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.Street">Street:</FluentTextField>
+    <br/><br/>
+    <FluentTextField style="width: 100%;" @bind-Value="@Content.Index">Index:</FluentTextField>
+    <br/><br/>
+    <FluentNumberField style="width: 100%;" @bind-Value="@Content.Percentage">Percentage:</FluentNumberField>
+</FluentDialogBody>
+
+@code {
+    
+    string? stringValue;
+    [Parameter]
+    public CustomerCard Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+    
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+    
+}
