@@ -11,10 +11,13 @@ public static class ApplicationServiceCollectionExtensions
     {
         services.AddSingleton<IProductRepository, ProductRepository>();
         services.AddSingleton<IProductService, ProductService>();
-        services.AddSingleton<ICustomerCardRepository, CustomerCardRepository>();
-        services.AddSingleton<ICustomerCardService, CustomerCardService>();
+<<<<<<<<< Temporary merge branch 1
+        services.AddSingleton<IStoreProductRepository, StoreProductRepository>();
+        services.AddSingleton<IStoreProductService, StoreProductService>();
+=========
         services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
         services.AddSingleton<IEmployeeService, EmployeeService>();
+>>>>>>>>> Temporary merge branch 2
         return services;
     }
 

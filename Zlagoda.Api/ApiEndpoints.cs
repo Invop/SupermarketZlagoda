@@ -12,17 +12,15 @@ public class ApiEndpoints
         public const string Update = $"{Base}/{{id:guid}}";
         public const string Delete = $"{Base}/{{id:guid}}";
     }
-    
-    public static class CustomerCards
+<<<<<<<<< Temporary merge branch 1
+    public static class StoreProducts
     {
-        private const string Base = $"{ApiBase}/customer-card";
+        private const string Base = $"{ApiBase}/store-products";
         public const string Create = Base;
-        public const string Get = $"{Base}/{{id:guid}}";
+        public const string Get = $"{Base}/{{upc}}";
         public const string GetAll = Base;
-        public const string Update = $"{Base}/{{id:guid}}";
-        public const string Delete = $"{Base}/{{id:guid}}";
-    }
-
+        public const string Update = $"{Base}/{{prevUpc}}";
+=========
     
     public static class Employees
     {
@@ -31,7 +29,7 @@ public class ApiEndpoints
         public const string Get = $"{Base}/{{id:guid}}";
         public const string GetAll = Base;
         public const string Update = $"{Base}/{{id:guid}}";
+>>>>>>>>> Temporary merge branch 2
         public const string Delete = $"{Base}/{{id:guid}}";
     }
-    
 }
