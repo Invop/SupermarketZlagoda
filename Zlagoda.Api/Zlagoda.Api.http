@@ -24,3 +24,46 @@ Content-Type: application/json
   "CategoryId": 1,
   "Characteristics": "Char 0"
 }
+###
+GET https://localhost:5001/api/employees/{GUID}
+Accept: application/json
+###
+GET https://localhost:5001/api/employees
+Accept: application/json
+###
+PUT https://localhost:5001/api/employees/{GUID}
+Content-Type: application/json
+
+{
+  "Surname": "Surname",
+  "Name": "Name",
+  "Patronymic": null,
+  "Role": "Role",
+  "Salary": 0,
+  "DateOfBirth": "",
+  "DateOfStart": "",
+  "PhoneNumber": "+380000000000",
+  "City": "City",
+  "Street": "Street",
+  "ZipCode": "ZipCode"
+}
+###
+DELETE https://localhost:5001/api/employees/{GUID}
+Accept: application/json
+###
+POST https://localhost:5001/api/employees
+Content-Type: application/json
+
+{
+  "Surname": "Surname",
+  "Name": "Name",
+  "Patronymic": null,
+  "Role": "Role",
+  "Salary": 0,
+  "DateOfBirth": "",
+  "DateOfStart": "",
+  "PhoneNumber": "+380000000000",
+  "City": "City",
+  "Street": "Street",
+  "ZipCode": "ZipCode"
+}
