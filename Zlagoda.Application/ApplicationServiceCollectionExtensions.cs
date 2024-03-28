@@ -13,6 +13,8 @@ public static class ApplicationServiceCollectionExtensions
         services.AddSingleton<IProductService, ProductService>();
         services.AddSingleton<IStoreProductRepository, StoreProductRepository>();
         services.AddSingleton<IStoreProductService, StoreProductService>();
+        services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+        services.AddSingleton<IEmployeeService, EmployeeService>();
         return services;
     }
 

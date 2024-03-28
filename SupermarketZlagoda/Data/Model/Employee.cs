@@ -1,7 +1,17 @@
 ﻿namespace SupermarketZlagoda.Data.Model;
 
-
-public record Employee(int IdEmployee,
-    string EmployeeSurname, string EmployeeName, string EmployeePatronymic, string Role,
-    decimal Salary, DateOnly DateOfStart, DateOnly DateOfBirth, string PhoneNumber, string City,
-    string Street, string ZipCode);
+public record Employee
+{
+    public Guid Id { get; init; }
+    public string Surname { get; set; }
+    public string Name { get; set; }
+    public string Patronymic { get; set; }
+    public string Role { get; set; }
+    public decimal Salary { get; set; }
+    public DateOnly DateOfStart { get; set; }
+    public DateOnly DateOfBirth { get; set; }
+    public string PhoneNumber { get; set; }
+    public string City { get; set; }
+    public string Street { get; set; }
+    public string ZipCode { get; set; }
+}

@@ -2,6 +2,7 @@
 using Microsoft.FluentUI.AspNetCore.Components;
 using SupermarketZlagoda.Data;
 using SupermarketZlagoda.Data.Model;
+using SupermarketZlagoda.Components.Dialogs;
 
 namespace SupermarketZlagoda.Components.Pages;
 public partial class CustomerCardTable
@@ -50,5 +51,41 @@ public partial class CustomerCardTable
     protected override void OnInitialized()
     {
         _items = GenerateSampleGridData(5000);
+    }
+    private async Task OpenEditDialogAsync(CustomerCard context)
+    {
+        var dialog = await DialogService.ShowDialogAsync<CreateEditCustomerCardDialog>(context, new DialogParameters()
+        {
+            Height = "850px",
+            Title = $"Updating the {context.CustomerSurname} {context.CustomerName} {context.CustomerPatronymic}",
+            PreventDismissOnOverlayClick = true,
+            PreventScroll = true,
+        });
+
+        var result = await dialog.Result;
+        if (result is { Cancelled: false, Data: not null })
+        {
+            //Update DB
+        }
+
+    }
+    private async Task OpenCreateDialogAsync()
+    {   
+        var context = new CustomerCard(string.Empty, string.Empty, string.Empty, string.Empty,
+            string.Empty, string.Empty, string.Empty, string.Empty, 0);
+        var dialog = await DialogService.ShowDialogAsync<CreateEditCustomerCardDialog>(context, new DialogParameters()
+        {
+            Height = "850px",
+            Title = $"Updating the {context.CustomerSurname} {context.CustomerName} {context.CustomerPatronymic}",
+            PreventDismissOnOverlayClick = true,
+            PreventScroll = true,
+        });
+
+        var result = await dialog.Result;
+        if (result is { Cancelled: false, Data: not null })
+        {
+            //Update DB
+        }
+
     }
 }
