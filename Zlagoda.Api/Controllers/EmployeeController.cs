@@ -30,14 +30,14 @@ public class EmployeeController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(employee.MapToResponse());
+        return Ok(employee.MapToProductResponse());
     }
     
     [HttpGet(ApiEndpoints.Employees.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         var employees = await _employeeService.GetAllAsync();
-        var employeesResponse = employees.MapToResponse();
+        var employeesResponse = employees.MapToProductResponse();
         return Ok(employeesResponse);
     }
 
@@ -49,7 +49,7 @@ public class EmployeeController : ControllerBase
         var employee = request.MapToEmployee(id);
         var updatedProduct = await _employeeService.UpdateAsync(employee);
         if (updatedProduct is null) return NotFound();
-        return Ok(employee.MapToResponse());
+        return Ok(employee.MapToProductResponse());
     }
     
     

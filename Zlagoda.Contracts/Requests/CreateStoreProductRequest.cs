@@ -8,4 +8,5 @@ public class CreateStoreProductRequest
     public required decimal Price { get; init; }
     public required int Quantity { get; init; }
     public required bool IsPromotional { get; init; }
+    
 }

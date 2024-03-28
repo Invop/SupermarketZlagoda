@@ -17,7 +17,7 @@ public static class ContractMapping
         };
     }
 
-    public static ProductResponse MapToResponse(this Product movie)
+    public static ProductResponse MapToProductResponse(this Product movie)
     {
         return new ProductResponse()
         {
@@ -28,11 +28,11 @@ public static class ContractMapping
         };
     }
     
-    public static ProductsResponse MapToResponse(this IEnumerable<Product> movies)
+    public static ProductsResponse MapToProductResponse(this IEnumerable<Product> movies)
     {
         return new ProductsResponse
         {
-            Items = movies.Select(MapToResponse)
+            Items = movies.Select(MapToProductResponse)
         };
     }
 
@@ -46,6 +46,55 @@ public static class ContractMapping
             Characteristics = request.Characteristics
         };
     }
+
+    public static StoreProduct MapToStoreProduct(this CreateStoreProductRequest request)
+    {
+        return new StoreProduct
+        {
+            Upc = request.Upc,
+            UpcProm = request.UpcProm,
+            ProductId = request.ProductId,
+            Price = request.Price,
+            Quantity = request.Quantity,
+            IsPromotional = request.IsPromotional
+        };
+    }
+    
+    public static StoreProductResponse MapToStoreProductResponse(this StoreProduct movie)
+    {
+        return new StoreProductResponse()
+        {
+            Upc = movie.Upc,
+            UpcProm = movie.UpcProm,
+            ProductId = movie.ProductId,
+            Price = movie.Price,
+            Quantity = movie.Quantity,
+            IsPromotional = movie.IsPromotional
+        };
+    }
+    
+    public static StoreProductsResponse MapToStoreProductResponse(this IEnumerable<StoreProduct> storeProducts)
+    {
+        return new StoreProductsResponse
+        {
+            Items = storeProducts.Select(MapToStoreProductResponse)
+        };
+    }
+
+    public static StoreProduct MapToStoreProduct(this UpdateStoreProductRequest request)
+    {
+        return new StoreProduct
+        {
+            Upc = request.Upc,
+            UpcProm = request.UpcProm,
+            ProductId = request.ProductId,
+            Price = request.Price,
+            Quantity = request.Quantity,
+            IsPromotional = request.IsPromotional
+        };
+    }
+    
+    
     
     public static Employee MapToEmployee(this CreateEmployeeRequest request)
     {
@@ -66,7 +115,7 @@ public static class ContractMapping
         };
     }
 
-    public static EmployeeResponse MapToResponse(this Employee em)
+    public static EmployeeResponse MapToProductResponse(this Employee em)
     {
         return new EmployeeResponse()
         {
@@ -85,11 +134,11 @@ public static class ContractMapping
         };
     }
     
-    public static EmployeesResponse MapToResponse(this IEnumerable<Employee> employees)
+    public static EmployeesResponse MapToProductResponse(this IEnumerable<Employee> employees)
     {
         return new EmployeesResponse
         {
-            Items = employees.Select(MapToResponse)
+            Items = employees.Select(MapToProductResponse)
         };
     }
 
@@ -128,7 +177,7 @@ public static class ContractMapping
         };
     }
 
-    public static CustomerCardResponse MapToResponse(this CustomerCard customerCard)
+    public static CustomerCardResponse MapToProductResponse(this CustomerCard customerCard)
     {
         return new CustomerCardResponse()
         {
@@ -144,11 +193,11 @@ public static class ContractMapping
         };
     }
     
-    public static CustomerCardsResponse MapToResponse(this IEnumerable<CustomerCard> customerCards)
+    public static CustomerCardsResponse MapToProductResponse(this IEnumerable<CustomerCard> customerCards)
     {
         return new CustomerCardsResponse
         {
-            Items = customerCards.Select(MapToResponse)
+            Items = customerCards.Select(MapToProductResponse)
         };
     }
 
