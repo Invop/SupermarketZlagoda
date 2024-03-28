@@ -119,17 +119,38 @@ public class CustomerCardRepository : ICustomerCardRepository
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText =
-            "UPDATE Customer_Cards SET cust_surname = @Surname, cust_name = @Name, cust_patronymic = @Patronymic, phone_number = @Phone, " +
-            "city = @City, street = @Street, zip_code = @Index, [percent] = @Percentage WHERE card_number = @Id";
+            $@"UPDATE Customer_Cards SET cust_surname = @Surname, cust_name = @Name, cust_patronymic = @Patronymic, phone_number = @Phone, 
+                          city = @City, street = @Street, zip_code = @Index, [percent] = @Percentage WHERE card_number = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", customerCard.Id);
         command.Parameters.AddWithValue("@Surname", customerCard.Surname);
         command.Parameters.AddWithValue("@Name", customerCard.Name);
-        command.Parameters.AddWithValue("@Patronymic", customerCard.Patronymic);
+        if(string.IsNullOrEmpty(customerCard.Patronymic))
+            command.Parameters.AddWithValue("@Patronymic", DBNull.Value);
+        else
+        {
+            command.Parameters.AddWithValue("@Patronymic", customerCard.Patronymic);
+        }
         command.Parameters.AddWithValue("@Phone", customerCard.Phone);
-        command.Parameters.AddWithValue("@City", customerCard.City);
-        command.Parameters.AddWithValue("@Street", customerCard.Street);
-        command.Parameters.AddWithValue("@Index", customerCard.Index);
+        if(string.IsNullOrEmpty(customerCard.City))
+            command.Parameters.AddWithValue("@City", DBNull.Value);
+        else
+        {
+            command.Parameters.AddWithValue("@City", customerCard.City);
+        }
+        if(string.IsNullOrEmpty(customerCard.Street))
+            command.Parameters.AddWithValue("@Street", DBNull.Value);
+        else
+        {
+            command.Parameters.AddWithValue("@Street", customerCard.Street);
+        }
+        if(string.IsNullOrEmpty(customerCard.Index))
+            command.Parameters.AddWithValue("@Index", DBNull.Value);
+        else
+        {
+            command.Parameters.AddWithValue("@Index", customerCard.Index);
+        }
+
         command.Parameters.AddWithValue("@Percentage", customerCard.Percentage);
         var result = await command.ExecuteNonQueryAsync();
         return result > 0;
