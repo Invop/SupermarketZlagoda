@@ -49,12 +49,13 @@ public class StoreProductRepository : IStoreProductRepository
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Upc", upc);
         using var reader = await command.ExecuteReaderAsync();
+    
         if (await reader.ReadAsync())
         {
             var storeProduct = new StoreProduct
             {
-                Upc = reader.GetString(reader.GetOrdinal("UPC")),
-                UpcProm = reader.GetString(reader.GetOrdinal("UPC_prom")),
+                Upc = reader.IsDBNull(reader.GetOrdinal("UPC")) ? null : reader.GetString(reader.GetOrdinal("UPC")),
+                UpcProm = reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
                 ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
                 Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
                 Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
@@ -72,12 +73,13 @@ public class StoreProductRepository : IStoreProductRepository
         using var command = new SqlCommand(commandText, connection);
         using var reader = await command.ExecuteReaderAsync();
         var storeProducts = new List<StoreProduct>();
+
         while (await reader.ReadAsync())
         {
             var storeProduct = new StoreProduct
             {
-                Upc = reader.GetString(reader.GetOrdinal("UPC")),
-                UpcProm = reader.GetString(reader.GetOrdinal("UPC_prom")),
+                Upc = reader.IsDBNull(reader.GetOrdinal("UPC")) ? null : reader.GetString(reader.GetOrdinal("UPC")),
+                UpcProm = reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
                 ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
                 Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
                 Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),

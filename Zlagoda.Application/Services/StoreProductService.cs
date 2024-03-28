@@ -19,7 +19,7 @@ public class StoreProductService : IStoreProductService
 
     public async Task<StoreProduct?> GetByUPCAsync(string upc)
     {
-        throw new NotImplementedException();
+        return await _storeProductRepository.GetByUPCAsync(upc);
     }
 
     public async Task<IEnumerable<StoreProduct>> GetAllAsync()
