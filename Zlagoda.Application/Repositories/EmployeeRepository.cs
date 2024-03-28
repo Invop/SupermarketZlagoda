@@ -104,8 +104,8 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<bool> UpdateAsync(Employee em)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText =
-            @"UPDATE Employees
+        var commandText = 
+            $@"UPDATE Employees
               SET empl_surname = @Surname, empl_name = @Name, empl_patronymic = @Patronymic, empl_role = @Role,
                   salary = @Salary, date_of_birth = @DateOfBirth, date_of_start = @DateOfStart,
                   phone_number = @PhoneNumber, city = @City, street = @Street, zip_code = @Code
@@ -113,7 +113,10 @@ public class EmployeeRepository : IEmployeeRepository
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Surname", em.Surname);
         command.Parameters.AddWithValue("@Name", em.Name);
-        command.Parameters.AddWithValue("@Patronymic", em.Patronymic);
+        if(string.IsNullOrEmpty(em.Patronymic))
+            command.Parameters.AddWithValue("@Patronymic", DBNull.Value);
+        else
+            command.Parameters.AddWithValue("@Patronymic", em.Patronymic);
         command.Parameters.AddWithValue("@Role", em.Role);
         command.Parameters.AddWithValue("@Salary", em.Salary);
         command.Parameters.AddWithValue("@DateOfBirth", em.DateOfBirth);
