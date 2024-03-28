@@ -25,6 +25,42 @@ Content-Type: application/json
   "Characteristics": "Char 0"
 }
 ###
+GET https://localhost:5001/api/customer-card/{GUID}
+Accept: application/json
+###
+GET https://localhost:5001/api/customer-card
+Accept: application/json
+###
+PUT https://localhost:5001/api/customer-card/{GUID}
+Content-Type: application/json
+
+{
+  "Surname": "surname",
+  "Name": "name",
+  "Patronymic": null,
+  "Phone": "+380000000000",
+  "City": null,
+  "Street": null,
+  "Index": null,
+  "Percentage": 0
+}
+###
+DELETE https://localhost:5001/api/customer-card/{GUID}
+Accept: application/json
+###
+POST https://localhost:5001/api/customer-card
+Content-Type: application/json
+
+{
+  "Surname": "surname",
+  "Name": "name",
+  "Patronymic": null,
+  "Phone": "+380000000000",
+  "City": null,
+  "Street": null,
+  "Index": null,
+  "Percentage": 0
+}###
 GET https://localhost:5001/api/employees/{GUID}
 Accept: application/json
 ###

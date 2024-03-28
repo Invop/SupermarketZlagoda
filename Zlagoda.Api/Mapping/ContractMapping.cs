@@ -111,4 +111,60 @@ public static class ContractMapping
             ZipCode = request.ZipCode
         };
     }
+    
+    public static CustomerCard MapToCustomerCard(this CreateCustomerCardRequest request)
+    {
+        return new CustomerCard
+        {
+            Id = Guid.NewGuid(),
+            Surname = request.Surname,
+            Name = request.Name,
+            Patronymic = request.Patronymic,
+            Phone = request.Phone,
+            City = request.City,
+            Street = request.Street,
+            Index = request.Index,
+            Percentage = request.Percentage
+        };
+    }
+
+    public static CustomerCardResponse MapToResponse(this CustomerCard customerCard)
+    {
+        return new CustomerCardResponse()
+        {
+            Id = customerCard.Id,
+            Surname = customerCard.Surname,
+            Name = customerCard.Name,
+            Patronymic = customerCard.Patronymic,
+            Phone = customerCard.Phone,
+            City = customerCard.City,
+            Street = customerCard.Street,
+            Index = customerCard.Index,
+            Percentage = customerCard.Percentage
+        };
+    }
+    
+    public static CustomerCardsResponse MapToResponse(this IEnumerable<CustomerCard> customerCards)
+    {
+        return new CustomerCardsResponse
+        {
+            Items = customerCards.Select(MapToResponse)
+        };
+    }
+
+    public static CustomerCard MapToCustomerCard(this UpdateCustomerCardRequest request,Guid id)
+    {
+        return new CustomerCard
+        {   
+            Id = id,
+            Surname = request.Surname,
+            Name = request.Name,
+            Patronymic = request.Patronymic,
+            Phone = request.Phone,
+            City = request.City,
+            Street = request.Street,
+            Index = request.Index,
+            Percentage = request.Percentage
+        };
+    }
 }
