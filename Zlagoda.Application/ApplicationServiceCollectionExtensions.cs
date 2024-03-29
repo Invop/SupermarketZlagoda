@@ -11,14 +11,24 @@ public static class ApplicationServiceCollectionExtensions
     {
         services.AddSingleton<IProductRepository, ProductRepository>();
         services.AddSingleton<IProductService, ProductService>();
+        
+        
         services.AddSingleton<IStoreProductRepository, StoreProductRepository>();
         services.AddSingleton<IStoreProductService, StoreProductService>();
-        services.AddSingleton<ICustomerCardRepository, CustomerCardRepository>();
-        services.AddSingleton<ICustomerCardService, CustomerCardService>();
+
+        
         services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
         services.AddSingleton<IEmployeeService, EmployeeService>();
+        
+        
+        services.AddSingleton<ICustomerCardRepository, CustomerCardRepository>();
+        services.AddSingleton<ICustomerCardService, CustomerCardService>();
+        
+        
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<ICategoryService, CategoryService>();
+        
+        
         return services;
     }
 

@@ -1,0 +1,58 @@
+﻿###
+POST https://localhost:5001/api/store-products
+Content-Type: application/json
+
+{
+  "Upc": "UPC1",
+  "UpcProm": null,
+  "ProductId": "3bd72c17-2cb1-4dd2-b500-550ab52d83c2",
+  "Price": 100.00,
+  "Quantity": 10,
+  "IsPromotional": false
+}
+###
+POST https://localhost:5001/api/store-products
+Content-Type: application/json
+
+{
+  "Upc": "UPC2",
+  "UpcProm": null,
+  "ProductId": "84636828-030d-4506-a08e-b2aeb5ef869c",
+  "Price": 200.00,
+  "Quantity": 20,
+  "IsPromotional": false
+}
+###
+POST https://localhost:5001/api/store-products
+Content-Type: application/json
+
+{
+  "Upc": "UPC3",
+  "UpcProm": null,
+  "ProductId": "9df2efae-c275-4ff2-b3ff-b81e7a93d521",
+  "Price": 300.00,
+  "Quantity": 30,
+  "IsPromotional": false
+}
+###
+GET https://localhost:5001/api/store-products/UPC3
+Accept: application/json
+###
+GET https://localhost:5001/api/store-products
+Accept: application/json
+
+###
+PUT https://localhost:5001/api/store-products/UPC22
+Content-Type: application/json
+
+{
+  "Upc": "UPC1",
+  "UpcProm": "",
+  "ProductId": "3bd72c17-2cb1-4dd2-b500-550ab52d83c2",
+  "Price": 300.00,
+  "Quantity": 50,
+  "IsPromotional": false
+}
+###
+DELETE https://localhost:5001/api/store-products/UPC1
+Content-Type: application/json

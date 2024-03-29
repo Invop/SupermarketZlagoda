@@ -18,7 +18,7 @@ public static class ContractMapping
         };
     }
 
-    public static ProductResponse MapToResponse(this Product movie)
+    public static ProductResponse MapToProductResponse(this Product movie)
     {
         return new ProductResponse()
         {
@@ -29,18 +29,18 @@ public static class ContractMapping
         };
     }
     
-    public static ProductsResponse MapToResponse(this IEnumerable<Product> movies)
+    public static ProductsResponse MapToProductResponse(this IEnumerable<Product> movies)
     {
         return new ProductsResponse
         {
-            Items = movies.Select(MapToResponse)
+            Items = movies.Select(MapToProductResponse)
         };
     }
 
-    public static Product MapToProduct(this UpdateProductRequest request,Guid id)
+    public static Product MapToProduct(this UpdateProductRequest request, Guid id)
     {
         return new Product
-        {   
+        {
             Id = id,
             Name = request.Name,
             CategoryId = request.CategoryId,
@@ -50,7 +50,6 @@ public static class ContractMapping
     #endregion
 
     #region StoreProduct
-
     public static StoreProduct MapToStoreProduct(this CreateStoreProductRequest request)
     {
         return new StoreProduct
@@ -63,7 +62,6 @@ public static class ContractMapping
             IsPromotional = request.IsPromotional
         };
     }
-    
     public static StoreProductResponse MapToStoreProductResponse(this StoreProduct movie)
     {
         return new StoreProductResponse()
@@ -159,7 +157,7 @@ public static class ContractMapping
         };
     }
 
-    public static EmployeeResponse MapToResponse(this Employee em)
+    public static EmployeeResponse MapToProductResponse(this Employee em)
     {
         return new EmployeeResponse()
         {
@@ -178,11 +176,11 @@ public static class ContractMapping
         };
     }
     
-    public static EmployeesResponse MapToResponse(this IEnumerable<Employee> employees)
+    public static EmployeesResponse MapToProductResponse(this IEnumerable<Employee> employees)
     {
         return new EmployeesResponse
         {
-            Items = employees.Select(MapToResponse)
+            Items = employees.Select(MapToProductResponse)
         };
     }
 
@@ -223,7 +221,7 @@ public static class ContractMapping
         };
     }
 
-    public static CustomerCardResponse MapToResponse(this CustomerCard customerCard)
+    public static CustomerCardResponse MapToProductResponse(this CustomerCard customerCard)
     {
         return new CustomerCardResponse()
         {
@@ -239,11 +237,11 @@ public static class ContractMapping
         };
     }
     
-    public static CustomerCardsResponse MapToResponse(this IEnumerable<CustomerCard> customerCards)
+    public static CustomerCardsResponse MapToProductResponse(this IEnumerable<CustomerCard> customerCards)
     {
         return new CustomerCardsResponse
         {
-            Items = customerCards.Select(MapToResponse)
+            Items = customerCards.Select(MapToProductResponse)
         };
     }
 

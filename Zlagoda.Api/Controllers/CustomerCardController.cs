@@ -31,14 +31,14 @@ public class CustomerCardController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(customerCard.MapToResponse());
+        return Ok(customerCard.MapToProductResponse());
     }
     
     [HttpGet(ApiEndpoints.CustomerCards.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         var customerCards = await _customerCardService.GetAllAsync();
-        var customerCardsResponse = customerCards.MapToResponse();
+        var customerCardsResponse = customerCards.MapToProductResponse();
         return Ok(customerCardsResponse);
     }
 
@@ -54,7 +54,7 @@ public class CustomerCardController : ControllerBase
             return NotFound();
         }
 
-        var response = customerCard.MapToResponse();
+        var response = customerCard.MapToProductResponse();
         return Ok(response);
     }
     
