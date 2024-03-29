@@ -16,12 +16,12 @@ public partial class StoreProductTable
     private IQueryable<StoreProduct>? _items = Enumerable.Empty<StoreProduct>().AsQueryable();
     private List<SelectOption> CategoryOptions = new List<SelectOption>()
     {
-        new() { Value = "1", Text = "Technology", Selected = true },
-        new() { Value = "2", Text = "Science", Selected = true },
-        new() { Value = "3", Text = "Art & Culture" },
-        new() { Value = "4", Text = "Health & Wellness" },
-        new() { Value = "5", Text = "Sports" },
-        new() { Value = "6", Text = "Education" },
+        // new() { Value = "1", Text = "Technology", Selected = true },
+        // new() { Value = "2", Text = "Science", Selected = true },
+        // new() { Value = "3", Text = "Art & Culture" },
+        // new() { Value = "4", Text = "Health & Wellness" },
+        // new() { Value = "5", Text = "Sports" },
+        // new() { Value = "6", Text = "Education" },
         // ... other category options
     };
     

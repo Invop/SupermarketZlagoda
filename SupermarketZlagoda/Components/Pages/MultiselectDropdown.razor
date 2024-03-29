@@ -27,7 +27,7 @@
     }
     private async Task HandleChange()
     {
-        var selectedValues = await JSRuntime.InvokeAsync<string[]>("getSelectedValues", _elementReference);
+        var selectedValues = await JSRuntime.InvokeAsync<Guid[]>("getSelectedValues", _elementReference);
         foreach (var option in Options)
         {
             option.Selected = selectedValues.Contains(option.Value);
