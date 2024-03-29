@@ -1,6 +1,7 @@
 ﻿namespace SupermarketZlagoda.Data.Model;
 
-public record Category(int Id, string Name)
+public record Category
 {
-    public string Name { get; set; } = Name;
+    public Guid Id { get; init; }
+    public string Name { get; set; }
 }

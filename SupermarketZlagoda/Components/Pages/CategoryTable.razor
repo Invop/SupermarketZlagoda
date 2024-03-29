@@ -12,7 +12,7 @@
     <PropertyColumn Property="@(c => c.Name)" Align="Align.Center" />
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
-        <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))" />
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialogAsync(context))" />
     </TemplateColumn>
 </FluentDataGrid>
 <FluentPaginator State="@_pagination">
