@@ -90,7 +90,7 @@ public class StoreProductRepository : IStoreProductRepository
         return storeProducts;
     }
 
-    public async Task<bool> UpdatePromProductsAsync(string prevUpc,string newUpc)
+    public async Task<bool> UpdatePromProductsAsync(string prevUpc,string? newUpc)
     {   
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         const string queryString = "UPDATE Store_Products SET UPC_prom = @newUpc WHERE UPC_prom = @prevUpc;";
@@ -127,7 +127,14 @@ public class StoreProductRepository : IStoreProductRepository
 
     public async Task<bool> DeleteByUPCAsync(string upc)
     {
-        throw new NotImplementedException();
+        
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        const string queryString = "DELETE FROM Store_Products WHERE UPC = @Upc";
+        using var command = new SqlCommand(queryString, connection);
+        command.Parameters.AddWithValue("@Upc", upc);
+        var result = await command.ExecuteNonQueryAsync();
+        return result > 0;
+        
     }
 
     public async Task<bool> ExistsByUPCAsync(string upc)

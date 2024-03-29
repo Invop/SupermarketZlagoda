@@ -39,6 +39,9 @@ public class StoreProductService : IStoreProductService
 
     public async Task<bool> DeleteByUPCAsync(string upc)
     {
-        throw new NotImplementedException();
+        
+        await _storeProductRepository.UpdatePromProductsAsync(upc, null);
+        return await _storeProductRepository.DeleteByUPCAsync(upc);
+        
     }
 }

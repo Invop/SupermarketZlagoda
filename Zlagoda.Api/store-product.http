@@ -53,3 +53,6 @@ Content-Type: application/json
   "Quantity": 50,
   "IsPromotional": false
 }
+###
+DELETE https://localhost:5001/api/store-products/UPC1
+Content-Type: application/json

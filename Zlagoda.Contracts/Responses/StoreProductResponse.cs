@@ -2,7 +2,7 @@
 
 public class StoreProductResponse
 {
-    public required string Upc { get; init; }
+    public required string? Upc { get; init; }
     public string? UpcProm { get; init; }
     public required Guid ProductId { get; init; }
     public required decimal Price { get; init; }
