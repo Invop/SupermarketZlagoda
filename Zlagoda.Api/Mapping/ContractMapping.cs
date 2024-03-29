@@ -6,6 +6,7 @@ namespace Zlagoda.Api.Mapping;
 
 public static class ContractMapping
 {
+    #region Product
     public static Product MapToProduct(this CreateProductRequest request)
     {
         return new Product
@@ -36,17 +37,19 @@ public static class ContractMapping
         };
     }
 
-    public static Product MapToProduct(this UpdateProductRequest request,Guid id)
+    public static Product MapToProduct(this UpdateProductRequest request, Guid id)
     {
         return new Product
-        {   
+        {
             Id = id,
             Name = request.Name,
             CategoryId = request.CategoryId,
             Characteristics = request.Characteristics
         };
     }
+    #endregion
 
+    #region StoreProduct
     public static StoreProduct MapToStoreProduct(this CreateStoreProductRequest request)
     {
         return new StoreProduct
@@ -59,7 +62,6 @@ public static class ContractMapping
             IsPromotional = request.IsPromotional
         };
     }
-    
     public static StoreProductResponse MapToStoreProductResponse(this StoreProduct movie)
     {
         return new StoreProductResponse()
@@ -93,9 +95,49 @@ public static class ContractMapping
             IsPromotional = request.IsPromotional
         };
     }
+
+
+    #endregion
+
+    #region Category
+
+    public static Category MapToCategory(this CreateCategoryRequest request)
+    {
+        return new Category
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name
+        };
+    }
+
+    public static CategoryResponse MapToResponse(this Category category)
+    {
+        return new CategoryResponse()
+        {
+            Id = category.Id,
+            Name = category.Name
+        };
+    }
     
+    public static CategoriesResponse MapToResponse(this IEnumerable<Category> movies)
+    {
+        return new CategoriesResponse
+        {
+            Items = movies.Select(MapToResponse)
+        };
+    }
+
+    public static Category MapToCategory(this UpdateCategoryRequest request, Guid id)
+    {
+        return new Category
+        {   
+            Id = id,
+            Name = request.Name
+        };
+    }
+    #endregion
     
-    
+    #region Employee
     public static Employee MapToEmployee(this CreateEmployeeRequest request)
     {
         return new Employee
@@ -160,7 +202,9 @@ public static class ContractMapping
             ZipCode = request.ZipCode
         };
     }
+    #endregion
     
+    #region CustomerCard
     public static CustomerCard MapToCustomerCard(this CreateCustomerCardRequest request)
     {
         return new CustomerCard
@@ -216,4 +260,5 @@ public static class ContractMapping
             Percentage = request.Percentage
         };
     }
+    #endregion
 }

@@ -109,7 +109,7 @@ namespace Zlagoda.Application.Database;
                                                     CREATE TABLE Products
                                                     (
                                                         id_product UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
-                                                        category_number INT FOREIGN KEY REFERENCES Categories(category_number) ON UPDATE CASCADE ON DELETE NO ACTION,
+                                                        category_number UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Categories(category_number) ON UPDATE CASCADE ON DELETE NO ACTION,
                                                         product_name VARCHAR(50) NOT NULL,
                                                         characteristics VARCHAR(100) NOT NULL
                                                     )
@@ -144,7 +144,7 @@ namespace Zlagoda.Application.Database;
                                                           IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='Categories')
                                                           CREATE TABLE Categories
                                                           (
-                                                              category_number INT PRIMARY KEY NOT NULL,
+                                                              category_number UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
                                                               category_name VARCHAR(50) NOT NULL
                                                           )
                                                   """;

@@ -6,21 +6,15 @@ public class SelectOption
     {
     }
 
-    public SelectOption(string value, string text, bool selected) : this()
+    public SelectOption(Guid value, string text, bool selected = false) : this()
     {
         Value = value;
         Text = text;
         Selected = selected;
     }
 
-    public SelectOption(string value, string text) : this()
-    {
-        Value = value;
-        Text = text;
-    }
 
-
-    public string Value { get; set; }
+    public Guid Value { get; set; }
     public string Text { get; set; }
     public bool Selected { get; set; }
 }
