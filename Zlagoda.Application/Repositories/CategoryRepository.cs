@@ -4,78 +4,75 @@ using Zlagoda.Application.Models;
 
 namespace Zlagoda.Application.Repositories;
 
-public class ProductRepository : IProductRepository
+public class CategoryRepository : ICategoryRepository
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
 
-    public ProductRepository(IDbConnectionFactory dbConnectionFactory)
+    public CategoryRepository(IDbConnectionFactory dbConnectionFactory)
     {
         _dbConnectionFactory = dbConnectionFactory;
     }
-    public async Task<bool> CreateAsync(Product product)
+
+    public async Task<bool> CreateAsync(Category category)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = $@"INSERT INTO Products (id_product, product_name, category_number,characteristics)
-             VALUES ('{product.Id}', '{product.Name}', '{product.CategoryId}','{product.Characteristics}')";
+        var commandText = $@"INSERT INTO Categories (category_number, category_name)
+             VALUES ('{category.Id}', '{category.Name}')";
         using var command = new SqlCommand(commandText, connection);
         var result = await command.ExecuteNonQueryAsync();
         return result > 0;
     }
 
-    public async Task<Product?> GetByIdAsync(Guid id)
+    public async Task<Category?> GetByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Products WHERE id_product = @Id";
+        var commandText = $@"SELECT * FROM Categories WHERE category_number = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", id);
         using var reader = await command.ExecuteReaderAsync();
         if (await reader.ReadAsync())
         {
-            var product = new Product
+            var category = new Category
             {
-                Id = reader.GetGuid(reader.GetOrdinal("id_product")),
-                Name = reader.GetString(reader.GetOrdinal("product_name")),
-                CategoryId = reader.GetGuid(reader.GetOrdinal("category_number")),
-                Characteristics = reader.GetString(reader.GetOrdinal("characteristics"))
+                Id = reader.GetGuid(reader.GetOrdinal("category_number")),
+                Name = reader.GetString(reader.GetOrdinal("category_name"))
             };
-            return product;
+            return category;
         }
+
         return null;
     }
 
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<IEnumerable<Category>> GetAllAsync()
     {
-        
+
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Products";
+        var commandText = "SELECT * FROM Categories";
         using var command = new SqlCommand(commandText, connection);
         using var reader = await command.ExecuteReaderAsync();
-        var products = new List<Product>();
+        var categories = new List<Category>();
         while (await reader.ReadAsync())
         {
-            var product = new Product
+            var category = new Category
             {
-                Id = reader.GetGuid(reader.GetOrdinal("id_product")),
-                Name = reader.GetString(reader.GetOrdinal("product_name")),
-                CategoryId = reader.GetGuid(reader.GetOrdinal("category_number")),
-                Characteristics = reader.GetString(reader.GetOrdinal("characteristics"))
+                Id = reader.GetGuid(reader.GetOrdinal("category_number")),
+                Name = reader.GetString(reader.GetOrdinal("category_name"))
             };
-            products.Add(product);
+            categories.Add(category);
         }
-        return products;
+
+        return categories;
     }
 
-    public async Task<bool> UpdateAsync(Product product)
+    public async Task<bool> UpdateAsync(Category category)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText =
-            "UPDATE Products SET product_name = @Name, category_number = @CategoryId, characteristics = @Characteristics WHERE id_product = @Id";
+            $@"UPDATE Categories SET category_name = @Name WHERE category_number = @Id";
         using var command = new SqlCommand(commandText, connection);
-        command.Parameters.AddWithValue("@Name", product.Name);
-        command.Parameters.AddWithValue("@CategoryId", product.CategoryId);
-        command.Parameters.AddWithValue("@Characteristics", product.Characteristics);
-        command.Parameters.AddWithValue("@Id", product.Id);
+        command.Parameters.AddWithValue("@Name", category.Name);
+        command.Parameters.AddWithValue("@Id", category.Id);
         var result = await command.ExecuteNonQueryAsync();
         return result > 0;
     }
@@ -83,7 +80,7 @@ public class ProductRepository : IProductRepository
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "DELETE FROM Products WHERE id_product = @Id";
+        var commandText = $@"DELETE FROM Categories WHERE category_number = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", id);
         var result = await command.ExecuteNonQueryAsync();
@@ -93,11 +90,10 @@ public class ProductRepository : IProductRepository
     public async Task<bool> ExistsByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT COUNT(*) FROM Products WHERE id_product = @Id";
+        var commandText = @$"SELECT COUNT(*) FROM Categories WHERE category_number = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", id);
         var result = await command.ExecuteScalarAsync();
         return Convert.ToInt32(result) > 0;
     }
-    
 }

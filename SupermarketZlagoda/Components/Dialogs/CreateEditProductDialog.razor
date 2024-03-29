@@ -1,6 +1,8 @@
 ﻿@using SupermarketZlagoda.Data.Model
 @using SupermarketZlagoda.Data
-@using SupermarketZlagoda.Components.Pages
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using Microsoft.IdentityModel.Tokens
 @implements IDialogContentComponent<Product>
 
 @* Header *@
@@ -23,41 +25,65 @@
 <FluentDialogBody>
     <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
     <br/><br/>
-    <FluentSelect Items="@stringOptions1"
-               OptionText="@(i => i.Text)"
-               OptionValue="@(i => i.Value)"
-               OptionSelected="@(i => i.Selected)"
-               @bind-Value="@stringValue" 
-               Label="Category:"/>
+    <FluentSelect Items="@_stringOptions"
+                  OptionText="@(i => i.Text)" 
+                  OptionSelected="@(i => i.Selected)" 
+                  OptionValue="@(i => i.Value)"
+                  @bind-Value="@_id"
+                  Label="Category:"/>
     <br/><br/>
     <FluentTextArea  style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea >
 </FluentDialogBody>
 
 @code {
     
-    string? stringValue;
+    string _id;
+    
     [Parameter]
     public Product Content { get; set; } = default!;
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
     
-    //Will be changed
-    static List<Option<string>> stringOptions1 =
-    [
-        new Option<string> { Value = "9", Text = "Nine" },
-        new Option<string> { Value = "8", Text = "Eight", Selected = true },
-        new Option<string> { Value = "7", Text = "Seven" },
-        new Option<string> { Value = "6", Text = "Six" },
-        new Option<string> { Value = "5", Text = "Five" },
-        new Option<string> { Value = "4", Text = "Four" },
-        new Option<string> { Value = "3", Text = "Three" },
-        new Option<string> { Value = "2", Text = "Two" },
-        new Option<string> { Value = "1", Text = "One" }
-    ];
+    private Stack<Option<string>> _stringOptions = [];
+    private static readonly HttpClient Client = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateCategoryOptions();
+    }
+
+    private async Task UpdateCategoryOptions()
+    {
+        var response = await Client.GetAsync("https://localhost:5001/api/categories");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var categories = JsonConvert
+                .DeserializeObject<List<Category>>(JObject.Parse(responseJson)["items"].ToString());
+            if (categories.IsNullOrEmpty()) return;
+            var id = Content.CategoryId;
+            var hasCategory = !id.Equals(Guid.Empty);
+            foreach (var category in categories)
+            {
+                _stringOptions.Push(new Option<string>
+                {
+                    Value = category.Id.ToString(), Text = category.Name
+                });
+                if (hasCategory && category.Id.Equals(id))
+                    _stringOptions.Peek().Selected = true;
+            }
+            if (!hasCategory) _stringOptions.Peek().Selected = true;
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
+    }
+    
     private async Task SaveAsync()
     {
-        Content.CategoryId = int.Parse(stringValue);
+        Content.CategoryId = Guid.Parse(_id);
         await Dialog.CloseAsync(Content);
     }
 

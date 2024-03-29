@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
@@ -18,21 +19,36 @@ public partial class ProductTable
     private int _sortType = 0;
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Product>? _items = Enumerable.Empty<Product>().AsQueryable();
-    private List<SelectOption> CategoryOptions = new()
-    {
-        new() { Value = "1", Text = "Technology", Selected = true },
-        new() { Value = "2", Text = "Science", Selected = true },
-        new() { Value = "3", Text = "Art & Culture" },
-        new() { Value = "4", Text = "Health & Wellness" },
-        new() { Value = "5", Text = "Sports" },
-        new() { Value = "6", Text = "Education" },
-        // ... other category options
-    };
+    private Dictionary<Guid, string> _categories = new();
+    private List<SelectOption> _categoryOptions = [];
     private static readonly HttpClient Client = new HttpClient();
+    
     protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
+        await UpdateCategoryOptions();
         await UpdateTable();
+    }
+
+    private async Task UpdateCategoryOptions()
+    {
+        var response = await Client.GetAsync("https://localhost:5001/api/categories");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var categories = JsonConvert
+                .DeserializeObject<List<Category>>(JObject.Parse(responseJson)["items"].ToString());
+            foreach (var category in categories)
+            {
+                _categories[category.Id] = category.Name;
+                _categoryOptions.Add(new SelectOption(category.Id, category.Name));
+            }
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
     }
 
     private async Task UpdateTable()
@@ -67,7 +83,7 @@ public partial class ProductTable
                 Height = "400px",
                 Title = $"Updating the {context.Name}",
                 PreventDismissOnOverlayClick = true,
-                PreventScroll = true,
+                PreventScroll = true
             });
 
             var result = await dialog.Result;
@@ -101,7 +117,7 @@ public partial class ProductTable
     {   
         var context = new Product()
         {
-            CategoryId = 0,
+            CategoryId = Guid.Empty,
             Name = "",
             Characteristics = ""
         };

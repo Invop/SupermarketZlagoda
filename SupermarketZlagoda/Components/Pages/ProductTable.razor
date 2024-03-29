@@ -11,12 +11,12 @@
         <FluentRadio Value="@(0)" Checked="true">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
     </FluentRadioGroup>
-    <MultiselectDropdown Options="CategoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
+    <MultiselectDropdown Options="_categoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
     @* <FluentTextField @bind-Value="_searchTerm" Placeholder="Search by UPC"></FluentTextField> *@
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Id)"/>
-    <PropertyColumn Property="@(c => c.CategoryId)" />
+    <PropertyColumn Title="Category" Property="@(c => _categories[c.CategoryId])" />
     <PropertyColumn Property="@(c => c.Name)" Align="Align.Center" />
     <PropertyColumn Property="@(c => c.Characteristics)" Align="Align.End" />
     @if(IsManager)
