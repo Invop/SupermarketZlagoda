@@ -32,9 +32,9 @@ public class StoreProductService : IStoreProductService
         var storeProductExists = await _storeProductRepository.ExistsByUPCAsync(prevUpc);
         if (!storeProductExists) 
             return null;
-        await _storeProductRepository.UpdateAsync(product);
-        var isCascadeUpdateDone = await _storeProductRepository.UpdatePromProductsAsync(prevUpc, product.Upc);
-        return !isCascadeUpdateDone ? null : product;
+        await _storeProductRepository.UpdateAsync(product,prevUpc);
+        await _storeProductRepository.UpdatePromProductsAsync(prevUpc, product.Upc);
+        return  product;
     }
 
     public async Task<bool> DeleteByUPCAsync(string upc)

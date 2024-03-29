@@ -41,3 +41,15 @@ Accept: application/json
 GET https://localhost:5001/api/store-products
 Accept: application/json
 
+###
+PUT https://localhost:5001/api/store-products/UPC22
+Content-Type: application/json
+
+{
+  "Upc": "UPC1",
+  "UpcProm": "",
+  "ProductId": "3bd72c17-2cb1-4dd2-b500-550ab52d83c2",
+  "Price": 300.00,
+  "Quantity": 50,
+  "IsPromotional": false
+}

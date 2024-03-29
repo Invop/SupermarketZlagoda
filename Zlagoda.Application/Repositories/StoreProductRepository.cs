@@ -95,20 +95,24 @@ public class StoreProductRepository : IStoreProductRepository
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         const string queryString = "UPDATE Store_Products SET UPC_prom = @newUpc WHERE UPC_prom = @prevUpc;";
         using var command = new SqlCommand(queryString, connection);
-        command.Parameters.AddWithValue("@newUpc", newUpc);
+        if (string.IsNullOrEmpty(newUpc))
+            command.Parameters.AddWithValue("@newUpc", DBNull.Value);
+        else
+            command.Parameters.AddWithValue("@newUpc", newUpc);
         command.Parameters.AddWithValue("@prevUpc", prevUpc);
         var result = await command.ExecuteNonQueryAsync();
 
         return result > 0;
     }
 
-    public async Task<bool> UpdateAsync(StoreProduct product)
+    public async Task<bool> UpdateAsync(StoreProduct product,string prevUpc)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         const string queryString =
-            "UPDATE Store_Products SET UPC = @UPC, UPC_prom = @UPC_prom, id_product = @id_product, selling_price = @selling_price, products_number = @products_number, promotional_product = @promotional_product WHERE UPC = @UPC";
+            "UPDATE Store_Products SET UPC = @UPC, UPC_prom = @UPC_prom, id_product = @id_product, selling_price = @selling_price, products_number = @products_number, promotional_product = @promotional_product WHERE UPC = @prevUPC";
         using var command = new SqlCommand(queryString, connection);
         command.Parameters.AddWithValue("@UPC", product.Upc);
+        command.Parameters.AddWithValue("@prevUPC", prevUpc);
         if (string.IsNullOrEmpty(product.UpcProm))
             command.Parameters.AddWithValue("@UPC_prom", DBNull.Value);
         else

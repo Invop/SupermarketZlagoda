@@ -8,7 +8,7 @@ public interface IStoreProductRepository
     Task<StoreProduct?> GetByUPCAsync(string upc);
     Task<IEnumerable<StoreProduct>> GetAllAsync();
     Task<bool> UpdatePromProductsAsync(string prevUpc, string newUpc);
-    Task<bool> UpdateAsync(StoreProduct product);
+    Task<bool> UpdateAsync(StoreProduct product, string prevUpc);
     Task<bool> DeleteByUPCAsync(string upc);
     Task<bool> ExistsByUPCAsync(string upc);
 }
