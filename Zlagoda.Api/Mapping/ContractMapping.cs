@@ -49,6 +49,58 @@ public static class ContractMapping
     }
     #endregion
 
+    #region StoreProduct
+
+    public static StoreProduct MapToStoreProduct(this CreateStoreProductRequest request)
+    {
+        return new StoreProduct
+        {
+            Upc = request.Upc,
+            UpcProm = request.UpcProm,
+            ProductId = request.ProductId,
+            Price = request.Price,
+            Quantity = request.Quantity,
+            IsPromotional = request.IsPromotional
+        };
+    }
+    
+    public static StoreProductResponse MapToStoreProductResponse(this StoreProduct movie)
+    {
+        return new StoreProductResponse()
+        {
+            Upc = movie.Upc,
+            UpcProm = movie.UpcProm,
+            ProductId = movie.ProductId,
+            Price = movie.Price,
+            Quantity = movie.Quantity,
+            IsPromotional = movie.IsPromotional
+        };
+    }
+    
+    public static StoreProductsResponse MapToStoreProductResponse(this IEnumerable<StoreProduct> storeProducts)
+    {
+        return new StoreProductsResponse
+        {
+            Items = storeProducts.Select(MapToStoreProductResponse)
+        };
+    }
+
+    public static StoreProduct MapToStoreProduct(this UpdateStoreProductRequest request)
+    {
+        return new StoreProduct
+        {
+            Upc = request.Upc,
+            UpcProm = request.UpcProm,
+            ProductId = request.ProductId,
+            Price = request.Price,
+            Quantity = request.Quantity,
+            IsPromotional = request.IsPromotional
+        };
+    }
+
+
+    #endregion
+
     #region Category
 
     public static Category MapToCategory(this CreateCategoryRequest request)
