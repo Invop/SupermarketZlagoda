@@ -16,7 +16,7 @@
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Id)"/>
-    <PropertyColumn Property="@(c => c.CategoryId)" />
+    <PropertyColumn Title="Category" Property="@(c => _categories[c.CategoryId])" />
     <PropertyColumn Property="@(c => c.Name)" Align="Align.Center" />
     <PropertyColumn Property="@(c => c.Characteristics)" Align="Align.End" />
     @if(IsManager)

@@ -35,7 +35,7 @@ public class ProductRepository : IProductRepository
             {
                 Id = reader.GetGuid(reader.GetOrdinal("id_product")),
                 Name = reader.GetString(reader.GetOrdinal("product_name")),
-                CategoryId = reader.GetInt32(reader.GetOrdinal("category_number")),
+                CategoryId = reader.GetGuid(reader.GetOrdinal("category_number")),
                 Characteristics = reader.GetString(reader.GetOrdinal("characteristics"))
             };
             return product;
@@ -58,7 +58,7 @@ public class ProductRepository : IProductRepository
             {
                 Id = reader.GetGuid(reader.GetOrdinal("id_product")),
                 Name = reader.GetString(reader.GetOrdinal("product_name")),
-                CategoryId = reader.GetInt32(reader.GetOrdinal("category_number")),
+                CategoryId = reader.GetGuid(reader.GetOrdinal("category_number")),
                 Characteristics = reader.GetString(reader.GetOrdinal("characteristics"))
             };
             products.Add(product);

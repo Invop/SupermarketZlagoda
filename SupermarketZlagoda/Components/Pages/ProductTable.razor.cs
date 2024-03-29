@@ -19,13 +19,14 @@ public partial class ProductTable
     private int _sortType = 0;
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Product>? _items = Enumerable.Empty<Product>().AsQueryable();
-
+    private Dictionary<Guid, string> _categories = new();
     private List<SelectOption> _categoryOptions = [];
     private static readonly HttpClient Client = new HttpClient();
     
     protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
+        await UpdateCategoryOptions();
         await UpdateTable();
     }
 
@@ -36,9 +37,10 @@ public partial class ProductTable
         {
             var responseJson = await response.Content.ReadAsStringAsync();
             var categories = JsonConvert
-                .DeserializeObject<List<Category>>(JObject.Parse(responseJson)["items"].ToString()).AsQueryable();
+                .DeserializeObject<List<Category>>(JObject.Parse(responseJson)["items"].ToString());
             foreach (var category in categories)
             {
+                _categories[category.Id] = category.Name;
                 _categoryOptions.Add(new SelectOption(category.Id, category.Name));
             }
             StateHasChanged();
@@ -51,7 +53,6 @@ public partial class ProductTable
 
     private async Task UpdateTable()
     {
-        await UpdateCategoryOptions();
         var response = await Client.GetAsync("https://localhost:5001/api/products");
         if (response.IsSuccessStatusCode)
         {
@@ -82,7 +83,7 @@ public partial class ProductTable
                 Height = "400px",
                 Title = $"Updating the {context.Name}",
                 PreventDismissOnOverlayClick = true,
-                PreventScroll = true,
+                PreventScroll = true
             });
 
             var result = await dialog.Result;
@@ -116,7 +117,7 @@ public partial class ProductTable
     {   
         var context = new Product()
         {
-            CategoryId = 0,
+            CategoryId = Guid.Empty,
             Name = "",
             Characteristics = ""
         };
