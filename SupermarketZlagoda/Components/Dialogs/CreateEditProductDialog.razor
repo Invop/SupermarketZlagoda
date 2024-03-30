@@ -1,90 +1,131 @@
 ﻿@using SupermarketZlagoda.Data.Model
-@using SupermarketZlagoda.Data
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
-@using Microsoft.IdentityModel.Tokens
+@inject IDialogService DialogService
 @implements IDialogContentComponent<Product>
+    @* Header *@
+    <FluentDialogHeader ShowDismiss="true">
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+            <FluentLabel Typo="Typography.PaneHeader">
+                @Dialog.Instance.Parameters.Title
+            </FluentLabel>
+        </FluentStack>
+    </FluentDialogHeader>
 
-@* Header *@
-<FluentDialogHeader ShowDismiss="true">
-    <FluentStack VerticalAlignment="VerticalAlignment.Center">
-        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
-        <FluentLabel Typo="Typography.PaneHeader">
-            @Dialog.Instance.Parameters.Title
-        </FluentLabel>
-    </FluentStack>
-</FluentDialogHeader>
+    @* Footer *@
 
-@* Footer *@
-<FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
-    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
-</FluentDialogFooter>
+    @* Body *@
+    <FluentDialogBody>
 
-@* Body *@
-<FluentDialogBody>
-    <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
-    <br/><br/>
-    <FluentSelect Items="@_stringOptions"
-                  OptionText="@(i => i.Text)" 
-                  OptionSelected="@(i => i.Selected)" 
-                  OptionValue="@(i => i.Value)"
-                  @bind-Value="@_id"
-                  Label="Category:"/>
-    <br/><br/>
-    <FluentTextArea  style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea >
-</FluentDialogBody>
-
-@code {
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
+            <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
+            <br/><br/>
+            <FluentCombobox Items="@_categoryList"
+                            Label="Category:"
+                            OptionValue="@(category => category.Id.ToString())"
+                            OptionText="@(category => category.Name)"
+                            @bind-SelectedOption="@Category"
+                            Required="true">
+                <OptionTemplate Context="optionContext">
+                    @optionContext.Name
+                </OptionTemplate>
+            </FluentCombobox>
+            <FluentValidationMessage For="() => Content.CategoryId"></FluentValidationMessage>
+            <br/><br/>
+            <FluentTextArea style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea >
+        </EditForm>
+     
+    </FluentDialogBody>
     
-    string _id;
-    
+    <FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit"
+                      Disabled="@(!_editContext.Validate())"
+                      Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+        <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+    </FluentDialogFooter>
+
+    @code {
+        private const string CategoryApiUrl = "https://localhost:5001/api/categories";    
     [Parameter]
     public Product Content { get; set; } = default!;
-
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
-    
-    private Stack<Option<string>> _stringOptions = [];
+    private Category? Category { get; set; }
+    private EditContext _editContext = default!;
+    private List<Category>? _categoryList = [];
     private static readonly HttpClient Client = new();
+    
+    
     protected override async Task OnInitializedAsync()
     {
-        await UpdateCategoryOptions();
+        InitializeEditContextForContent();
+        await InitializeCategoryListAsync();
+        CheckCategoryListAndActIfNeeded();
+        SetCategory();
     }
 
-    private async Task UpdateCategoryOptions()
+    private void InitializeEditContextForContent()
     {
-        var response = await Client.GetAsync("https://localhost:5001/api/categories");
-        if (response.IsSuccessStatusCode)
-        {
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var categories = JsonConvert
-                .DeserializeObject<List<Category>>(JObject.Parse(responseJson)["items"].ToString());
-            if (categories.IsNullOrEmpty()) return;
-            var id = Content.CategoryId;
-            var hasCategory = !id.Equals(Guid.Empty);
-            foreach (var category in categories)
-            {
-                _stringOptions.Push(new Option<string>
-                {
-                    Value = category.Id.ToString(), Text = category.Name
-                });
-                if (hasCategory && category.Id.Equals(id))
-                    _stringOptions.Peek().Selected = true;
-            }
-            if (!hasCategory) _stringOptions.Peek().Selected = true;
-            StateHasChanged();
-        }
-        else
+        _editContext = new EditContext(Content);
+    }
+
+    private async Task InitializeCategoryListAsync()
+    {
+        _categoryList = await GetCategoryList();
+    }
+
+    private async void CheckCategoryListAndActIfNeeded()
+    {
+        if (_categoryList != null && _categoryList.Any()) return;
+        await ShowErrorAsync();
+        await Dialog.CancelAsync();
+    }
+
+    private void SetCategory()
+    {
+        Category = Content.CategoryId != Guid.Empty 
+            ? GetMatchingCategoryFromList() 
+            : GetFirstCategoryFromList();
+    }
+
+    private Category GetMatchingCategoryFromList()
+    {
+        return _categoryList.First(x => x.Id == Content.CategoryId);
+    }
+
+    private Category GetFirstCategoryFromList()
+    {
+        return _categoryList.ElementAtOrDefault(0);
+    }
+    
+    private async Task ShowErrorAsync()
+    {
+        var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 category");
+        var result = await dialog.Result;
+    }
+
+    private async Task<List<Category>?> GetCategoryList()
+    {
+        var response = await Client.GetAsync(CategoryApiUrl);
+        if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine($"Error: {response.StatusCode}");
+            return null;
         }
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<Category>>(JObject.Parse(content)["items"].ToString());
     }
     
     private async Task SaveAsync()
     {
-        Content.CategoryId = Guid.Parse(_id);
-        await Dialog.CloseAsync(Content);
+        if (_editContext.Validate())
+        {
+            if (Category != null) Content.CategoryId = Category.Id;
+            await Dialog.CloseAsync(Content);
+        }
     }
 
     private async Task CancelAsync()
