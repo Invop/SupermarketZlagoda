@@ -11,4 +11,7 @@ public interface IStoreProductRepository
     Task<bool> UpdateAsync(StoreProduct product, string prevUpc);
     Task<bool> DeleteByUPCAsync(string upc);
     Task<bool> ExistsByUPCAsync(string upc);
+
+    Task<IEnumerable<string>> GetAllNotPromoProductUPC();
+
 }

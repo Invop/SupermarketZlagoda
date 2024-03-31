@@ -43,7 +43,6 @@ public partial class ProductTable
                 _categories[category.Id] = category.Name;
                 _categoryOptions.Add(new SelectOption(category.Id, category.Name));
             }
-            StateHasChanged();
         }
         else
         {

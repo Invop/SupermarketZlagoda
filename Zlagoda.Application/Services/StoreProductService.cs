@@ -27,6 +27,11 @@ public class StoreProductService : IStoreProductService
        return await _storeProductRepository.GetAllAsync();
     }
 
+    public async Task<IEnumerable<string>> GetAllNotPromoUpc()
+    {
+        return await _storeProductRepository.GetAllNotPromoProductUPC();
+    }
+
     public async Task<StoreProduct?> UpdateAsync(StoreProduct product,string prevUpc)
     {
         var storeProductExists = await _storeProductRepository.ExistsByUPCAsync(prevUpc);

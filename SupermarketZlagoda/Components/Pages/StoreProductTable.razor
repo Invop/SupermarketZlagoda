@@ -1,10 +1,11 @@
 ﻿@page "/store-products"
 @using SupermarketZlagoda.Data
 @inject UserState UserState
+@inject IDialogService DialogService
 <FluentToolbar id="toolbar-fluent-components">
     @if(IsManager)
     {
-        <FluentButton Appearance="Appearance.Accent">Add new product</FluentButton>
+        <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new store product</FluentButton>
     }
     <FluentRadioGroup @bind-Value="_sortType">
         <FluentRadio Value="@(0)">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
@@ -14,17 +15,16 @@
     </FluentRadioGroup>
     <FluentCheckbox Label="Hide promotions" bind-Value="_hidePromotional"></FluentCheckbox>
     <FluentCheckbox Label="Hide non-promotions" bind-Value="_hideNonPromotional"></FluentCheckbox>
-    <MultiselectDropdown Options="CategoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
     <FluentTextField @bind-Value="_searchTerm" Placeholder="Search by UPC" Style="margin-top: 10px;"></FluentTextField>
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 1fr" Style="height: 600px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Upc)"/>
     <PropertyColumn Property="@(c => c.UpcProm)"/>
-    <PropertyColumn Property="@(c => c.IdProduct)"/>
-    <PropertyColumn Property="@(c => c.SellingPrice)"/>
-    <PropertyColumn Property="@(c => c.ProductsNumber)"/>
+    <PropertyColumn Property="@(c => c.ProductId)"/>
+    <PropertyColumn Property="@(c => c.Price)"/>
+    <PropertyColumn Property="@(c => c.Quantity)"/>
     <TemplateColumn Title="PromotionalProduct">
-        @if (context.PromotionalProduct)
+        @if (context.IsPromotional)
         {
             <FluentIcon Value="new Icons.Regular.Size32.CheckmarkCircle()"/>
         }

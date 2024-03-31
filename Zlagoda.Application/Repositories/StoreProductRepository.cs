@@ -148,4 +148,19 @@ public class StoreProductRepository : IStoreProductRepository
         return (int)result > 0;
         
     }
+
+    public async Task<IEnumerable<string>> GetAllNotPromoProductUPC()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        const string queryString = "SELECT UPC FROM Store_Products WHERE promotional_product = 0";
+        using var command = new SqlCommand(queryString, connection);
+        using var reader = await command.ExecuteReaderAsync();
+        var upcs = new List<string>();
+        while (await reader.ReadAsync())
+        {
+            var upc = reader.GetString(reader.GetOrdinal("UPC"));
+            upcs.Add(upc);
+        }
+        return upcs;
+    }
 }

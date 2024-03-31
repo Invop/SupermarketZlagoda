@@ -42,7 +42,12 @@ public class StoreProductController : ControllerBase
         var productsResponse = products.MapToStoreProductResponse();
         return Ok(productsResponse);
     }
-
+    [HttpGet(ApiEndpoints.StoreProducts.GetAllNotPromoUpc)]
+    public async Task<IActionResult> GetAllNotPromoUpc()
+    {
+        var products = await _productService.GetAllNotPromoUpc();
+        return Ok(products);
+    }
 
     [HttpPut(ApiEndpoints.StoreProducts.Update)]
     public async Task<IActionResult> Update([FromRoute] string prevUpc,
