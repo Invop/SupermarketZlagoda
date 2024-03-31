@@ -7,8 +7,8 @@ namespace Zlagoda.Application.Repositories;
 public class StoreProductRepository : IStoreProductRepository
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
-    private readonly IProductRepository _productRepository;
-    public StoreProductRepository(IDbConnectionFactory dbConnectionFactory, IProductRepository productRepository)
+    private readonly Lazy<IProductRepository> _productRepository;
+    public StoreProductRepository(IDbConnectionFactory dbConnectionFactory, Lazy<IProductRepository>  productRepository)
     {
         _dbConnectionFactory = dbConnectionFactory;
         _productRepository = productRepository;
@@ -16,7 +16,7 @@ public class StoreProductRepository : IStoreProductRepository
 
     private async Task<bool> IsProductExists(StoreProduct storeProduct)
     {
-        var productExists = await _productRepository.ExistsByIdAsync(storeProduct.ProductId);
+        var productExists = await _productRepository.Value.ExistsByIdAsync(storeProduct.ProductId);
         return productExists;
     }
     public async Task<bool> CreateAsync(StoreProduct storeProduct)
