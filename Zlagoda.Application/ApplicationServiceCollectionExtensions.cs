@@ -39,4 +39,12 @@ public static class ApplicationServiceCollectionExtensions
         services.AddSingleton<DbInitializer>();
         return services;
     }
+    
+    public static void AddLazy(this IServiceCollection services)
+    {
+        services.AddTransient<IProductRepository, ProductRepository>();
+        services.AddTransient<IStoreProductService, StoreProductService>();
+        services.AddTransient<Lazy<IProductRepository>>(provider => new Lazy<IProductRepository>(provider.GetRequiredService<IProductRepository>));
+        services.AddTransient<Lazy<IStoreProductService>>(provider => new Lazy<IStoreProductService>(provider.GetRequiredService<IStoreProductService>));
+    }
 }

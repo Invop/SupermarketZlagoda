@@ -152,7 +152,17 @@ public class StoreProductRepository : IStoreProductRepository
     public async Task<IEnumerable<string>> GetAllNotPromoProductUPC()
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        const string queryString = "SELECT UPC FROM Store_Products WHERE promotional_product = 0";
+        const string queryString = """
+                                   
+                                           SELECT UPC
+                                           FROM Store_Products
+                                           WHERE id_product IN (
+                                               SELECT id_product
+                                               FROM Store_Products
+                                               GROUP BY id_product
+                                               HAVING COUNT(*) = 1)
+                                           AND promotional_product = 0
+                                   """;
         using var command = new SqlCommand(queryString, connection);
         using var reader = await command.ExecuteReaderAsync();
         var upcs = new List<string>();

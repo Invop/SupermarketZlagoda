@@ -42,6 +42,13 @@ public class ProductController : ControllerBase
         var productsResponse = products.MapToProductResponse();
         return Ok(productsResponse);
     }
+    [HttpGet(ApiEndpoints.Products.GetAllUnused)]
+    public async Task<IActionResult> GetAllUnused()
+    {
+        var products = await _productService.GetAllUnusedAsync();
+        var productsResponse = products.MapToProductResponse();
+        return Ok(productsResponse);
+    }
 
 
     [HttpPut(ApiEndpoints.Products.Update)]

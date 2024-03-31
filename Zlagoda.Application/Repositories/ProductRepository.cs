@@ -1,16 +1,18 @@
 ﻿using Microsoft.Data.SqlClient;
 using Zlagoda.Application.Database;
 using Zlagoda.Application.Models;
+using Zlagoda.Application.Services;
 
 namespace Zlagoda.Application.Repositories;
 
 public class ProductRepository : IProductRepository
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
-
-    public ProductRepository(IDbConnectionFactory dbConnectionFactory)
+    private readonly Lazy<IStoreProductService> _storeProductService;
+    public ProductRepository(IDbConnectionFactory dbConnectionFactory, Lazy<IStoreProductService> storeProductService)
     {
         _dbConnectionFactory = dbConnectionFactory;
+        _storeProductService = storeProductService;
     }
     public async Task<bool> CreateAsync(Product product)
     {
@@ -64,6 +66,31 @@ public class ProductRepository : IProductRepository
             products.Add(product);
         }
         return products;
+    }
+
+    public async Task<IEnumerable<Product>> GetAllUnusedAsync()
+    {
+        var allStoreItems = await _storeProductService.Value.GetAllAsync();
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var unusedProductIds = allStoreItems.Select(item => item.ProductId).Distinct();
+        string idsString = string.Join(",", unusedProductIds.Select(id => $"'{id}'"));
+        var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString})";
+        using var command = new SqlCommand(commandText, connection);
+        using var reader = await command.ExecuteReaderAsync();
+        var products = new List<Product>();
+        while (await reader.ReadAsync())
+        {
+            var product = new Product
+            {
+                Id = reader.GetGuid(reader.GetOrdinal("id_product")),
+                Name = reader.GetString(reader.GetOrdinal("product_name")),
+                CategoryId = reader.GetGuid(reader.GetOrdinal("category_number")),
+                Characteristics = reader.GetString(reader.GetOrdinal("characteristics"))
+            };
+            products.Add(product);
+        }
+        return products;
+        
     }
 
     public async Task<bool> UpdateAsync(Product product)

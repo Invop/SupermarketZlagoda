@@ -10,6 +10,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 builder.Services.AddApplication();
+builder.Services.AddLazy();
 builder.Services.AddDatabase(config["Database:ConnectionString"]!);
 
 
