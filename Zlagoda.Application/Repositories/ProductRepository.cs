@@ -79,7 +79,7 @@ public class ProductRepository : IProductRepository
             return await GetAllAsync();
         }
         string idsString = string.Join(",", productIds.Select(id => $"'{id}'"));
-        var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString}))";
+        var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString})";
         using var command = new SqlCommand(commandText, connection);
         using var reader = await command.ExecuteReaderAsync();
         var products = new List<Product>();
