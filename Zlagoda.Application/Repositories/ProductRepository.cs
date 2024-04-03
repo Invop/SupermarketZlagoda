@@ -73,8 +73,13 @@ public class ProductRepository : IProductRepository
         var allStoreItems = await _storeProductService.Value.GetAllAsync();
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var unusedProductIds = allStoreItems.Select(item => item.ProductId).Distinct();
-        string idsString = string.Join(",", unusedProductIds.Select(id => $"'{id}'"));
-        var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString})";
+        var productIds = unusedProductIds.ToList();
+        if (productIds.Count == 0)
+        {
+            return await GetAllAsync();
+        }
+        string idsString = string.Join(",", productIds.Select(id => $"'{id}'"));
+        var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString}))";
         using var command = new SqlCommand(commandText, connection);
         using var reader = await command.ExecuteReaderAsync();
         var products = new List<Product>();
