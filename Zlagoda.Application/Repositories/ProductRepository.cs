@@ -93,6 +93,19 @@ public class ProductRepository : IProductRepository
         
     }
 
+    public async Task<IEnumerable<Product>> GetAllUnusedAndCurrentAsync(Guid id)
+    {
+        var currentProduct = await GetByIdAsync(id);
+        var allUnusedProducts = await GetAllUnusedAsync();
+
+        if (currentProduct != null)
+        {
+            allUnusedProducts = allUnusedProducts.Append(currentProduct);
+        }
+
+        return allUnusedProducts;
+    }
+
     public async Task<bool> UpdateAsync(Product product)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();

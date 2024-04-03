@@ -49,6 +49,14 @@ public class ProductController : ControllerBase
         var productsResponse = products.MapToProductResponse();
         return Ok(productsResponse);
     }
+    
+    [HttpGet(ApiEndpoints.Products.GetAllUnusedAndCurrent)]
+    public async Task<IActionResult> GetAllUnusedAndCurrent([FromRoute] Guid id)
+    {
+        var products = await _productService.GetAllUnusedAndCurrentAsync(id);
+        var productsResponse = products.MapToProductResponse();
+        return Ok(productsResponse);
+    }
 
 
     [HttpPut(ApiEndpoints.Products.Update)]

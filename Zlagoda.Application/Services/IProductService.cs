@@ -8,6 +8,7 @@ public interface IProductService
     Task<Product?> GetByIdAsync(Guid id);
     Task<IEnumerable<Product>> GetAllAsync();
     Task<IEnumerable<Product>> GetAllUnusedAsync();
+    Task<IEnumerable<Product>> GetAllUnusedAndCurrentAsync(Guid id);
     Task<Product?> UpdateAsync(Product product);
     Task<bool> DeleteByIdAsync(Guid id);
 }

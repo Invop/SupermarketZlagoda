@@ -119,10 +119,11 @@ public partial class StoreProductTable
         var dialog = await DialogService.ShowDialogAsync<CreateEditStoreProductDialog>(context, new DialogParameters()
         {
             Height = "400px",
+            Title = $"Updating  {context.Upc}",
             PreventDismissOnOverlayClick = true,
-            PreventScroll = true
+            PreventScroll = true,
         });
-
+        
         var result = await dialog.Result;
         if (result is { Cancelled: false, Data: not null })
         {

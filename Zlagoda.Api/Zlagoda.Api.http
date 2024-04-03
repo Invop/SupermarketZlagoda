@@ -5,7 +5,7 @@ GET https://localhost:5001/api/products
 Accept: application/json
 
 ###
-GET https://localhost:5001/api/products/unused
+GET https://localhost:5001/api/products/unused/dbeca2b5-d56b-4f18-9ac5-0689bc6fbf2f
 Accept: application/json
 
 

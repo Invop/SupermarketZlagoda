@@ -1,7 +1,6 @@
 ﻿@using SupermarketZlagoda.Data.Model
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
-@inject IDialogService DialogService
 @implements IDialogContentComponent<StoreProduct>
     @* Header *@
     <FluentDialogHeader ShowDismiss="true">
@@ -20,27 +19,16 @@
 
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
-            <FluentTextField @bind-Value="@Content.Upc">UPC:</FluentTextField>
-            <FluentValidationMessage For="() => Content.Upc"></FluentValidationMessage>
-            <br/><br/>
-            <FluentCheckbox @bind-Value="@Content.IsPromotional" Label="Is Promo"/>
-            @if (Content.IsPromotional)
-            {
-                <FluentCombobox Items="_notPromoUpcsList" @bind-Value="@Content.UpcProm"/>
-            }
-            <FluentCombobox Items="@_productList"
-                            Label="Product:"
-                            OptionValue="@(product => product.Id.ToString())"
-                            OptionText="@(product => product.Name)"
-                            @bind-SelectedOption="@Product"
-                            Required="true">
-                <OptionTemplate Context="optionContext">
-                    @optionContext.Name
-                </OptionTemplate>
-            </FluentCombobox>
-            <FluentNumberField @bind-Value="@Content.Price">Price:</FluentNumberField><br />
-            <FluentNumberField @bind-Value="@Content.Quantity">Quantity:</FluentNumberField><br />
-            
+                <FluentCombobox Items="@_products"
+                                Label="ProductId:"
+                                OptionValue="@(product => product.Id.ToString())"
+                                OptionText="@(product => product.Name)"
+                                @bind-SelectedOption="@Product"
+                                Required="true">
+                    <OptionTemplate Context="optionContext">
+                        @optionContext.Name
+                    </OptionTemplate>
+                </FluentCombobox>
         </EditForm>
      
     </FluentDialogBody>
@@ -53,85 +41,48 @@
     </FluentDialogFooter>
 
     @code {
-    private const string ProductsApiUrl = "https://localhost:5001/api/products";
+    private const string ProductsApiUrl = "https://localhost:5001/api/products/unused";
     private const string NotPromoUpcsApiUrl = "https://localhost:5001/api/store-products/not-promo/upcs";   
+
     [Parameter]
     public StoreProduct Content { get; set; } = default!;
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
+    private bool IsEditMode { get; set; }
     private Product? Product { get; set; }
     private EditContext _editContext = default!;
-    private List<Product>? _productList = [];
-    private List<string>? _notPromoUpcsList = [];
     private static readonly HttpClient Client = new();
-    
+
+
+    private List<Product>? _products = new List<Product>();
     
     protected override async Task OnInitializedAsync()
     {
-        InitializeEditContextForContent();
         
-        await InitializeNotPromoUpcsListAsync();
-        await InitializeProductListAsync();
-        //CheckCategoryListAndActIfNeeded();
-        SetCategory();
+        InitializeEditContextForContent();
+        Console.WriteLine(Content.ProductId);
+        if (Dialog.Instance.Parameters.Title != null && Dialog.Instance.Parameters.Title.StartsWith("Updating"))
+        {
+            IsEditMode = true;
+            _products = await GetAllUnusedProductsAndCurrent(Content.ProductId);
+        }
+        else
+        {
+            IsEditMode = false;
+            _products = await GetAllUnusedProducts();
+        }
+
+        InitSelectedProduct();
+        
     }
 
     private void InitializeEditContextForContent()
     {
         _editContext = new EditContext(Content);
     }
-
-    private async Task InitializeNotPromoUpcsListAsync()
-    {
-        _notPromoUpcsList = await GetNotPromoUpcsList();
-    }
     
-    private async Task InitializeProductListAsync()
-    {
-        _productList = await GetProductsList();
-    }
-
-    private async void CheckCategoryListAndActIfNeeded()
-    {
-        if (_productList != null && _productList.Any()) return;
-        await ShowErrorAsync();
-        await Dialog.CancelAsync();
-    }
-
-    private void SetCategory()
-    {
-        Product = Content.ProductId != Guid.Empty 
-            ? GetMatchingCategoryFromList() 
-            : GetFirstCategoryFromList();
-    }
-
-    private Product GetMatchingCategoryFromList()
-    {
-        return _productList.First(x => x.Id == Content.ProductId);
-    }
-
-    private Product GetFirstCategoryFromList()
-    {
-        return _productList.ElementAtOrDefault(0);
-    }
     
-    private async Task ShowErrorAsync()
-    {
-        var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 category");
-        var result = await dialog.Result;
-    }
-    private async Task<List<string>?> GetNotPromoUpcsList()
-    {
-        var response = await Client.GetAsync(NotPromoUpcsApiUrl);
-
-        if (!response.IsSuccessStatusCode) return null;
-        var jsonResult = await response.Content.ReadAsStringAsync();
-        var data = JsonConvert.DeserializeObject<List<string>>(jsonResult);
-        return data;
-
-    }
-
-    private async Task<List<Product>?> GetProductsList()
+    private async Task<List<Product>?> GetAllUnusedProducts()
     {
         var response = await Client.GetAsync(ProductsApiUrl);
         if (!response.IsSuccessStatusCode)
@@ -142,6 +93,31 @@
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<Product>>(JObject.Parse(content)["items"].ToString());
     }
+    
+    private async Task<List<Product>?> GetAllUnusedProductsAndCurrent(Guid id)
+    {
+        var response = await Client.GetAsync(ProductsApiUrl+$"/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+            return null;
+        }
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<Product>>(JObject.Parse(content)["items"].ToString());
+    }
+
+    private void InitSelectedProduct()
+    {
+        if (IsEditMode)
+        {
+            if (_products != null) Product = _products.FirstOrDefault(x => x.Id == Content.ProductId);
+        }
+        else
+        {
+            Product = _products?[0];
+        }
+    }
+    
     
     private async Task SaveAsync()
     {

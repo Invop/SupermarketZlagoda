@@ -10,6 +10,7 @@ public class ApiEndpoints
         public const string Get = $"{Base}/{{id:guid}}";
         public const string GetAll = Base;
         public const string GetAllUnused = $"{Base}/unused";
+        public const string GetAllUnusedAndCurrent = $"{Base}/unused/{{id:guid}}";
         public const string Update = $"{Base}/{{id:guid}}";
         public const string Delete = $"{Base}/{{id:guid}}";
     }

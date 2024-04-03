@@ -32,6 +32,11 @@ public class ProductService : IProductService
         return await _productRepository.GetAllUnusedAsync();
     }
 
+    public async Task<IEnumerable<Product>> GetAllUnusedAndCurrentAsync(Guid id)
+    {
+        return await _productRepository.GetAllUnusedAndCurrentAsync(id);
+    }
+
     public async Task<Product?> UpdateAsync(Product product)
     {
         var productExists = await _productRepository.ExistsByIdAsync(product.Id);
