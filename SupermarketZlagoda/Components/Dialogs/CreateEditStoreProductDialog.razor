@@ -72,13 +72,13 @@
     protected override async Task OnInitializedAsync()
     {
         InitializeEditContextForContent();
-        GetMaxQuantityIfNotPromotional();
+        GetMaxQuantityIfPromotional();
         await HandleDialogDependentLoading();
     }
 
-    private void GetMaxQuantityIfNotPromotional()
+    private void GetMaxQuantityIfPromotional()
     {
-        if (!Content.IsPromotional)
+        if (Content.IsPromotional)
             _maxQuantityValue = Content.Quantity;
     }
 
