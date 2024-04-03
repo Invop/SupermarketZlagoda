@@ -100,7 +100,7 @@ public partial class StoreProductTable
         }
     }
 
-    private async Task DeleteProductAsync(string guid)
+    private async Task DeleteProductAsync(string? guid)
     {
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Accept.Clear();
@@ -116,6 +116,7 @@ public partial class StoreProductTable
     
     private async Task OpenEditDialogAsync(StoreProduct context)
     {
+        var prevUpc = context.Upc;
         var dialog = await DialogService.ShowDialogAsync<CreateEditStoreProductDialog>(context, new DialogParameters()
         {
             Height = "400px",
@@ -128,13 +129,13 @@ public partial class StoreProductTable
         if (result is { Cancelled: false, Data: not null })
         {
             var item = result.Data as StoreProduct;
-            await UpdateProductAsync(item);
+            await UpdateStoreProductAsync(item,prevUpc);
             await UpdateTable();
         }
             
     }
 
-    private async Task UpdateProductAsync(StoreProduct product)
+    private async Task UpdateStoreProductAsync(StoreProduct product, string contextUpc)
     {
         var productJson = JsonConvert.SerializeObject(product);
 
@@ -144,10 +145,38 @@ public partial class StoreProductTable
 
         var content = new StringContent(productJson, Encoding.UTF8, "application/json");
 
-        var response = await client.PutAsync($"https://localhost:5001/api/store-products/{product.Upc}", content);
+        var response = await client.PutAsync($"https://localhost:5001/api/store-products/{contextUpc}", content);
 
         Console.WriteLine(response.IsSuccessStatusCode
             ? "Product successfully updated."
             : $"Failed to update the product. Status code: {response.StatusCode}");
+    }
+
+    private async Task OpenAddPromoStoreProductDialog(StoreProduct context)
+    {   
+        StoreProduct promoStoreProduct = new StoreProduct
+        {   
+            ProductId = context.ProductId,
+            Quantity = context.Quantity,
+            Price = context.Price * 0.8m,
+            IsPromotional = true,
+        };
+        var dialog = await DialogService.ShowDialogAsync<CreateEditStoreProductDialog>(promoStoreProduct, new DialogParameters()
+        {
+            Height = "400px",
+            Title = $"Create new promo product",
+            PreventDismissOnOverlayClick = true,
+            PreventScroll = true,
+        });
+        
+        var result = await dialog.Result;
+        if (result is { Cancelled: false, Data: not null })
+        {
+            var item = result.Data as StoreProduct;
+            context.UpcProm = item.Upc;
+            await UpdateStoreProductAsync(context,context.Upc);
+            await PostStoreProductAsync(item);
+            await UpdateTable();
+        }
     }
 }

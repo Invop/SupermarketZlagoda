@@ -27,9 +27,14 @@ public class StoreProductService : IStoreProductService
        return await _storeProductRepository.GetAllAsync();
     }
 
-    public async Task<IEnumerable<string>> GetAllNotPromoUpc()
+    public async Task<IEnumerable<StoreProduct>> GetAllPromoStoreProductsAsync()
     {
-        return await _storeProductRepository.GetAllNotPromoProductUPC();
+        return await _storeProductRepository.GetAllPromoStoreProductsAsync();
+    }
+
+    public async Task<int> GetQuantityByUpcPromAsync(string upc)
+    {
+        return await _storeProductRepository.GetQuantityByUpcPromAsync(upc);
     }
 
     public async Task<StoreProduct?> UpdateAsync(StoreProduct product,string prevUpc)
@@ -37,15 +42,20 @@ public class StoreProductService : IStoreProductService
         var storeProductExists = await _storeProductRepository.ExistsByUPCAsync(prevUpc);
         if (!storeProductExists) 
             return null;
+        
         await _storeProductRepository.UpdateAsync(product,prevUpc);
-        await _storeProductRepository.UpdatePromProductsAsync(prevUpc, product.Upc);
+        if(!string.IsNullOrEmpty(product.UpcProm))
+        {
+            await _storeProductRepository.UpdatePromProductIdAsync(product.ProductId,product.UpcProm);
+        }
+        await _storeProductRepository.UpdatePromUpcAsync(prevUpc, product.Upc);
         return  product;
     }
 
     public async Task<bool> DeleteByUPCAsync(string upc)
     {
         
-        await _storeProductRepository.UpdatePromProductsAsync(upc, null);
+        await _storeProductRepository.UpdatePromUpcAsync(upc, null);
         return await _storeProductRepository.DeleteByUPCAsync(upc);
         
     }

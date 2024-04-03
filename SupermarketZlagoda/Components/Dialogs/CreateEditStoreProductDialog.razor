@@ -2,86 +2,118 @@
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
 @implements IDialogContentComponent<StoreProduct>
-    @* Header *@
-    <FluentDialogHeader ShowDismiss="true">
-        <FluentStack VerticalAlignment="VerticalAlignment.Center">
-            <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
-            <FluentLabel Typo="Typography.PaneHeader">
-                @Dialog.Instance.Parameters.Title
-            </FluentLabel>
-        </FluentStack>
-    </FluentDialogHeader>
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())"/>
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
 
-    @* Footer *@
+@* Footer *@
 
-    @* Body *@
-    <FluentDialogBody>
+@* Body *@
+<FluentDialogBody>
 
-        <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
-                <FluentCombobox Items="@_products"
-                                Label="ProductId:"
-                                OptionValue="@(product => product.Id.ToString())"
-                                OptionText="@(product => product.Name)"
-                                @bind-SelectedOption="@Product"
-                                Required="true">
-                    <OptionTemplate Context="optionContext">
-                        @optionContext.Name
-                    </OptionTemplate>
-                </FluentCombobox>
-        </EditForm>
-     
-    </FluentDialogBody>
-    
-    <FluentDialogFooter>
-        <FluentButton Type="ButtonType.Submit"
-                      Disabled="@(!_editContext.Validate())"
-                      Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
-        <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
-    </FluentDialogFooter>
+    <EditForm EditContext="_editContext">
+        <DataAnnotationsValidator/>
+        <FluentValidationSummary/>
+        <FluentTextField Required Label="UPC:" @bind-Value="@Content.Upc"/>
+        <FluentValidationMessage For="() => Content.Upc"></FluentValidationMessage>
 
-    @code {
-    private const string ProductsApiUrl = "https://localhost:5001/api/products/unused";
-    private const string NotPromoUpcsApiUrl = "https://localhost:5001/api/store-products/not-promo/upcs";   
-
-    [Parameter]
-    public StoreProduct Content { get; set; } = default!;
-    [CascadingParameter]
-    public FluentDialog Dialog { get; set; } = default!;
-    private bool IsEditMode { get; set; }
-    private Product? Product { get; set; }
-    private EditContext _editContext = default!;
-    private static readonly HttpClient Client = new();
-
-
-    private List<Product>? _products = new List<Product>();
-    
-    protected override async Task OnInitializedAsync()
-    {
-        
-        InitializeEditContextForContent();
-        Console.WriteLine(Content.ProductId);
-        if (Dialog.Instance.Parameters.Title != null && Dialog.Instance.Parameters.Title.StartsWith("Updating"))
+        @if (!Content.IsPromotional)
         {
-            IsEditMode = true;
-            _products = await GetAllUnusedProductsAndCurrent(Content.ProductId);
+            <FluentCombobox Items="@_products"
+                            Label="Select ProductId:"
+                            OptionValue="@(product => product.Id.ToString())"
+                            OptionText="@(product => product.Name)"
+                            @bind-SelectedOption="@Product"
+                            Required="true">
+                <OptionTemplate Context="optionContext">
+                    @optionContext.Name
+                </OptionTemplate>
+            </FluentCombobox>
+            <FluentNumberField Label="Quantity:" Min="1" @bind-Value="@(StoreProductQuantity)"/>
+            <FluentNumberField Label="Price:" Min="0.001" @bind-Value="@Content.Price"/>
         }
         else
         {
-            IsEditMode = false;
+            <FluentNumberField Label="Price:" ReadOnly="true" @bind-Value="@Content.Price"/>
+            <FluentNumberField Label="Quantity:" Min="1" Max="@_maxQuantityValue.ToString()" @bind-Value="@(StoreProductQuantity)"/>
+        }
+    </EditForm>
+
+</FluentDialogBody>
+
+<FluentDialogFooter>
+    <FluentButton Type="ButtonType.Submit"
+                  Disabled="@(!_editContext.Validate())"
+                  Appearance="Appearance.Accent" OnClick="@SaveAsync">
+        Save
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@code {
+    private const string ProductsApiUrl = "https://localhost:5001/api/products/unused";
+
+    [Parameter] public StoreProduct Content { get; set; } = default!;
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = default!;
+
+    private double StoreProductQuantity { get; set; } = 1;
+    private Product? Product { get; set; }
+    private EditContext _editContext = default!;
+    private static readonly HttpClient Client = new();
+    private List<Product>? _products = new();
+    private int _maxQuantityValue = int.MaxValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InitializeEditContextForContent();
+        GetMaxQuantityIfNotPromotional();
+        await HandleDialogDependentLoading();
+    }
+
+    private void GetMaxQuantityIfNotPromotional()
+    {
+        if (!Content.IsPromotional)
+            _maxQuantityValue = Content.Quantity;
+    }
+
+    private async Task HandleDialogDependentLoading()
+    {
+        var isUpdatingDialog = Dialog.Instance.Parameters.Title != null && Dialog.Instance.Parameters.Title.StartsWith("Updating");
+
+        if (isUpdatingDialog)
+        {
+            await HandleUpdateDialog();
+        }
+        else
+        {
             _products = await GetAllUnusedProducts();
         }
+    }
 
-        InitSelectedProduct();
-        
+    private async Task HandleUpdateDialog()
+    {
+        StoreProductQuantity = Content.Quantity;
+
+        if (Content is { Upc: not null, IsPromotional: true })
+            _maxQuantityValue = await GetQuantityByUpcProm(Content.Upc);
+
+        _products = await GetAllUnusedProductsAndCurrent(Content.ProductId);
+
+        if (_products != null)
+            Product = _products.FirstOrDefault(x => x.Id == Content.ProductId);
     }
 
     private void InitializeEditContextForContent()
     {
         _editContext = new EditContext(Content);
     }
-    
-    
+
     private async Task<List<Product>?> GetAllUnusedProducts()
     {
         var response = await Client.GetAsync(ProductsApiUrl);
@@ -90,40 +122,48 @@
             Console.WriteLine($"Error: {response.StatusCode}");
             return null;
         }
+
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<Product>>(JObject.Parse(content)["items"].ToString());
     }
-    
+
     private async Task<List<Product>?> GetAllUnusedProductsAndCurrent(Guid id)
     {
-        var response = await Client.GetAsync(ProductsApiUrl+$"/{id}");
+        var response = await Client.GetAsync(ProductsApiUrl + $"/{id}");
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine($"Error: {response.StatusCode}");
             return null;
         }
+
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<Product>>(JObject.Parse(content)["items"].ToString());
     }
 
-    private void InitSelectedProduct()
+    private async Task<int> GetQuantityByUpcProm(string upc)
     {
-        if (IsEditMode)
+        var response = await Client.GetAsync($"https://localhost:5001/api/store-products/{upc}/quantity");
+        if (!response.IsSuccessStatusCode)
         {
-            if (_products != null) Product = _products.FirstOrDefault(x => x.Id == Content.ProductId);
+            Console.WriteLine($"Error: {response.StatusCode}");
+            return 1;
         }
-        else
-        {
-            Product = _products?[0];
-        }
+
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<int>(content);
     }
-    
-    
+
     private async Task SaveAsync()
     {
         if (_editContext.Validate())
         {
             if (Product != null) Content.ProductId = Product.Id;
+            if (Content.IsPromotional)
+            {
+                Content.UpcProm = null;
+            }
+
+            Content.Quantity = Convert.ToInt32(StoreProductQuantity);
             await Dialog.CloseAsync(Content);
         }
     }
@@ -132,5 +172,5 @@
     {
         await Dialog.CancelAsync();
     }
-    
+
 }
