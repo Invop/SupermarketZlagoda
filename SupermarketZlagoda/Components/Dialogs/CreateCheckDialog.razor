@@ -65,8 +65,10 @@
             <FluentTextField @bind-Value="@context.UPC" ReadOnly="true"/>
         </TemplateColumn>
         <TemplateColumn Title="Number">
-            <FluentNumberField Value="@context.ProductNumber" ValueChanged="(int value) => HandleQuantityChanged(context, value)" 
-                               Min="1" />
+            <FluentNumberField Value="@context.ProductNumber" 
+                                   ValueChanged="(int value) => HandleQuantityChanged(context, value)"
+                                   Min="1" 
+                                   Max= "@_maxProductNumber.ToString()"/>
         </TemplateColumn>
         <TemplateColumn Title="Price">
             <FluentNumberField Value="@context.SellingPrice" ReadOnly="true" />
@@ -85,28 +87,28 @@
 @code {
 
     string? stringValue;
-    private const string EmployeeApiUrl = "https://localhost:5001/api/employees"; 
+    private const string EmployeeApiUrl = "https://localhost:5001/api/employees";
     private const string CustomerApiUrl = "https://localhost:5001/api/customer-card";
     private const string StoreProductApiUrl = "https://localhost:5001/api/store-products";
-    [Parameter]
-    public Check Content { get; set; } = default!;
-    
-    [CascadingParameter]
+    [Parameter] public Check Content { get; set; } = default!;
+
+    [CascadingParameter] 
     public FluentDialog Dialog { get; set; } = default!;
     private static readonly HttpClient Client = new();
+    private int _maxProductNumber;
 
     private Employee? Employee { get; set; }
     private List<Employee>? _employeeList = [];
-    
+
     private CustomerCard? CustomerCard { get; set; }
     private List<CustomerCard>? _customerList = [];
-   
+
     private StoreProduct? StoreProduct { get; set; }
     private List<StoreProduct>? _storeProductsList = [];
-    
+
     private List<Sale> SalesList = new List<Sale>();
-   
-    
+
+
     protected override async Task OnInitializedAsync()
     {
         await InitializeEmployeeListAsync();
@@ -122,10 +124,13 @@
     {
         _employeeList = await GetEmployeeList();
     }
+
     private async Task InitializeCustomerListAsync()
     {
         _customerList = await GetCustomerList();
+        _customerList.Insert(0, new CustomerCard { Id = Guid.Empty, Surname = "None" });
     }
+
     private async Task InitializeStoreProductListAsync()
     {
         _storeProductsList = await GetStoreProductList();
@@ -147,8 +152,8 @@
 
     private void SetEmployee()
     {
-        Employee = Content.IdEmployee != Guid.Empty 
-            ? GetMatchingEmployeeFromList() 
+        Employee = Content.IdEmployee != Guid.Empty
+            ? GetMatchingEmployeeFromList()
             : GetFirstEmployeeFromList();
     }
 
@@ -161,27 +166,28 @@
     {
         return _employeeList.ElementAtOrDefault(0);
     }
-    
-    
+
+
     private void SetCustomerCard()
     {
         CustomerCard = Content.IdCardCustomer != Guid.Empty
             ? GetMatchingCustomerCardFromList()
-            : null;
+            : _customerList.ElementAtOrDefault(0);
     }
+
 
     private CustomerCard GetMatchingCustomerCardFromList()
     {
         return _customerList.FirstOrDefault(x => x.Id == Content.IdCardCustomer);
     }
-    
-    
+
+
     private async Task ShowEmployeeErrorAsync()
     {
         var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 employee");
         var result = await dialog.Result;
     }
-    
+
     private async Task ShowStoreProductErrorAsync()
     {
         var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 product in the store");
@@ -196,10 +202,11 @@
             Console.WriteLine($"Error: {response.StatusCode}");
             return null;
         }
+
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(content)["items"].ToString());
     }
-    
+
     private async Task<List<CustomerCard>?> GetCustomerList()
     {
         var response = await Client.GetAsync(CustomerApiUrl);
@@ -208,10 +215,11 @@
             Console.WriteLine($"Error: {response.StatusCode}");
             return null;
         }
+
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<CustomerCard>>(JObject.Parse(content)["items"].ToString());
     }
-    
+
     private async Task<List<StoreProduct>?> GetStoreProductList()
     {
         var response = await Client.GetAsync(StoreProductApiUrl);
@@ -220,18 +228,20 @@
             Console.WriteLine($"Error: {response.StatusCode}");
             return null;
         }
+
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<StoreProduct>>(JObject.Parse(content)["items"].ToString());
     }
-    
+
     private async Task SaveAsync()
     {
-            if (Employee != null) Content.IdEmployee = Employee.Id;
-            if (CustomerCard == null) Content.IdCardCustomer = null;
-            else Content.IdCardCustomer = CustomerCard.Id;
-            await Dialog.CloseAsync(Content);
-            CheckTable.SalesList = SalesList;
+        if (Employee != null) Content.IdEmployee = Employee.Id;
+        if (CustomerCard.Id == Guid.Empty) Content.IdCardCustomer = null;
+        else Content.IdCardCustomer = CustomerCard.Id;
+        await Dialog.CloseAsync(Content);
+        CheckTable.SalesList = SalesList;
     }
+
     private async Task CancelAsync()
     {
         await Dialog.CancelAsync();
@@ -248,15 +258,16 @@
                 ProductNumber = 1,
                 SellingPrice = StoreProduct.Price
             };
+            await GetMaxQuantity(newSale.UPC);
             SalesList.Add(newSale);
             UpdateTotalAndVat();
         }
-        else 
+        else
         {
             Console.WriteLine("Already in the this check");
         }
     }
-    
+
     private void UpdateTotalAndVat()
     {
         decimal discountPercentage = 0m;
@@ -269,17 +280,33 @@
         Content.SumTotal = totalBeforeDiscount - (totalBeforeDiscount * discountPercentage);
         Content.Vat = 0.2m * Content.SumTotal;
     }
-    
+
     private void HandleQuantityChanged(Sale context, int value)
     {
         context.ProductNumber = value;
         UpdateTotalAndVat();
     }
-    
+
     private void DeleteSale(Sale sale)
     {
         SalesList.Remove(sale);
         UpdateTotalAndVat();
     }
     
+   
+    private async Task GetMaxQuantity(string? upc)
+    {
+        var response = await Client.GetAsync($"https://localhost:5001/api/store-products/{upc}");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var storeProduct = JsonConvert.DeserializeObject<StoreProduct>(responseJson);
+            _maxProductNumber = storeProduct.Quantity;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sales for check {Content.IdCheck}. Status code: {response.StatusCode}");
+        }
+
+    }
 }
