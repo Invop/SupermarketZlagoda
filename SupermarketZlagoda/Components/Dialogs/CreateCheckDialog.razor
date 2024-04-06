@@ -1,0 +1,285 @@
+﻿@using SupermarketZlagoda.Data.Model
+@using SupermarketZlagoda.Data
+@using SupermarketZlagoda.Components.Pages
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.ComponentModel
+@inject IDialogService DialogService
+@implements IDialogContentComponent<Check>
+
+ @* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+ @* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+ @* Body *@
+<FluentDialogBody>
+    <FluentCombobox Style="width: 100%" Items="@_employeeList"
+                                Label="Employee:"
+                                OptionValue="@(employee => employee.Id.ToString())"
+                                OptionText="@(employee => employee.Surname)"
+                                @bind-SelectedOption="@Employee">
+                    <OptionTemplate Context="optionContext">
+                        @optionContext.Surname
+                    </OptionTemplate>
+                </FluentCombobox>
+    <br/><br/>
+     <FluentCombobox Style="width: 100%" Items="@_customerList"
+                                    Label="Customer:"
+                                    OptionValue="@(customerCard => customerCard.Id.ToString())"
+                                    OptionText="@(customerCard => customerCard.Surname)"
+                                    @bind-SelectedOption="@CustomerCard">
+                        <OptionTemplate Context="optionContext">
+                            @optionContext.Surname
+                        </OptionTemplate>
+                    </FluentCombobox>
+    <br/><br/>
+    <FluentDatePicker Label="Print Date" ReadOnly="true" Value="@Content.PrintDate" ValueChanged="@(e =>@Content.PrintDate = e.ToDateTime())" />
+    <FluentTimePicker ReadOnly="true" Value="@Content.PrintDate" ValueChanged="@(e => @Content.PrintDate = e.ToDateTime())" />
+    <br/><br/>
+    <FluentDivider></FluentDivider>
+    <FluentCombobox Style="width: 100%" Items="@_storeProductsList"
+                    Label="Add new product:"
+                    OptionValue="@(storeProduct => storeProduct.Upc)"
+                    OptionText="@(storeProduct => storeProduct.Upc)"
+                    @bind-SelectedOption="@StoreProduct">
+        <OptionTemplate Context="optionContext">
+            @optionContext.Upc
+        </OptionTemplate>
+    </FluentCombobox>
+    <br/><br/>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@AddNewSale" Style="width: 100%">Add product</FluentButton>
+    <FluentDataGrid GridTemplateColumns="1fr 1fr 1fr 1fr" Items=SalesList.AsQueryable()>
+        <TemplateColumn Title="UPC">
+            <FluentTextField @bind-Value="@context.UPC" ReadOnly="true"/>
+        </TemplateColumn>
+        <TemplateColumn Title="Number">
+            <FluentNumberField Value="@context.ProductNumber" ValueChanged="(int value) => HandleQuantityChanged(context, value)" 
+                               Min="1" />
+        </TemplateColumn>
+        <TemplateColumn Title="Price">
+            <FluentNumberField Value="@context.SellingPrice" ReadOnly="true" />
+        </TemplateColumn>
+        <TemplateColumn>
+            <FluentButton Appearance="Appearance.Accent" Style="width: 100%" OnClick="@( () => DeleteSale(context) )">Delete</FluentButton>
+        </TemplateColumn>
+    </FluentDataGrid>
+    <FluentDivider></FluentDivider>
+    <br/><br/>
+    <FluentNumberField @bind-Value="@Content.SumTotal" ReadOnly="true" Style="width: 100%"> Sum total: </FluentNumberField>
+    <br/><br/>
+    <FluentNumberField @bind-Value="@Content.Vat" ReadOnly="true" Style="width: 100%"> Vat: </FluentNumberField>
+    </FluentDialogBody>
+
+@code {
+
+    string? stringValue;
+    private const string EmployeeApiUrl = "https://localhost:5001/api/employees"; 
+    private const string CustomerApiUrl = "https://localhost:5001/api/customer-card";
+    private const string StoreProductApiUrl = "https://localhost:5001/api/store-products";
+    [Parameter]
+    public Check Content { get; set; } = default!;
+    
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+    private static readonly HttpClient Client = new();
+
+    private Employee? Employee { get; set; }
+    private List<Employee>? _employeeList = [];
+    
+    private CustomerCard? CustomerCard { get; set; }
+    private List<CustomerCard>? _customerList = [];
+   
+    private StoreProduct? StoreProduct { get; set; }
+    private List<StoreProduct>? _storeProductsList = [];
+    
+    private List<Sale> SalesList = new List<Sale>();
+   
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeEmployeeListAsync();
+        await InitializeCustomerListAsync();
+        await InitializeStoreProductListAsync();
+        CheckStoreProductAndActIfNeeded();
+        CheckEmployeeListAndActIfNeeded();
+        SetEmployee();
+        SetCustomerCard();
+    }
+
+    private async Task InitializeEmployeeListAsync()
+    {
+        _employeeList = await GetEmployeeList();
+    }
+    private async Task InitializeCustomerListAsync()
+    {
+        _customerList = await GetCustomerList();
+    }
+    private async Task InitializeStoreProductListAsync()
+    {
+        _storeProductsList = await GetStoreProductList();
+    }
+
+    private async void CheckEmployeeListAndActIfNeeded()
+    {
+        if (_employeeList != null && _employeeList.Any()) return;
+        await ShowEmployeeErrorAsync();
+        await Dialog.CancelAsync();
+    }
+
+    private async void CheckStoreProductAndActIfNeeded()
+    {
+        if (_storeProductsList != null && _storeProductsList.Any()) return;
+        await ShowStoreProductErrorAsync();
+        await Dialog.CancelAsync();
+    }
+
+    private void SetEmployee()
+    {
+        Employee = Content.IdEmployee != Guid.Empty 
+            ? GetMatchingEmployeeFromList() 
+            : GetFirstEmployeeFromList();
+    }
+
+    private Employee GetMatchingEmployeeFromList()
+    {
+        return _employeeList.First(x => x.Id == Content.IdEmployee);
+    }
+
+    private Employee GetFirstEmployeeFromList()
+    {
+        return _employeeList.ElementAtOrDefault(0);
+    }
+    
+    
+    private void SetCustomerCard()
+    {
+        CustomerCard = Content.IdCardCustomer != Guid.Empty
+            ? GetMatchingCustomerCardFromList()
+            : null;
+    }
+
+    private CustomerCard GetMatchingCustomerCardFromList()
+    {
+        return _customerList.FirstOrDefault(x => x.Id == Content.IdCardCustomer);
+    }
+    
+    
+    private async Task ShowEmployeeErrorAsync()
+    {
+        var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 employee");
+        var result = await dialog.Result;
+    }
+    
+    private async Task ShowStoreProductErrorAsync()
+    {
+        var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 product in the store");
+        var result = await dialog.Result;
+    }
+
+    private async Task<List<Employee>?> GetEmployeeList()
+    {
+        var response = await Client.GetAsync(EmployeeApiUrl);
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+            return null;
+        }
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(content)["items"].ToString());
+    }
+    
+    private async Task<List<CustomerCard>?> GetCustomerList()
+    {
+        var response = await Client.GetAsync(CustomerApiUrl);
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+            return null;
+        }
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<CustomerCard>>(JObject.Parse(content)["items"].ToString());
+    }
+    
+    private async Task<List<StoreProduct>?> GetStoreProductList()
+    {
+        var response = await Client.GetAsync(StoreProductApiUrl);
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+            return null;
+        }
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<List<StoreProduct>>(JObject.Parse(content)["items"].ToString());
+    }
+    
+    private async Task SaveAsync()
+    {
+            if (Employee != null) Content.IdEmployee = Employee.Id;
+            if (CustomerCard == null) Content.IdCardCustomer = null;
+            else Content.IdCardCustomer = CustomerCard.Id;
+            await Dialog.CloseAsync(Content);
+            CheckTable.SalesList = SalesList;
+    }
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+
+    private async Task AddNewSale()
+    {
+        if (StoreProduct != null && !SalesList.Exists(x => x.UPC == StoreProduct.Upc))
+        {
+            var newSale = new Sale
+            {
+                CheckNumber = Content.IdCheck,
+                UPC = StoreProduct.Upc,
+                ProductNumber = 1,
+                SellingPrice = StoreProduct.Price
+            };
+            SalesList.Add(newSale);
+            UpdateTotalAndVat();
+        }
+        else 
+        {
+            Console.WriteLine("Already in the this check");
+        }
+    }
+    
+    private void UpdateTotalAndVat()
+    {
+        decimal discountPercentage = 0m;
+        if (CustomerCard != null)
+        {
+            discountPercentage = (decimal)CustomerCard.Percentage / 100m;
+        }
+
+        decimal totalBeforeDiscount = SalesList.Sum(sale => sale.ProductNumber * sale.SellingPrice);
+        Content.SumTotal = totalBeforeDiscount - (totalBeforeDiscount * discountPercentage);
+        Content.Vat = 0.2m * Content.SumTotal;
+    }
+    
+    private void HandleQuantityChanged(Sale context, int value)
+    {
+        context.ProductNumber = value;
+        UpdateTotalAndVat();
+    }
+    
+    private void DeleteSale(Sale sale)
+    {
+        SalesList.Remove(sale);
+        UpdateTotalAndVat();
+    }
+    
+}

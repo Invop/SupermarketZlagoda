@@ -261,4 +261,75 @@ public static class ContractMapping
         };
     }
     #endregion
+    
+    #region Check
+    public static Check MapToCheck(this CreateCheckRequest request)
+    {
+        return new Check
+        {
+            IdCheck = Guid.NewGuid(),
+            IdEmployee = request.IdEmployee,
+            IdCardCustomer = request.IdCardCustomer,
+            PrintDate = request.PrintDate,
+            SumTotal = request.SumTotal,
+            Vat = request.Vat
+        };
+    }
+
+    public static CheckResponse MapToCheckResponse(this Check check)
+    {
+        return new CheckResponse()
+        {
+            IdCheck = check.IdCheck,
+            IdEmployee = check.IdEmployee,
+            IdCardCustomer = check.IdCardCustomer,
+            PrintDate = check.PrintDate,
+            SumTotal = check.SumTotal,
+            Vat = check.Vat
+        };
+    }
+    
+    public static ChecksResponse MapToChecksResponse(this IEnumerable<Check> checks)
+    {
+        return new ChecksResponse
+        {
+            Items = checks.Select(MapToCheckResponse)
+        };
+    }
+    
+    #endregion
+    
+    #region Sale
+    public static Sale MapToSale(this CreateSaleRequest request)
+    {
+        return new Sale
+        {
+            UPC = request.Upc,
+            CheckNumber = request.CheckNumber,
+            ProductNumber = request.ProductNumber,
+            SellingPrice = request.SellingPrice,
+        };
+    }
+
+    public static SaleResponse MapToSaleResponse(this Sale sale)
+    {
+        return new SaleResponse()
+        {
+            UPC = sale.UPC,
+            CheckNumber = sale.CheckNumber,
+            ProductNumber = sale.ProductNumber,
+            SellingPrice = sale.SellingPrice,
+        };
+    }
+    
+    public static SalesResponse MapToSalesResponse(this IEnumerable<Sale> sales)
+    {
+        return new SalesResponse
+        {
+            Items = sales.Select(MapToSaleResponse)
+        };
+    }
+
+    
+    #endregion
 }

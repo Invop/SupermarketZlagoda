@@ -1,0 +1,90 @@
+﻿@using SupermarketZlagoda.Data.Model
+@using SupermarketZlagoda.Components.Pages
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@inject IDialogService DialogService
+@implements IDialogContentComponent<Check>
+
+ @* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+ @* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+ @* Body *@
+ <FluentDialogBody>
+     <FluentDivider></FluentDivider>
+     <FluentDataGrid GridTemplateColumns="1fr 1fr 1fr" Items=SalesList.AsQueryable()>
+         <TemplateColumn Title="UPC">
+             <FluentTextField @bind-Value="@context.UPC" ReadOnly="true"/>
+         </TemplateColumn>
+         <TemplateColumn Title="Number">
+             <FluentNumberField Value="@context.ProductNumber" ReadOnly="true"/>
+         </TemplateColumn>
+         <TemplateColumn Title="Price">
+             <FluentNumberField Value="@context.SellingPrice" ReadOnly="true"/>
+         </TemplateColumn>
+     </FluentDataGrid>
+     <FluentDivider></FluentDivider>
+     <br/><br/>
+     <FluentNumberField @bind-Value="@Content.SumTotal" ReadOnly="true"> Sum total: </FluentNumberField>
+     <br/><br/>
+     <FluentNumberField @bind-Value="@Content.Vat" ReadOnly="true"> Vat: </FluentNumberField>
+     <style>
+            .fluent-dialog-body * {
+                width: 100%;
+            }
+        </style>
+ </FluentDialogBody>
+
+@code {
+
+    [Parameter] public Check Content { get; set; } = default!;
+    
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    public List<Sale> SalesList { get; set; } = new List<Sale>();
+    private static readonly HttpClient Client = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeSaleList();
+        foreach (var sale in SalesList)
+        {
+            Console.WriteLine(sale);
+        }
+    }
+    
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+
+    private async Task InitializeSaleList()
+    {
+        var response = await Client.GetAsync($"https://localhost:5001/api/sale/{Content.IdCheck}");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Response JSON:");
+            Console.WriteLine(responseJson); 
+            var salesList = JsonConvert.DeserializeObject<List<Sale>>(JObject.Parse(responseJson)["items"].ToString());
+            SalesList = salesList;
+        }
+        else
+        {
+            Console.WriteLine($"Error retrieving sales for check {Content.IdCheck}. Status code: {response.StatusCode}");
+        }
+    }
+
+}

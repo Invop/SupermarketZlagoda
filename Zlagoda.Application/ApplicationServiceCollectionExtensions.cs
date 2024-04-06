@@ -28,6 +28,11 @@ public static class ApplicationServiceCollectionExtensions
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<ICategoryService, CategoryService>();
         
+        services.AddSingleton<ICheckRepository, CheckRepository>();
+        services.AddSingleton<ICheckService, CheckService>();
+        
+        services.AddSingleton<ISaleRepository, SaleRepository>();
+        services.AddSingleton<ISaleService, SaleService>();
         
         return services;
     }

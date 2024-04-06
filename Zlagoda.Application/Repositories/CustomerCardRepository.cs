@@ -16,7 +16,7 @@ public class CustomerCardRepository : ICustomerCardRepository
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var command = new SqlCommand(
-            "INSERT INTO Customer_Cards (card_number, cust_surname, cust_name, cust_patronymic, phone_number, city, street, zip_code, [percent])" +
+            $@"INSERT INTO Customer_Cards (card_number, cust_surname, cust_name, cust_patronymic, phone_number, city, street, zip_code, [percent])" +
             "VALUES (@Id, @Surname, @Name, @Patronymic, @Phone, @City, @Street, @Index, @Percentage)",
             connection);
         command.Parameters.AddWithValue("@Id", customerCard.Id);
