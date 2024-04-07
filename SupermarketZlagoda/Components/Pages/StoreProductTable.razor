@@ -32,9 +32,13 @@
     @if (IsManager)
     {
         <TemplateColumn Title="Actions" Align="@Align.End">
-                @if (!context.IsPromotional && string.IsNullOrEmpty(context.UpcProm))
-                {
-                    <FluentButton OnClick="@(() => OpenAddPromoStoreProductDialog(context))">Add Promo</FluentButton>
+                @if (!context.IsPromotional)
+                {   
+                    if(string.IsNullOrEmpty(context.UpcProm))
+                    {
+                        <FluentButton OnClick="@(() => OpenAddPromoStoreProductDialog(context))">Add Promo</FluentButton>
+                    }
+                    <FluentButton OnClick="@(() =>OpenCreateNewProductBatchDialog(context))">New batch of product</FluentButton>
                 }
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>

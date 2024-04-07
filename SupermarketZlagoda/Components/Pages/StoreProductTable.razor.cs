@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -216,6 +217,35 @@ public partial class StoreProductTable
             context.Quantity -= item.Quantity;
             await UpdateStoreProductAsync(context,context.Upc);
             await PostStoreProductAsync(item);
+            await UpdateTable();
+        }
+    }
+
+    private async Task OpenCreateNewProductBatchDialog(StoreProduct context)
+    {   
+        StoreProduct product = new StoreProduct
+        {   
+            Upc = context.Upc,
+            Price = context.Price,
+            IsPromotional = false,
+        };
+        var dialog = await DialogService.ShowDialogAsync<CreateNewProductBatchDialog>(product, new DialogParameters()
+        {
+            Height = "400px",
+            Title = $"New batch of product  {context.Upc}",
+            PreventDismissOnOverlayClick = true,
+            PreventScroll = true,
+        });
+        
+        var result = await dialog.Result;
+        if (result is { Cancelled: false, Data: not null })
+        {
+            var item = result.Data as StoreProduct;
+            Console.WriteLine(context.Quantity);
+            Console.WriteLine(item.Quantity);
+            context.Quantity += item.Quantity;
+            context.Price = item.Price;
+            await UpdateStoreProductAsync(context,context.Upc);
             await UpdateTable();
         }
     }

@@ -1,0 +1,67 @@
+﻿@using SupermarketZlagoda.Data.Model
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@implements IDialogContentComponent<StoreProduct>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())"/>
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+
+@* Body *@
+<FluentDialogBody>
+    <FluentTextField ReadOnly="true" Label="UPC:" @bind-Value="@Content.Upc"/>
+    <FluentNumberField Label="Quantity:" Min="1" @bind-Value="@StoreProductQuantity"/>
+    <FluentNumberField Label="Price:" Min="0.001" @bind-Value="@Content.Price"/>
+</FluentDialogBody>
+
+<FluentDialogFooter>
+    <FluentButton Type="ButtonType.Submit"
+                  Disabled="@(!_editContext.Validate())"
+                  Appearance="Appearance.Accent" OnClick="@SaveAsync">
+        Save
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+
+@code {
+
+    [Parameter] public StoreProduct Content { get; set; } = default!;
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = default!;
+
+    private double StoreProductQuantity { get; set; } = 1;
+    private EditContext _editContext = default!;
+    private int _maxQuantityValue = int.MaxValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InitializeEditContextForContent();
+    }
+    
+    private void InitializeEditContextForContent()
+    {
+        _editContext = new EditContext(Content);
+    }
+    private async Task SaveAsync()
+    {
+        if (_editContext.Validate())
+        {
+            Content.Quantity = Convert.ToInt32(StoreProductQuantity);
+            await Dialog.CloseAsync(Content);
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+
+}

@@ -15,7 +15,8 @@ public interface IStoreProductRepository
     Task<bool> DeleteByUpcAsync(string upc);
     Task<bool> ExistsByUpcAsync(string upc);
 
-    Task<IEnumerable<StoreProduct>> GetAllPromoStoreProductsAsync();
+    Task<IEnumerable<StoreProduct>> GetAllPromoProductsAsync();
 
+    Task<IEnumerable<StoreProduct>> GetAllNotPromoProductsAsync();
 
 }

@@ -190,7 +190,7 @@ public class StoreProductRepository : IStoreProductRepository
         
     }
 
-    public async Task<IEnumerable<StoreProduct>> GetAllPromoStoreProductsAsync()
+    public async Task<IEnumerable<StoreProduct>> GetAllPromoProductsAsync()
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         const string queryString = """
@@ -220,6 +220,31 @@ public class StoreProductRepository : IStoreProductRepository
             };
             storeProducts.Add(storeProduct);
         }
+        return storeProducts;
+    }
+
+    public async Task<IEnumerable<StoreProduct>> GetAllNotPromoProductsAsync()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = "SELECT * FROM Store_Products WHERE promotional_product = 0";
+        using var command = new SqlCommand(commandText, connection);
+        using var reader = await command.ExecuteReaderAsync();
+        var storeProducts = new List<StoreProduct>();
+
+        while (await reader.ReadAsync())
+        {
+            var product = new StoreProduct
+            {
+                Upc = reader.GetString(0),
+                UpcProm = reader.IsDBNull(1) ? null : reader.GetString(1),
+                ProductId = reader.GetGuid(2),
+                Price = reader.GetDecimal(3),
+                Quantity = reader.GetInt32(4),
+                IsPromotional = reader.GetBoolean(5)
+            };
+            storeProducts.Add(product);
+        }
+
         return storeProducts;
     }
 }
