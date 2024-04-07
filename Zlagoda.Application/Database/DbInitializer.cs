@@ -41,7 +41,7 @@ namespace Zlagoda.Application.Database;
                                                   IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='Checks')
                                                   CREATE TABLE Checks
                                                   (
-                                                      check_number VARCHAR(10) PRIMARY KEY NOT NULL,
+                                                      check_number UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
                                                       id_employee UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Employees(id_employee) ON UPDATE CASCADE ON DELETE NO ACTION,
                                                       card_number UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Customer_Cards(card_number) ON UPDATE CASCADE ON DELETE NO ACTION,
                                                       print_date DATETIME NOT NULL,
@@ -160,7 +160,7 @@ namespace Zlagoda.Application.Database;
                                                  CREATE TABLE Sales
                                                  (
                                                      UPC VARCHAR(12) NOT NULL FOREIGN KEY REFERENCES Store_Products(UPC) ON UPDATE CASCADE ON DELETE NO ACTION,
-                                                     check_number VARCHAR(10) NOT NULL FOREIGN KEY REFERENCES Checks(check_number) ON UPDATE CASCADE ON DELETE CASCADE,
+                                                     check_number UNIQUEIDENTIFIER NOT NULL FOREIGN KEY REFERENCES Checks(check_number) ON UPDATE CASCADE ON DELETE CASCADE,
                                                      product_number INT NOT NULL,
                                                      selling_price DECIMAL(13,4) NOT NULL,
                                                      PRIMARY KEY (check_number, UPC)

@@ -1,10 +1,11 @@
 ﻿@page "/check"
 @using SupermarketZlagoda.Data
 @inject UserState UserState
+@inject IDialogService DialogService
 <FluentToolbar id="toolbar-fluent-components">
     @if (!IsManager)
     {
-        <FluentButton Appearance="Appearance.Accent">Add new check</FluentButton>
+        <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new check</FluentButton>
         <FluentTextField @bind-Value="CheckSearchTerm" Placeholder="Search by Id"></FluentTextField>
     }
     @if (IsManager)
@@ -29,16 +30,16 @@
 <FluentDataGrid Items="@_items" ResizableColumns="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr 1fr 1fr"
                 Style="height: 600px; width: 1500px; overflow:auto;">
     <PropertyColumn Property="@(c => c.IdCheck)"/>
-    <PropertyColumn Property="@(c => c.IdEmployee)"/>
-    <PropertyColumn Property="@(c => c.IdCardCustomer)"/>
+    <PropertyColumn Title="IdEmployee" Property="@(c => _employees[c.IdEmployee])" />
+<PropertyColumn Title="IdCustomerCard" Property="@(c => c.IdCardCustomer.HasValue ? _customerCards[c.IdCardCustomer.Value] : string.Empty)" />
     <PropertyColumn Property="@(c => c.PrintDate)"/>
     <PropertyColumn Property="@(c => c.SumTotal)"/>
     <PropertyColumn Property="@(c => c.Vat)"/>
     <TemplateColumn Title="Actions" Align="@Align.End">
-        <FluentButton IconEnd="@(new Icons.Regular.Size16.Open())" OnClick="@(() => Console.WriteLine("Open clicked"))"/>
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Open())" OnClick="@(() => OpenCheckAsync(context))"/>
         @if (IsManager)
         {
-            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => Console.WriteLine("Delete clicked"))"/>
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialogAsync(context))"/>
         }
     </TemplateColumn>
 
