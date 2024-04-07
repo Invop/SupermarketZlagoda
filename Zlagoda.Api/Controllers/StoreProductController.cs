@@ -27,14 +27,23 @@ public class StoreProductController : ControllerBase
     [HttpGet(ApiEndpoints.StoreProducts.Get)]
     public async Task<IActionResult> Get([FromRoute] string upc)
     {
-        var product = await _productService.GetByUPCAsync(upc);
+        var product = await _productService.GetByUpcAsync(upc);
         if (product == null)
         {
             return NotFound();
         }
         return Ok(product.MapToStoreProductResponse());
     }
-    
+    [HttpGet(ApiEndpoints.StoreProducts.GetByPromoUpc)]
+    public async Task<IActionResult> GetByPromoUpc([FromRoute] string upc)
+    {
+        var product = await _productService.GetByPromoUpcAsync(upc);
+        if (product == null)
+        {
+            return NotFound();
+        }
+        return Ok(product.MapToStoreProductResponse());
+    }
     [HttpGet(ApiEndpoints.StoreProducts.GetAll)]
     public async Task<IActionResult> GetAll()
     {
@@ -76,7 +85,7 @@ public class StoreProductController : ControllerBase
     [HttpDelete(ApiEndpoints.StoreProducts.Delete)]
     public async Task<IActionResult> Delete([FromRoute] string upc)
     {
-        var deleted = await _productService.DeleteByUPCAsync(upc);
+        var deleted = await _productService.DeleteByUpcAsync(upc);
         if (!deleted)
         {
             return NotFound();

@@ -26,7 +26,7 @@ namespace Zlagoda.Application.Database;
         await CreateSaleTableIfNotExists(connection);
     }
 
-    private async Task dropDatabase(SqlConnection connection)
+    private async Task DropDatabase(SqlConnection connection)
     {
         string databaseName = "zlagoda";
         string dropDatabaseQuery = $"DROP DATABASE [{databaseName}]";

@@ -41,6 +41,29 @@ public partial class StoreProductTable
             Console.WriteLine($"Error: {response.StatusCode}");
         }
     }
+
+    private async Task<StoreProduct?> GetProductByPromUpc(string upc)
+    {
+        var response = await Client.GetAsync($"https://localhost:5001/api/store-products/promo/{upc}");
+    
+        if (response is { IsSuccessStatusCode: true, Content: not null })
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+
+            if (!string.IsNullOrEmpty(responseJson))
+            {
+                var product = JsonConvert.DeserializeObject<StoreProduct>(responseJson);
+
+                if (product != null)
+                {
+                    return product;
+                }
+            }
+        } 
+    
+        Console.WriteLine($"Error: {response.StatusCode}");
+        return null;
+    }
     
     private async Task OpenCreateDialogAsync()
     {
@@ -95,18 +118,28 @@ public partial class StoreProductTable
         var canceled = result.Cancelled;
         if (!canceled)
         {
+            if (context.IsPromotional)
+            {
+                var notPromoProduct = await GetProductByPromUpc(context.Upc);
+                if (notPromoProduct != null)
+                {
+                    notPromoProduct.Quantity += context.Quantity;
+                    await UpdateStoreProductAsync(notPromoProduct, notPromoProduct.Upc);
+                }
+            }
+
             await DeleteProductAsync(context.Upc);
             await UpdateTable();
         }
     }
 
-    private async Task DeleteProductAsync(string? guid)
+    private async Task DeleteProductAsync(string? upc)
     {
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var response = await client.DeleteAsync($"https://localhost:5001/api/store-products/{guid}");
+        var response = await client.DeleteAsync($"https://localhost:5001/api/store-products/{upc}");
 
         Console.WriteLine(response.IsSuccessStatusCode
             ? "Product successfully deleted."
@@ -129,6 +162,12 @@ public partial class StoreProductTable
         if (result is { Cancelled: false, Data: not null })
         {
             var item = result.Data as StoreProduct;
+            if (item.IsPromotional)
+            {
+                var notPromoProduct = await GetProductByPromUpc(prevUpc);
+                notPromoProduct.Quantity -= item.Quantity;
+                await UpdateStoreProductAsync(notPromoProduct,notPromoProduct.Upc);
+            }
             await UpdateStoreProductAsync(item,prevUpc);
             await UpdateTable();
         }
@@ -174,6 +213,7 @@ public partial class StoreProductTable
         {
             var item = result.Data as StoreProduct;
             context.UpcProm = item.Upc;
+            context.Quantity -= item.Quantity;
             await UpdateStoreProductAsync(context,context.Upc);
             await PostStoreProductAsync(item);
             await UpdateTable();

@@ -90,7 +90,7 @@
         {
             await HandleUpdateDialog();
         }
-        else
+        else if(!Content.IsPromotional)
         {
             _products = await GetAllUnusedProducts();
         }

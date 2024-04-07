@@ -304,7 +304,7 @@ public static class ContractMapping
     {
         return new Sale
         {
-            UPC = request.Upc,
+            Upc = request.Upc,
             CheckNumber = request.CheckNumber,
             ProductNumber = request.ProductNumber,
             SellingPrice = request.SellingPrice,
@@ -315,7 +315,7 @@ public static class ContractMapping
     {
         return new SaleResponse()
         {
-            UPC = sale.UPC,
+            UPC = sale.Upc,
             CheckNumber = sale.CheckNumber,
             ProductNumber = sale.ProductNumber,
             SellingPrice = sale.SellingPrice,

@@ -21,6 +21,7 @@ public class ApiEndpoints
         private const string PromoBase = $"{Base}/promo";
         public const string Create = Base;
         public const string Get = $"{Base}/{{upc}}";
+        public const string GetByPromoUpc = $"{PromoBase}/{{upc}}";
         public const string GetAll = Base;
         public const string GetAllPromo = PromoBase;
         public const string GetQuantityByUpcProm = $"{Base}/{{upcProm}}/quantity";

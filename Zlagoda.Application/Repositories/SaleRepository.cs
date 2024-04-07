@@ -20,7 +20,7 @@ public class SaleRepository : ISaleRepository
             $@"INSERT INTO Sales (UPC, check_number, product_number, selling_price)" +
             "VALUES (@Upc, @CheckNumber, @ProductNumber, @SellingPrice)",
             connection);
-        command.Parameters.AddWithValue("@Upc", sale.UPC);
+        command.Parameters.AddWithValue("@Upc", sale.Upc);
         command.Parameters.AddWithValue("@CheckNumber", sale.CheckNumber);
         command.Parameters.AddWithValue("@ProductNumber", sale.ProductNumber);
         command.Parameters.AddWithValue("@SellingPrice", sale.SellingPrice);
@@ -28,7 +28,7 @@ public class SaleRepository : ISaleRepository
         return result > 0;
     }
     
-    public async Task<Sale?> GetByUPCCheckAsync(string upc, Guid check)
+    public async Task<Sale?> GetByUpcCheckAsync(string upc, Guid check)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText = "SELECT * FROM Sales WHERE UPC = @Upc AND check_number = @CheckNumber";
@@ -40,7 +40,7 @@ public class SaleRepository : ISaleRepository
         {
             var sale = new Sale
             {
-                UPC = reader.GetString(reader.GetOrdinal("Upc")),
+                Upc = reader.GetString(reader.GetOrdinal("Upc")),
                 CheckNumber = reader.GetGuid(reader.GetOrdinal("check_number")),
                 ProductNumber = reader.GetInt32(reader.GetOrdinal("product_number")),
                 SellingPrice = reader.GetDecimal(reader.GetOrdinal("selling_price")),
@@ -62,7 +62,7 @@ public class SaleRepository : ISaleRepository
         {
             var sale = new Sale
             {
-                UPC = reader.GetString(reader.GetOrdinal("Upc")),
+                Upc = reader.GetString(reader.GetOrdinal("Upc")),
                 CheckNumber = reader.GetGuid(reader.GetOrdinal("check_number")),
                 ProductNumber = reader.GetInt32(reader.GetOrdinal("product_number")),
                 SellingPrice = reader.GetDecimal(reader.GetOrdinal("selling_price")),
@@ -83,7 +83,7 @@ public class SaleRepository : ISaleRepository
         {
             var sale = new Sale
             {
-                UPC = reader.GetString(reader.GetOrdinal("Upc")),
+                Upc = reader.GetString(reader.GetOrdinal("Upc")),
                 CheckNumber = reader.GetGuid(reader.GetOrdinal("check_number")),
                 ProductNumber = reader.GetInt32(reader.GetOrdinal("product_number")),
                 SellingPrice = reader.GetDecimal(reader.GetOrdinal("selling_price")),
@@ -93,7 +93,7 @@ public class SaleRepository : ISaleRepository
         return checks;
     }
     
-    public async Task<bool> DeleteByUPCCheckAsync(Guid check)
+    public async Task<bool> DeleteByUpcCheckAsync(Guid check)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText = $@"DELETE FROM Sales WHERE check_number = @CheckNumber";

@@ -21,13 +21,13 @@ public class SaleController : ControllerBase
     {
         var sale = request.MapToSale();
         await _saleService.CreateAsync(sale);
-        return CreatedAtAction(nameof(Get), new { upc = sale.UPC, check = sale.CheckNumber }, sale);
+        return CreatedAtAction(nameof(Get), new { upc = sale.Upc, check = sale.CheckNumber }, sale);
     }
 
     [HttpGet(ApiEndpoints.Sales.Get)]
     public async Task<IActionResult> Get([FromRoute] string upc, [FromRoute] Guid check)
     {
-        var sale = await _saleService.GetByUPCCheckAsync(upc, check);
+        var sale = await _saleService.GetByUpcCheckAsync(upc, check);
         if (sale == null)
         {
             return NotFound();
@@ -56,7 +56,7 @@ public class SaleController : ControllerBase
     [HttpDelete(ApiEndpoints.Sales.Delete)]
     public async Task<IActionResult> Delete(Guid check)
     {
-        var deleted = await _saleService.DeleteByUPCCheckAsync(check);
+        var deleted = await _saleService.DeleteByUpcCheckAsync(check);
         if (!deleted)
         {
             return NotFound();
