@@ -17,9 +17,14 @@ public class StoreProductService : IStoreProductService
        return await _storeProductRepository.CreateAsync(storeProduct);
     }
 
-    public async Task<StoreProduct?> GetByUPCAsync(string upc)
+    public async Task<StoreProduct?> GetByUpcAsync(string upc)
     {
-        return await _storeProductRepository.GetByUPCAsync(upc);
+        return await _storeProductRepository.GetByUpcAsync(upc);
+    }
+
+    public async Task<StoreProduct?> GetByPromoUpcAsync(string upc)
+    {
+        return await _storeProductRepository.GetByPromoUpcAsync(upc);
     }
 
     public async Task<IEnumerable<StoreProduct>> GetAllAsync()
@@ -39,7 +44,7 @@ public class StoreProductService : IStoreProductService
 
     public async Task<StoreProduct?> UpdateAsync(StoreProduct product,string prevUpc)
     {
-        var storeProductExists = await _storeProductRepository.ExistsByUPCAsync(prevUpc);
+        var storeProductExists = await _storeProductRepository.ExistsByUpcAsync(prevUpc);
         if (!storeProductExists) 
             return null;
         
@@ -52,11 +57,11 @@ public class StoreProductService : IStoreProductService
         return  product;
     }
 
-    public async Task<bool> DeleteByUPCAsync(string upc)
+    public async Task<bool> DeleteByUpcAsync(string upc)
     {
         
         await _storeProductRepository.UpdatePromUpcAsync(upc, null);
-        return await _storeProductRepository.DeleteByUPCAsync(upc);
+        return await _storeProductRepository.DeleteByUpcAsync(upc);
         
     }
 }

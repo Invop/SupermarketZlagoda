@@ -29,8 +29,8 @@ public class CategoryService : ICategoryService
 
     public async Task<Category?> UpdateAsync(Category category)
     {
-        var CategoryExists = await _categoryRepository.ExistsByIdAsync(category.Id);
-        if (!CategoryExists)
+        var categoryExists = await _categoryRepository.ExistsByIdAsync(category.Id);
+        if (!categoryExists)
         {
             return null;
         }

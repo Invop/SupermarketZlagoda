@@ -173,6 +173,45 @@ public partial class CheckTable
         }
     }
     
+    private async Task<StoreProduct?> GetProductByUpc(string upc)
+    {
+        var response = await Client.GetAsync($"https://localhost:5001/api/store-products/{upc}");
+    
+        if (response is { IsSuccessStatusCode: true, Content: not null })
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+
+            if (!string.IsNullOrEmpty(responseJson))
+            {
+                var product = JsonConvert.DeserializeObject<StoreProduct>(responseJson);
+
+                if (product != null)
+                {
+                    return product;
+                }
+            }
+        } 
+    
+        Console.WriteLine($"Error: {response.StatusCode}");
+        return null;
+    }
+    private async Task UpdateStoreProductAsync(StoreProduct product, string contextUpc)
+    {
+        var productJson = JsonConvert.SerializeObject(product);
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var content = new StringContent(productJson, Encoding.UTF8, "application/json");
+
+        var response = await client.PutAsync($"https://localhost:5001/api/store-products/{contextUpc}", content);
+
+        Console.WriteLine(response.IsSuccessStatusCode
+            ? "Product successfully updated."
+            : $"Failed to update the product. Status code: {response.StatusCode}");
+    }
+    
     private async Task PostCheckAsync(Check check)
     {
         var employeeJson = JsonConvert.SerializeObject(check);
@@ -194,6 +233,9 @@ public partial class CheckTable
             var check1 = JsonConvert.DeserializeObject<Check>(responseContent);
             foreach (var sale in SalesList)
             {
+                var storeProduct = await GetProductByUpc(sale.UPC);
+                storeProduct.Quantity -= sale.ProductNumber;
+                await UpdateStoreProductAsync(storeProduct, storeProduct.Upc);
                 sale.CheckNumber = check1.IdCheck;
                 await PostSaleAsync(sale);
             }

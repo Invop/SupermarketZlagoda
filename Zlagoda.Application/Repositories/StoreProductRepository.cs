@@ -42,7 +42,7 @@ public class StoreProductRepository : IStoreProductRepository
         return result > 0;
     }
 
-    public async Task<StoreProduct?> GetByUPCAsync(string upc)
+    public async Task<StoreProduct?> GetByUpcAsync(string upc)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText = "SELECT * FROM Store_Products WHERE UPC = @Upc";
@@ -65,8 +65,8 @@ public class StoreProductRepository : IStoreProductRepository
         }
         return null;
     }
-    
-    private async Task<StoreProduct?> GetByUpcPromAsync(string upc)
+
+    public async Task<StoreProduct?> GetByPromoUpcAsync(string upc)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText = "SELECT * FROM Store_Products WHERE UPC_prom = @UPC_prom";
@@ -116,7 +116,7 @@ public class StoreProductRepository : IStoreProductRepository
 
     public async Task<int> GetQuantityByUpcPromAsync(string upc)
     {
-        var item = await GetByUpcPromAsync(upc);
+        var item = await GetByPromoUpcAsync(upc);
         return item.Quantity;
     }
 
@@ -167,7 +167,7 @@ public class StoreProductRepository : IStoreProductRepository
         return result > 0;
     }
 
-    public async Task<bool> DeleteByUPCAsync(string upc)
+    public async Task<bool> DeleteByUpcAsync(string upc)
     {
         
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -179,7 +179,7 @@ public class StoreProductRepository : IStoreProductRepository
         
     }
 
-    public async Task<bool> ExistsByUPCAsync(string upc)
+    public async Task<bool> ExistsByUpcAsync(string upc)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         const string queryString = "SELECT COUNT(*) FROM Store_Products WHERE UPC = @Upc";

@@ -17,9 +17,9 @@ public class SaleService : ISaleService
         return await _saleRepository.CreateAsync(sale);
     }
 
-    public async Task<Sale?> GetByUPCCheckAsync(string upc, Guid sale)
+    public async Task<Sale?> GetByUpcCheckAsync(string upc, Guid sale)
     {
-        return await _saleRepository.GetByUPCCheckAsync(upc, sale);
+        return await _saleRepository.GetByUpcCheckAsync(upc, sale);
     }
 
     public async Task<IEnumerable<Sale>> GetSaleByIdCheckAsync(Guid sale)
@@ -31,8 +31,8 @@ public class SaleService : ISaleService
         return await _saleRepository.GetAllAsync();
     }
     
-    public async Task<bool> DeleteByUPCCheckAsync(Guid sale)
+    public async Task<bool> DeleteByUpcCheckAsync(Guid sale)
     {
-        return await _saleRepository.DeleteByUPCCheckAsync(sale);
+        return await _saleRepository.DeleteByUpcCheckAsync(sale);
     }
 }
