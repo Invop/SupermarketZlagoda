@@ -19,11 +19,13 @@ public class ApiEndpoints
     {
         private const string Base = $"{ApiBase}/store-products";
         private const string PromoBase = $"{Base}/promo";
+        private const string NotPromoBase = $"{Base}/not-promo";
         public const string Create = Base;
         public const string Get = $"{Base}/{{upc}}";
         public const string GetByPromoUpc = $"{PromoBase}/{{upc}}";
         public const string GetAll = Base;
         public const string GetAllPromo = PromoBase;
+        public const string GetAllNotPromo = NotPromoBase;
         public const string GetQuantityByUpcProm = $"{Base}/{{upcProm}}/quantity";
         public const string Update = $"{Base}/{{prevUpc}}";
         public const string Delete = $"{Base}/{{upc}}";

@@ -54,10 +54,19 @@ public class StoreProductController : ControllerBase
     [HttpGet(ApiEndpoints.StoreProducts.GetAllPromo)]
     public async Task<IActionResult> GetAllPromo()
     {
-        var products = await _productService.GetAllPromoStoreProductsAsync();
+        var products = await _productService.GetAllPromoProductsAsync();
         var productsResponse = products.MapToStoreProductResponse();
         return Ok(productsResponse);
     }
+    
+    [HttpGet(ApiEndpoints.StoreProducts.GetAllNotPromo)]
+    public async Task<IActionResult> GetAllNotPromo()
+    {
+        var products = await _productService.GetAllNotPromoProductsAsync();
+        var productsResponse = products.MapToStoreProductResponse();
+        return Ok(productsResponse);
+    }
+    
     
     [HttpGet(ApiEndpoints.StoreProducts.GetQuantityByUpcProm)]
     public async Task<IActionResult> GetQuantityByUpcProm([FromRoute] string upcProm)

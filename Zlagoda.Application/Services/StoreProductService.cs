@@ -32,9 +32,13 @@ public class StoreProductService : IStoreProductService
        return await _storeProductRepository.GetAllAsync();
     }
 
-    public async Task<IEnumerable<StoreProduct>> GetAllPromoStoreProductsAsync()
+    public async Task<IEnumerable<StoreProduct>> GetAllPromoProductsAsync()
     {
-        return await _storeProductRepository.GetAllPromoStoreProductsAsync();
+        return await _storeProductRepository.GetAllPromoProductsAsync();
+    }
+    public async Task<IEnumerable<StoreProduct>> GetAllNotPromoProductsAsync()
+    {
+        return await _storeProductRepository.GetAllNotPromoProductsAsync();
     }
 
     public async Task<int> GetQuantityByUpcPromAsync(string upc)
