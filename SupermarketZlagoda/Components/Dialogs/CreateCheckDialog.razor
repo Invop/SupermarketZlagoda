@@ -104,7 +104,7 @@
     private List<CustomerCard>? _customerList = [];
 
     private StoreProduct? StoreProduct { get; set; }
-    private List<StoreProduct>? _storeProductsList = [];
+    private IEnumerable<StoreProduct> _storeProductsList = [];
 
     private List<Sale> SalesList = new List<Sale>();
 
@@ -133,7 +133,8 @@
 
     private async Task InitializeStoreProductListAsync()
     {
-        _storeProductsList = await GetStoreProductList();
+        var data = await GetStoreProductList();
+        if (data != null) _storeProductsList = data.Where(x => x.Quantity > 0);
     }
 
     private async void CheckEmployeeListAndActIfNeeded()
