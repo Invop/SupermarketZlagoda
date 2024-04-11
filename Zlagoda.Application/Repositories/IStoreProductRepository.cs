@@ -19,4 +19,6 @@ public interface IStoreProductRepository
 
     Task<IEnumerable<StoreProduct>> GetAllNotPromoProductsAsync();
 
+    Task<IEnumerable<StoreProduct>> GetAllSortedAscending();
+    Task<IEnumerable<StoreProduct>> GetAllSortedDescending();
 }

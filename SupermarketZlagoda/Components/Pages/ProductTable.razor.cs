@@ -36,11 +36,7 @@ public partial class ProductTable
     {
         IsManager = UserState.IsManager;
         await UpdateCategoryOptions();
-        await UpdateTable();
-    }
-    private async Task UpdateTableAsync()
-    {
-        await UpdateTable();
+        await UpdateTableAsync();
     }
     private async Task UpdateCategoryOptions()
     {
@@ -62,7 +58,7 @@ public partial class ProductTable
         }
     }
 
-    private async Task UpdateTable()
+    private async Task UpdateTableAsync()
     {
         HttpResponseMessage response;
         if(_sortType == 0)
@@ -110,7 +106,7 @@ public partial class ProductTable
             {
                 var item = result.Data as Product;
                 await UpdateProductAsync(item);
-                await UpdateTable();
+                await UpdateTableAsync();
             }
             
     }
@@ -153,7 +149,7 @@ public partial class ProductTable
         {
             var item = result.Data as Product;
             await PostProductAsync(item);
-            await UpdateTable();
+            await UpdateTableAsync();
         }
     }
 
@@ -193,7 +189,7 @@ public partial class ProductTable
         if (!canceled)
         {
             await DeleteProductAsync(context.Id);
-            await UpdateTable();
+            await UpdateTableAsync();
         }
     }
 

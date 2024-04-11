@@ -51,6 +51,24 @@ public class StoreProductController : ControllerBase
         var productsResponse = products.MapToStoreProductResponse();
         return Ok(productsResponse);
     }
+    
+    [HttpGet(ApiEndpoints.StoreProducts.GetAllSortedAscending)]
+    public async Task<IActionResult> GetAllSortedAscending()
+    {
+        var products = await _productService.GetAllSortedAscending();
+        var productsResponse = products.MapToStoreProductResponse();
+        return Ok(productsResponse);
+    }
+    
+    [HttpGet(ApiEndpoints.StoreProducts.GetAllSortedDescending)]
+    public async Task<IActionResult> GetAllSortedDescending()
+    {
+        var products = await _productService.GetAllSortedDescending();
+        var productsResponse = products.MapToStoreProductResponse();
+        return Ok(productsResponse);
+    }
+    
+    
     [HttpGet(ApiEndpoints.StoreProducts.GetAllPromo)]
     public async Task<IActionResult> GetAllPromo()
     {

@@ -14,7 +14,16 @@ namespace SupermarketZlagoda.Components.Pages;
 public partial class StoreProductTable
 {
     private bool IsManager { get; set; } = true;
-    
+    private int SortType
+    {
+        get => _sortType;
+        set { _sortType = value;
+            _ = UpdateTableAsync();
+        }
+    }
+
+
+
     private string _searchTerm = string.Empty;
     private int _sortType = 0;
     private bool _hidePromotional = false, _hideNonPromotional = false;
@@ -24,12 +33,20 @@ public partial class StoreProductTable
     protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
-        await UpdateTable();
+        await UpdateTableAsync();
     }
     
-    private async Task UpdateTable()
+    private async Task UpdateTableAsync()
     {
-        var response = await Client.GetAsync("https://localhost:5001/api/store-products");
+        HttpResponseMessage response;
+        if(_sortType == 0)
+        {
+            response = await Client.GetAsync("https://localhost:5001/api/store-products/asc");
+        }
+        else
+        {
+            response = await Client.GetAsync("https://localhost:5001/api/store-products/desc");
+        }
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -81,7 +98,7 @@ public partial class StoreProductTable
         {
             var item = result.Data as StoreProduct;
             await PostStoreProductAsync(item);
-            await UpdateTable();
+            await UpdateTableAsync();
         }
     }
     private async Task PostStoreProductAsync(StoreProduct product)
@@ -130,7 +147,7 @@ public partial class StoreProductTable
             }
 
             await DeleteProductAsync(context.Upc);
-            await UpdateTable();
+            await UpdateTableAsync();
         }
     }
 
@@ -170,7 +187,7 @@ public partial class StoreProductTable
                 await UpdateStoreProductAsync(notPromoProduct,notPromoProduct.Upc);
             }
             await UpdateStoreProductAsync(item,prevUpc);
-            await UpdateTable();
+            await UpdateTableAsync();
         }
             
     }
@@ -217,7 +234,7 @@ public partial class StoreProductTable
             context.Quantity -= item.Quantity;
             await UpdateStoreProductAsync(context,context.Upc);
             await PostStoreProductAsync(item);
-            await UpdateTable();
+            await UpdateTableAsync();
         }
     }
 
@@ -246,7 +263,7 @@ public partial class StoreProductTable
             context.Quantity += item.Quantity;
             context.Price = item.Price;
             await UpdateStoreProductAsync(context,context.Upc);
-            await UpdateTable();
+            await UpdateTableAsync();
         }
     }
 }
