@@ -46,11 +46,31 @@ public class ProductRepository : IProductRepository
     }
 
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<IEnumerable<Product>> GetAllSortedAscendingAsync()
     {
-        
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Products";
+        var commandText = "SELECT * FROM Products ORDER BY product_name ASC";
+        using var command = new SqlCommand(commandText, connection);
+        using var reader = await command.ExecuteReaderAsync();
+        var products = new List<Product>();
+        while (await reader.ReadAsync())
+        {
+            var product = new Product
+            {
+                Id = reader.GetGuid(reader.GetOrdinal("id_product")),
+                Name = reader.GetString(reader.GetOrdinal("product_name")),
+                CategoryId = reader.GetGuid(reader.GetOrdinal("category_number")),
+                Characteristics = reader.GetString(reader.GetOrdinal("characteristics"))
+            };
+            products.Add(product);
+        }
+        return products;
+    }
+    
+    public async Task<IEnumerable<Product>> GetAllSortedDescendingAsync()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = "SELECT * FROM Products ORDER BY product_name DESC ";
         using var command = new SqlCommand(commandText, connection);
         using var reader = await command.ExecuteReaderAsync();
         var products = new List<Product>();
@@ -76,7 +96,7 @@ public class ProductRepository : IProductRepository
         var productIds = unusedProductIds.ToList();
         if (productIds.Count == 0)
         {
-            return await GetAllAsync();
+            return await GetAllSortedAscendingAsync();
         }
         string idsString = string.Join(",", productIds.Select(id => $"'{id}'"));
         var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString})";
