@@ -25,6 +25,11 @@ public class ApiEndpoints
         public const string Get = $"{Base}/{{upc}}";
         public const string GetByPromoUpc = $"{PromoBase}/{{upc}}";
         public const string GetAll = Base;
+        
+        public const string GetAllSortedAscending = $"{Base}/asc";
+        public const string GetAllSortedDescending = $"{Base}/desc";
+        
+        
         public const string GetAllPromo = PromoBase;
         public const string GetAllNotPromo = NotPromoBase;
         public const string GetQuantityByUpcProm = $"{Base}/{{upcProm}}/quantity";

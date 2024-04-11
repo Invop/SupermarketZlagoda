@@ -32,6 +32,16 @@ public class StoreProductService : IStoreProductService
        return await _storeProductRepository.GetAllAsync();
     }
 
+    public async Task<IEnumerable<StoreProduct>> GetAllSortedAscending()
+    {
+        return await _storeProductRepository.GetAllSortedAscending();
+    }
+
+    public async Task<IEnumerable<StoreProduct>> GetAllSortedDescending()
+    {
+        return await _storeProductRepository.GetAllSortedDescending();
+    }
+
     public async Task<IEnumerable<StoreProduct>> GetAllPromoProductsAsync()
     {
         return await _storeProductRepository.GetAllPromoProductsAsync();

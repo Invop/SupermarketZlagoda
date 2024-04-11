@@ -247,4 +247,51 @@ public class StoreProductRepository : IStoreProductRepository
 
         return storeProducts;
     }
+
+    public async Task<IEnumerable<StoreProduct>> GetAllSortedAscending()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = "SELECT * FROM Store_Products ORDER BY products_number ASC";
+        using var command = new SqlCommand(commandText, connection);
+        using var reader = await command.ExecuteReaderAsync();
+        var storeProducts = new List<StoreProduct>();
+
+        while (await reader.ReadAsync())
+        {
+            var storeProduct = new StoreProduct
+            {
+                Upc = reader.IsDBNull(reader.GetOrdinal("UPC")) ? null : reader.GetString(reader.GetOrdinal("UPC")),
+                UpcProm = reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
+                ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
+                Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
+                Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
+                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
+            };
+            storeProducts.Add(storeProduct);
+        }
+        return storeProducts;
+    }
+    public async Task<IEnumerable<StoreProduct>> GetAllSortedDescending()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = "SELECT * FROM Store_Products ORDER BY products_number DESC";
+        using var command = new SqlCommand(commandText, connection);
+        using var reader = await command.ExecuteReaderAsync();
+        var storeProducts = new List<StoreProduct>();
+
+        while (await reader.ReadAsync())
+        {
+            var storeProduct = new StoreProduct
+            {
+                Upc = reader.IsDBNull(reader.GetOrdinal("UPC")) ? null : reader.GetString(reader.GetOrdinal("UPC")),
+                UpcProm = reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
+                ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
+                Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
+                Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
+                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
+            };
+            storeProducts.Add(storeProduct);
+        }
+        return storeProducts;
+    }
 }

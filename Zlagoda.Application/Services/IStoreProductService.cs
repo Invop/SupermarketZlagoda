@@ -9,10 +9,14 @@ public interface IStoreProductService
     Task<StoreProduct?> GetByPromoUpcAsync(string upc);
     
     Task<IEnumerable<StoreProduct>> GetAllAsync();
+    Task<IEnumerable<StoreProduct>> GetAllSortedAscending();
+    Task<IEnumerable<StoreProduct>> GetAllSortedDescending();
     Task<IEnumerable<StoreProduct>> GetAllPromoProductsAsync();
     Task<IEnumerable<StoreProduct>> GetAllNotPromoProductsAsync();
     Task<int> GetQuantityByUpcPromAsync(string upc);
     Task<StoreProduct?> UpdateAsync(StoreProduct product,string prevUpc);
     Task<bool> DeleteByUpcAsync(string upc);
+
+
 
 }
