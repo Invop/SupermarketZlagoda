@@ -16,11 +16,20 @@ public partial class ProductTable
     private bool IsManager { get; set; } = false;
     
     private string _searchTerm = string.Empty;
-    private int _sortType = 0;
+
+    private int SortType
+    {
+        get => _sortType;
+        set { _sortType = value;
+            _ = UpdateTableAsync();
+        }
+    }
+
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Product>? _items = Enumerable.Empty<Product>().AsQueryable();
     private Dictionary<Guid, string> _categories = new();
     private List<SelectOption> _categoryOptions = [];
+    private int _sortType = 0;
     private static readonly HttpClient Client = new HttpClient();
     
     protected override async Task OnInitializedAsync()
@@ -29,7 +38,10 @@ public partial class ProductTable
         await UpdateCategoryOptions();
         await UpdateTable();
     }
-
+    private async Task UpdateTableAsync()
+    {
+        await UpdateTable();
+    }
     private async Task UpdateCategoryOptions()
     {
         var response = await Client.GetAsync("https://localhost:5001/api/categories");
@@ -52,7 +64,15 @@ public partial class ProductTable
 
     private async Task UpdateTable()
     {
-        var response = await Client.GetAsync("https://localhost:5001/api/products");
+        HttpResponseMessage response;
+        if(_sortType == 0)
+        {
+            response = await Client.GetAsync("https://localhost:5001/api/products/asc");
+        }
+        else
+        {
+            response = await Client.GetAsync("https://localhost:5001/api/products/desc");
+        }
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();

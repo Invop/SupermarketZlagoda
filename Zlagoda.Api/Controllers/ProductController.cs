@@ -35,13 +35,22 @@ public class ProductController : ControllerBase
         return Ok(product.MapToProductResponse());
     }
     
-    [HttpGet(ApiEndpoints.Products.GetAll)]
-    public async Task<IActionResult> GetAll()
+    [HttpGet(ApiEndpoints.Products.GetAllSortedAscending)]
+    public async Task<IActionResult> GetAllSortedAscending()
     {
-        var products = await _productService.GetAllAsync();
+        var products = await _productService.GetAllSortedAscendingAsync();
         var productsResponse = products.MapToProductResponse();
         return Ok(productsResponse);
     }
+        
+    [HttpGet(ApiEndpoints.Products.GetAllSortedDescending)]
+    public async Task<IActionResult> GetAllSortedDescending()
+    {
+        var products = await _productService.GetAllSortedDescendingAsync();
+        var productsResponse = products.MapToProductResponse();
+        return Ok(productsResponse);
+    }
+    
     [HttpGet(ApiEndpoints.Products.GetAllUnused)]
     public async Task<IActionResult> GetAllUnused()
     {

@@ -7,8 +7,8 @@
     {
         <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new product</FluentButton>
     }
-    <FluentRadioGroup @bind-Value="_sortType">
-        <FluentRadio Value="@(0)" Checked="true">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
+    <FluentRadioGroup @bind-Value="SortType">
+        <FluentRadio Value="@(0)">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
     </FluentRadioGroup>
     <MultiselectDropdown Options="_categoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>

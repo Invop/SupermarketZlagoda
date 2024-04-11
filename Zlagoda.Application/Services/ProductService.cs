@@ -22,11 +22,16 @@ public class ProductService : IProductService
         return await _productRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<IEnumerable<Product>> GetAllSortedAscendingAsync()
     {
-        return await _productRepository.GetAllAsync();
+        return await _productRepository.GetAllSortedAscendingAsync();
     }
-
+    
+    public async Task<IEnumerable<Product>> GetAllSortedDescendingAsync()
+    {
+        return await _productRepository.GetAllSortedDescendingAsync();
+    }
+    
     public async Task<IEnumerable<Product>> GetAllUnusedAsync()
     {
         return await _productRepository.GetAllUnusedAsync();
