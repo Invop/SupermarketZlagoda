@@ -1,0 +1,16 @@
+﻿###
+GET https://localhost:5001/api/store-products/?SortBy=products_number&SortOrder=asc
+Accept: application/json
+###
+GET https://localhost:5001/api/store-products/?SortBy=products_number&SortOrder=desc
+Accept: application/json
+###
+GET https://localhost:5001/api/store-products/?Promo=true&SortBy=products_number&SortOrder=desc
+Accept: application/json
+###
+GET https://localhost:5001/api/store-products/?Promo=false&SortBy=product_name&SortOrder=asc
+Accept: application/json
+###
+GET https://localhost:5001/api/store-products/?Category=44ed8f19-c320-435f-8418-8bc8e198cf0b&Category=bb522a8a-caed-454d-8eb5-b5f27a380c14&SortOrder=asc
+Accept: application/json
+###

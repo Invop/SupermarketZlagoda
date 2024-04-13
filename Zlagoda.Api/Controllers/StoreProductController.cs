@@ -2,6 +2,7 @@
 using Zlagoda.Api.Mapping;
 using Zlagoda.Application.Repositories;
 using Zlagoda.Application.Services;
+using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Contracts.Requests;
 
 namespace Zlagoda.Api.Controllers;
@@ -45,47 +46,13 @@ public class StoreProductController : ControllerBase
         return Ok(product.MapToStoreProductResponse());
     }
     [HttpGet(ApiEndpoints.StoreProducts.GetAll)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] StoreProductQueryParameters? parameters)
     {
-        var products = await _productService.GetAllAsync();
+        var products = await _productService.GetAllAsync(parameters);
         var productsResponse = products.MapToStoreProductResponse();
         return Ok(productsResponse);
     }
-    
-    [HttpGet(ApiEndpoints.StoreProducts.GetAllSortedAscending)]
-    public async Task<IActionResult> GetAllSortedAscending()
-    {
-        var products = await _productService.GetAllSortedAscending();
-        var productsResponse = products.MapToStoreProductResponse();
-        return Ok(productsResponse);
-    }
-    
-    [HttpGet(ApiEndpoints.StoreProducts.GetAllSortedDescending)]
-    public async Task<IActionResult> GetAllSortedDescending()
-    {
-        var products = await _productService.GetAllSortedDescending();
-        var productsResponse = products.MapToStoreProductResponse();
-        return Ok(productsResponse);
-    }
-    
-    
-    [HttpGet(ApiEndpoints.StoreProducts.GetAllPromo)]
-    public async Task<IActionResult> GetAllPromo()
-    {
-        var products = await _productService.GetAllPromoProductsAsync();
-        var productsResponse = products.MapToStoreProductResponse();
-        return Ok(productsResponse);
-    }
-    
-    [HttpGet(ApiEndpoints.StoreProducts.GetAllNotPromo)]
-    public async Task<IActionResult> GetAllNotPromo()
-    {
-        var products = await _productService.GetAllNotPromoProductsAsync();
-        var productsResponse = products.MapToStoreProductResponse();
-        return Ok(productsResponse);
-    }
-    
-    
+
     [HttpGet(ApiEndpoints.StoreProducts.GetQuantityByUpcProm)]
     public async Task<IActionResult> GetQuantityByUpcProm([FromRoute] string upcProm)
     {

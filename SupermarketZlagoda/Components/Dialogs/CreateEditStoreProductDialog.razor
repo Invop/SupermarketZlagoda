@@ -93,6 +93,7 @@
         else if(!Content.IsPromotional)
         {
             _products = await GetAllUnusedProducts();
+            if (_products != null) Product = _products[0];
         }
     }
 
@@ -105,7 +106,7 @@
 
         _products = await GetAllUnusedProductsAndCurrent(Content.ProductId);
 
-        if (_products != null)
+        if (_products != null && Content.ProductId != Guid.Empty)
             Product = _products.FirstOrDefault(x => x.Id == Content.ProductId);
     }
 

@@ -90,14 +90,15 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllUnusedAsync()
     {
-        var allStoreItems = await _storeProductService.Value.GetAllAsync();
+        var allStoreItems = await _storeProductService.Value.GetAllAsync(null);
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var unusedProductIds = allStoreItems.Select(item => item.ProductId).Distinct();
         var productIds = unusedProductIds.ToList();
-        if (productIds.Count == 0)
-        {
-            return await GetAllSortedAscendingAsync();
-        }
+         if (productIds.Count == 0)
+         {
+             return await GetAllSortedAscendingAsync();
+         }
+
         string idsString = string.Join(",", productIds.Select(id => $"'{id}'"));
         var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString})";
         using var command = new SqlCommand(commandText, connection);
