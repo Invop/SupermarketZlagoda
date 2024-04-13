@@ -8,8 +8,7 @@ public class ApiEndpoints
         private const string Base = $"{ApiBase}/products";
         public const string Create = Base;
         public const string Get = $"{Base}/{{id:guid}}";
-        public const string GetAllSortedAscending = $"{Base}/asc";
-        public const string GetAllSortedDescending = $"{Base}/desc";
+        public const string GetAll = $"{Base}";
         public const string GetAllUnused = $"{Base}/unused";
         public const string GetAllUnusedAndCurrent = $"{Base}/unused/{{id:guid}}";
         public const string Update = $"{Base}/{{id:guid}}";

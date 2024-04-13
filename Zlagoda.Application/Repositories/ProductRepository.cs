@@ -1,7 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data;
+using System.Text;
+using Microsoft.Data.SqlClient;
 using Zlagoda.Application.Database;
 using Zlagoda.Application.Models;
 using Zlagoda.Application.Services;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Repositories;
 
@@ -46,11 +49,57 @@ public class ProductRepository : IProductRepository
     }
 
 
-    public async Task<IEnumerable<Product>> GetAllSortedAscendingAsync()
+    private SqlCommand GetCommandWithParameters(ProductQueryParameters parameters, SqlCommand command)
+    {
+        if (parameters.Category != null)
+        {
+            var categoryParameters = parameters.Category.Select((id, index) =>
+                new SqlParameter($"@Category{index}", SqlDbType.UniqueIdentifier) { Value = id }).ToArray();
+            command.Parameters.AddRange(categoryParameters);
+        }
+        if (!string.IsNullOrWhiteSpace(parameters.ProductTitleMatch))
+        {
+            command.Parameters.AddWithValue("@ProductTitleMatch", $"{parameters.ProductTitleMatch}");
+        }
+        return command;
+    }
+
+    private void AppendAdditionalCriteria(StringBuilder commandText, ProductQueryParameters? parameters)
+    {
+        if (parameters == null) return;
+
+        if (parameters.Category != null && parameters.Category.Any())
+        {
+            var ids = parameters.Category.Select((id, index) => $"@Category{index}").ToArray();
+            commandText.Append($" AND category_number IN ({string.Join(",", ids)})");
+        }
+        if (!string.IsNullOrWhiteSpace(parameters.ProductTitleMatch))
+        {
+            commandText.Append(" AND (product_name LIKE '%'+ @ProductTitleMatch +'%' OR product_name = @ProductTitleMatch)");
+        }
+        if (!string.IsNullOrEmpty(parameters.SortBy))
+        {
+            commandText.Append($" ORDER BY {parameters.SortBy}");
+            if (!string.IsNullOrEmpty(parameters.SortOrder))
+            {
+                commandText.Append($" {parameters.SortOrder}");
+            }
+        }
+
+    }
+
+    public async Task<IEnumerable<Product>> GetAllAsync(ProductQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Products ORDER BY product_name ASC";
-        using var command = new SqlCommand(commandText, connection);
+        var commandText = new StringBuilder(@"SELECT * FROM Products WHERE 1=1");
+
+        AppendAdditionalCriteria(commandText, parameters);
+        using var command = new SqlCommand(commandText.ToString(), connection);
+        if(parameters != null)
+        {
+            GetCommandWithParameters(parameters, command);
+        }
+
         using var reader = await command.ExecuteReaderAsync();
         var products = new List<Product>();
         while (await reader.ReadAsync())
@@ -64,6 +113,7 @@ public class ProductRepository : IProductRepository
             };
             products.Add(product);
         }
+
         return products;
     }
     
@@ -96,7 +146,7 @@ public class ProductRepository : IProductRepository
         var productIds = unusedProductIds.ToList();
          if (productIds.Count == 0)
          {
-             return await GetAllSortedAscendingAsync();
+             return await GetAllAsync(null);
          }
 
         string idsString = string.Join(",", productIds.Select(id => $"'{id}'"));

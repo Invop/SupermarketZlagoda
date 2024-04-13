@@ -2,6 +2,7 @@
 using Zlagoda.Api.Mapping;
 using Zlagoda.Application.Repositories;
 using Zlagoda.Application.Services;
+using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Contracts.Requests;
 
 namespace Zlagoda.Api.Controllers;
@@ -35,21 +36,14 @@ public class ProductController : ControllerBase
         return Ok(product.MapToProductResponse());
     }
     
-    [HttpGet(ApiEndpoints.Products.GetAllSortedAscending)]
-    public async Task<IActionResult> GetAllSortedAscending()
+    [HttpGet(ApiEndpoints.Products.GetAll)]
+    public async Task<IActionResult> GetAll([FromQuery] ProductQueryParameters? parameters)
     {
-        var products = await _productService.GetAllSortedAscendingAsync();
+        var products = await _productService.GetAllAsync(parameters);
         var productsResponse = products.MapToProductResponse();
         return Ok(productsResponse);
     }
-        
-    [HttpGet(ApiEndpoints.Products.GetAllSortedDescending)]
-    public async Task<IActionResult> GetAllSortedDescending()
-    {
-        var products = await _productService.GetAllSortedDescendingAsync();
-        var productsResponse = products.MapToProductResponse();
-        return Ok(productsResponse);
-    }
+    
     
     [HttpGet(ApiEndpoints.Products.GetAllUnused)]
     public async Task<IActionResult> GetAllUnused()

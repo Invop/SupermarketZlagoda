@@ -1,5 +1,6 @@
 ﻿using Zlagoda.Application.Models;
 using Zlagoda.Application.Repositories;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Services;
 
@@ -22,9 +23,9 @@ public class ProductService : IProductService
         return await _productRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Product>> GetAllSortedAscendingAsync()
+    public async Task<IEnumerable<Product>> GetAllAsync(ProductQueryParameters? parameters)
     {
-        return await _productRepository.GetAllSortedAscendingAsync();
+        return await _productRepository.GetAllAsync(parameters);
     }
     
     public async Task<IEnumerable<Product>> GetAllSortedDescendingAsync()
