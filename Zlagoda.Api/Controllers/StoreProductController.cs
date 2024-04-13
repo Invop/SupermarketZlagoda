@@ -46,20 +46,13 @@ public class StoreProductController : ControllerBase
         return Ok(product.MapToStoreProductResponse());
     }
     [HttpGet(ApiEndpoints.StoreProducts.GetAll)]
-    public async Task<IActionResult> GetAll([FromQuery] StoreProductQueryParameters parameters)
+    public async Task<IActionResult> GetAll([FromQuery] StoreProductQueryParameters? parameters)
     {
         var products = await _productService.GetAllAsync(parameters);
         var productsResponse = products.MapToStoreProductResponse();
         return Ok(productsResponse);
     }
-    [HttpGet(ApiEndpoints.StoreProducts.GetAllPromo)]
-    public async Task<IActionResult> GetAllPromo()
-    {
-        var products = await _productService.GetAllPromoProductsAsync();
-        var productsResponse = products.MapToStoreProductResponse();
-        return Ok(productsResponse);
-    }
-    
+
     [HttpGet(ApiEndpoints.StoreProducts.GetQuantityByUpcProm)]
     public async Task<IActionResult> GetQuantityByUpcProm([FromRoute] string upcProm)
     {

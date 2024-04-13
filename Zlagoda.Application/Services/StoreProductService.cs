@@ -28,7 +28,7 @@ public class StoreProductService : IStoreProductService
         return await _storeProductRepository.GetByPromoUpcAsync(upc);
     }
 
-    public async Task<IEnumerable<StoreProduct>> GetAllAsync(StoreProductQueryParameters parameters)
+    public async Task<IEnumerable<StoreProduct>> GetAllAsync(StoreProductQueryParameters? parameters)
     {
        return await _storeProductRepository.GetAllAsync(parameters);
     }

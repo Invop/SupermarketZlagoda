@@ -92,71 +92,85 @@ public class StoreProductRepository : IStoreProductRepository
         }
         return null;
     }
-    
-public async Task<IEnumerable<StoreProduct>> GetAllAsync(StoreProductQueryParameters parameters)
-{
-    using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-
-    var commandText = new StringBuilder(@"SELECT * FROM Store_Products 
-                                      INNER JOIN Products 
-                                      ON Store_Products.id_product = Products.id_product 
-                                      WHERE 1=1");
-    
-    if (parameters.Promo.HasValue)
+    private SqlCommand GetCommandWithParameters(StoreProductQueryParameters parameters, SqlCommand command)
     {
-        commandText.Append(" AND promotional_product = @Promo");
-    }
-    if (!string.IsNullOrWhiteSpace(parameters.StartUpc))
-    {
-        commandText.Append(" AND (UPC LIKE @StartUpc + '%' OR UPC = @StartUpc)");
-    }
-    if (parameters.Category != null && parameters.Category.Any())
-    {
-        var ids = parameters.Category.Select((id, index) => $"@Category{index}").ToArray();
-        commandText.Append($" AND category_number IN ({string.Join(",", ids)})");
-    }
-    if (!string.IsNullOrEmpty(parameters.SortBy))
-    {
-        commandText.Append($" ORDER BY {parameters.SortBy}");
-        if (!string.IsNullOrEmpty(parameters.SortOrder))
+        if ( parameters.Category != null)
         {
-            commandText.Append($" {parameters.SortOrder}");
+            var categoryParameters = parameters.Category.Select((id, index) =>
+                new SqlParameter($"@Category{index}", SqlDbType.UniqueIdentifier) { Value = id }).ToArray();
+            command.Parameters.AddRange(categoryParameters);
+        }
+        if (parameters.Promo.HasValue)
+        {
+            command.Parameters.AddWithValue("@Promo", parameters.Promo.Value ? 1 : 0);
+        }
+        if (!string.IsNullOrWhiteSpace(parameters.StartUpc))
+        {
+            command.Parameters.AddWithValue("@StartUpc", parameters.StartUpc);
+        }
+
+        return command;
+    }
+
+    private void AppendAdditionalCriteria(StringBuilder commandText, StoreProductQueryParameters? parameters)
+    {
+        if (parameters == null) return;
+        if (parameters.Promo.HasValue)
+        {
+            commandText.Append(" AND promotional_product = @Promo");
+        }
+        if (!string.IsNullOrWhiteSpace(parameters.StartUpc))
+        {
+            commandText.Append(" AND (UPC LIKE @StartUpc + '%' OR UPC = @StartUpc)");
+        }
+        if (parameters.Category != null && parameters.Category.Any())
+        {
+            var ids = parameters.Category.Select((id, index) => $"@Category{index}").ToArray();
+            commandText.Append($" AND category_number IN ({string.Join(",", ids)})");
+        }
+        if (!string.IsNullOrEmpty(parameters.SortBy))
+        {
+            commandText.Append($" ORDER BY {parameters.SortBy}");
+            if (!string.IsNullOrEmpty(parameters.SortOrder))
+            {
+                commandText.Append($" {parameters.SortOrder}");
+            }
         }
     }
 
-    await using var command = new SqlCommand(commandText.ToString(), connection);
-    if (parameters.Category != null)
+    public async Task<IEnumerable<StoreProduct>> GetAllAsync(StoreProductQueryParameters? parameters)
     {
-        var categoryParameters = parameters.Category.Select((id, index) => 
-            new SqlParameter($"@Category{index}", SqlDbType.UniqueIdentifier){Value = id}).ToArray();
-        command.Parameters.AddRange(categoryParameters);
-    }
-    if (parameters.Promo.HasValue)
-    {
-        command.Parameters.AddWithValue("@Promo", parameters.Promo.Value ? 1 : 0);
-    }
-    if (!string.IsNullOrWhiteSpace(parameters.StartUpc))
-    {
-        command.Parameters.AddWithValue("@StartUpc", parameters.StartUpc);
-    }
-    await using var reader = await command.ExecuteReaderAsync();
-    var storeProducts = new List<StoreProduct>();
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = new StringBuilder(@"SELECT * FROM Store_Products 
+                                          INNER JOIN Products 
+                                          ON Store_Products.id_product = Products.id_product 
+                                          WHERE 1=1");
+        
+        AppendAdditionalCriteria(commandText, parameters);
 
-    while (await reader.ReadAsync())
-    {
-        var storeProduct = new StoreProduct
+        await using var command = new SqlCommand(commandText.ToString(), connection);
+        if(parameters != null)
         {
-            Upc = reader.IsDBNull(reader.GetOrdinal("UPC")) ? null : reader.GetString(reader.GetOrdinal("UPC")),
-            UpcProm = reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
-            ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
-            Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
-            Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
-            IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
-        };
-        storeProducts.Add(storeProduct);
+            GetCommandWithParameters(parameters, command);
+        }
+        
+        await using var reader = await command.ExecuteReaderAsync();
+        var storeProducts = new List<StoreProduct>();
+        while (await reader.ReadAsync())
+        {
+            var storeProduct = new StoreProduct
+            {
+                Upc = reader.IsDBNull(reader.GetOrdinal("UPC")) ? null : reader.GetString(reader.GetOrdinal("UPC")),
+                UpcProm = reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
+                ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
+                Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
+                Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
+                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
+            };
+            storeProducts.Add(storeProduct);
+        }
+        return storeProducts;
     }
-    return storeProducts;
-}
 
     public async Task<int> GetQuantityByUpcPromAsync(string upc)
     {
