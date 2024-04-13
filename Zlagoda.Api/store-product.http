@@ -29,7 +29,7 @@ Content-Type: application/json
 {
   "Upc": "UPC3",
   "UpcProm": null,
-  "ProductId": "9df2efae-c275-4ff2-b3ff-b81e7a93d521",
+  "ProductId": "cd9bff9e-8c4b-4311-81b9-7e41d0cd52ca",
   "Price": 300.00,
   "Quantity": 30,
   "IsPromotional": false
@@ -42,13 +42,13 @@ GET https://localhost:5001/api/store-products
 Accept: application/json
 
 ###
-PUT https://localhost:5001/api/store-products/Test
+PUT https://localhost:5001/api/store-products
 Content-Type: application/json
 
 {
-  "Upc": "UPC2",
+  "Upc": "UPC99",
   "UpcProm": null,
-  "ProductId": "9ff5c278-6436-496b-bf32-191e1bfb08df",
+  "ProductId": "cd9bff9e-8c4b-4311-81b9-7e41d0cd52ca",
   "Price": 300.00,
   "Quantity": 50,
   "IsPromotional": false

@@ -1,5 +1,6 @@
 ﻿using Zlagoda.Application.Models;
 using Zlagoda.Application.Repositories;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Services;
 
@@ -27,9 +28,9 @@ public class StoreProductService : IStoreProductService
         return await _storeProductRepository.GetByPromoUpcAsync(upc);
     }
 
-    public async Task<IEnumerable<StoreProduct>> GetAllAsync()
+    public async Task<IEnumerable<StoreProduct>> GetAllAsync(StoreProductQueryParameters parameters)
     {
-       return await _storeProductRepository.GetAllAsync();
+       return await _storeProductRepository.GetAllAsync(parameters);
     }
 
     public async Task<IEnumerable<StoreProduct>> GetAllPromoProductsAsync()
