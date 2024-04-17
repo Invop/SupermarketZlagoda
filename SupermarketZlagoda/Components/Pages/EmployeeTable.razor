@@ -2,12 +2,12 @@
 @inject IDialogService DialogService
 <FluentToolbar id="toolbar-fluent-components">
     <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new employee</FluentButton>
-    <FluentRadioGroup @bind-Value="_sortType">
+    <FluentRadioGroup @bind-Value="@SortType">
         <FluentRadio Value="@(0)" Checked="true">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
     </FluentRadioGroup>
-    <FluentCheckbox @bind-Value="@_cashiersOnly">Cashiers only</FluentCheckbox>
-    <FluentTextField @bind-Value="_surnameSearchTerm" Placeholder="Search by surname"></FluentTextField>
+    <FluentCheckbox @bind-Value="@CashiersOnly">Cashiers only</FluentCheckbox>
+    <FluentTextField @bind-Value="@SearchTerm" Placeholder="Search by surname"></FluentTextField>
 </FluentToolbar>
 <FluentDataGrid ResizableColumns="true" Items="@_items" ItemSize="54" Pagination="@_pagination" Virtualize="true"
                 GridTemplateColumns="1.4fr 1.9fr 1.7fr 2fr 0.9fr 1fr 1.4fr 1.4fr 1.6fr 0.8fr 1fr 1.2fr 1.3fr"

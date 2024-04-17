@@ -1,6 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Text;
+using Microsoft.Data.SqlClient;
 using Zlagoda.Application.Database;
 using Zlagoda.Application.Models;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Repositories;
 
@@ -68,15 +70,36 @@ public class EmployeeRepository : IEmployeeRepository
         }
         return null;
     }
-
-
-    public async Task<IEnumerable<Employee>> GetAllAsync()
+    
+    private void AppendAdditionalCriteria(StringBuilder commandText, EmployeeQueryParameters? parameters)
     {
-        
+        if (parameters == null) return;
+        if (parameters.CashiersOnly)
+        {
+            commandText.Append(" AND empl_role = 'Cashier'");
+        }
+        if (!string.IsNullOrWhiteSpace(parameters.StartSurname))
+        {
+            commandText.Append(" AND (empl_surname LIKE @StartSurname + '%' OR empl_surname = @StartSurname)");
+        }
+        if (!string.IsNullOrEmpty(parameters.SortBy))
+        {
+            commandText.Append($" ORDER BY {parameters.SortBy}");
+        }
+    }
+    
+    public async Task<IEnumerable<Employee>> GetAllAsync(EmployeeQueryParameters? parameters)
+    {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Employees";
-        using var command = new SqlCommand(commandText, connection);
-        using var reader = await command.ExecuteReaderAsync();
+        var commandText = new StringBuilder(@"SELECT * FROM Employees 
+                                          WHERE 1=1");
+        AppendAdditionalCriteria(commandText, parameters);
+        await using var command = new SqlCommand(commandText.ToString(), connection);
+        if(parameters != null && !string.IsNullOrWhiteSpace(parameters.StartSurname))
+        {
+            command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
+        }
+        await using var reader = await command.ExecuteReaderAsync();
         var employees = new List<Employee>();
         while (await reader.ReadAsync())
         {
