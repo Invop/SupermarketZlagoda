@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zlagoda.Api.Mapping;
+using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Application.Services;
 using Zlagoda.Contracts.Requests;
 
@@ -35,9 +36,9 @@ public class CustomerCardController : ControllerBase
     }
     
     [HttpGet(ApiEndpoints.CustomerCards.GetAll)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] CustomerCardQueryParameters? parameters)
     {
-        var customerCards = await _customerCardService.GetAllAsync();
+        var customerCards = await _customerCardService.GetAllAsync(parameters);
         var customerCardsResponse = customerCards.MapToProductResponse();
         return Ok(customerCardsResponse);
     }
