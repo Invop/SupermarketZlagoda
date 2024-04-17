@@ -45,8 +45,8 @@
                         </OptionTemplate>
                     </FluentCombobox>
     <br/><br/>
-    <FluentDatePicker Label="Print Date" ReadOnly="true" Value="@Content.PrintDate" ValueChanged="@(e =>@Content.PrintDate = e.ToDateTime())" />
-    <FluentTimePicker ReadOnly="true" Value="@Content.PrintDate" ValueChanged="@(e => @Content.PrintDate = e.ToDateTime())" />
+    <FluentDatePicker Label="Print Date" ReadOnly="false" Value="@Content.PrintDate" ValueChanged="@(e =>@Content.PrintDate = e.ToDateTime())" />
+    <FluentTimePicker ReadOnly="false" Value="@Content.PrintDate" ValueChanged="@(e => @Content.PrintDate = e.ToDateTime())" />
     <br/><br/>
     <FluentDivider></FluentDivider>
     <FluentCombobox Style="width: 100%" Items="@_storeProductsList"

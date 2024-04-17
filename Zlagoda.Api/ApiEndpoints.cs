@@ -77,5 +77,11 @@ public class ApiEndpoints
         public const string GetAll = Base;
         public const string Delete = $"{Base}/{{check:guid}}"; 
     }
+    
+    public static class SoldProducts
+    {
+        private const string Base = $"{ApiBase}/sold-products";
+        public const string GetAll = $"{Base}";
+    }
 
 }

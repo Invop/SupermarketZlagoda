@@ -34,6 +34,9 @@ public static class ApplicationServiceCollectionExtensions
         services.AddSingleton<ISaleRepository, SaleRepository>();
         services.AddSingleton<ISaleService, SaleService>();
         
+        services.AddSingleton<ISoldProductRepository, SoldProductRepository>();
+        services.AddSingleton<ISoldProductService, SoldProductService>();
+        
         return services;
     }
 

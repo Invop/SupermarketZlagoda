@@ -332,4 +332,27 @@ public static class ContractMapping
 
     
     #endregion
+
+    #region SoldProduct
+
+    public static SoldProductResponse MapToSoldProductResponse(this SoldProduct product)
+    {
+        return new SoldProductResponse()
+        {
+            ProductId = product.ProductId,
+            ProductName = product.ProductName,
+            SellingPrice = product.SellingPrice,
+            TotalQuantity = product.TotalQuantity
+        };
+    }
+    
+    public static SoldProductsResponse MapToSoldProductsResponse(this IEnumerable<SoldProduct> products)
+    {
+        return new SoldProductsResponse
+        {
+            Items = products.Select(MapToSoldProductResponse)
+        };
+    }
+
+    #endregion
 }

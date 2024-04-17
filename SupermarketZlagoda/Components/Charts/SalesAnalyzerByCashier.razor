@@ -1,0 +1,24 @@
+﻿@using SupermarketZlagoda.Data.Model
+@page "/sales-by-cashier-chart"
+
+<FluentToolbar id="toolbar-fluent-components">
+    <FluentSelect TOption="Employee"
+                  Label="Select a person"
+                  Items="@_employees"
+                  Id="people-listbox"
+                  Width="200px"
+                  Height="250px"
+                  OptionValue="@(p => p.Id.ToString())"
+                  OptionText="@(p => p.Surname + ", " + p.Name)"
+                  @bind-Value="@SelectedEmployeeValue"
+                  @bind-SelectedOption="@SelectedEmployee" />
+    <FluentDatePicker Label="Date from:" @bind-Value="@DateFrom"/>
+    <FluentDatePicker Label="Date to:" @bind-Value="@DateTo"/>
+</FluentToolbar>
+
+<PieChart @ref="pieChart" Width="500" Class="mb-5" />
+
+
+@code {
+
+}
