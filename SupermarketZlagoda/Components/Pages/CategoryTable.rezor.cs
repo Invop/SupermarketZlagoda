@@ -18,17 +18,25 @@ public partial class CategoryTable
     private static readonly HttpClient Client = new HttpClient();
     protected override async Task OnInitializedAsync()
     {
-        await UpdateTable();
+        await GetCategoriesAsync();
+    }
+    private int SortType
+    {
+        get => _sortType;
+        set { _sortType = value;
+            _ = GetCategoriesAsync();
+        }
     }
 
-    private async Task UpdateTable()
-    {
-        var response = await Client.GetAsync("https://localhost:5001/api/categories");
+    private async Task GetCategoriesAsync()
+    {   
+        var sortType = _sortType == 0 ? "asc" : "desc";
+        var response = await Client.GetAsync($"https://localhost:5001/api/categories/?SortBy=category_name&SortOrder={sortType}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
             var categories = JsonConvert.DeserializeObject<List<Category>>(JObject.Parse(responseJson)["items"].ToString());
-            _items = categories.AsQueryable();
+            if (categories != null) _items = categories.AsQueryable();
             StateHasChanged();
         }
         else
@@ -53,7 +61,7 @@ public partial class CategoryTable
         {
             var item = result.Data as Category;
             await PostCategoryAsync(item);
-            await UpdateTable();
+            await GetCategoriesAsync();
         }
     }
 
@@ -89,7 +97,7 @@ public partial class CategoryTable
         {
             var item = result.Data as Category;
             await UpdateCategoryAsync(item);
-            await UpdateTable();
+            await GetCategoriesAsync();
         }  
     }
     private async Task PostCategoryAsync(Category category)
@@ -128,7 +136,7 @@ public partial class CategoryTable
         if (!canceled)
         {
             await DeleteCategoryAsync(category.Id);
-            await UpdateTable();
+            await GetCategoriesAsync();
         }
     }
 

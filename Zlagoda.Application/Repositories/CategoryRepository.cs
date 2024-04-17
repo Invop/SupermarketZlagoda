@@ -1,6 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Text;
+using Microsoft.Data.SqlClient;
 using Zlagoda.Application.Database;
 using Zlagoda.Application.Models;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Repositories;
 
@@ -42,14 +44,13 @@ public class CategoryRepository : ICategoryRepository
 
         return null;
     }
-
-
-    public async Task<IEnumerable<Category>> GetAllAsync()
+    
+    public async Task<IEnumerable<Category>> GetAllAsync(CategoryQueryParameters? parameters)
     {
-
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Categories";
-        using var command = new SqlCommand(commandText, connection);
+        var commandText = new StringBuilder("SELECT * FROM Categories");
+        AppendAdditionalCriteria(commandText, parameters);
+        using var command = new SqlCommand(commandText.ToString(), connection);
         using var reader = await command.ExecuteReaderAsync();
         var categories = new List<Category>();
         while (await reader.ReadAsync())
@@ -61,8 +62,18 @@ public class CategoryRepository : ICategoryRepository
             };
             categories.Add(category);
         }
-
         return categories;
+    }
+
+    private void AppendAdditionalCriteria(StringBuilder commandText, CategoryQueryParameters? parameters)
+    {
+        if (parameters == null) return;
+        if (string.IsNullOrEmpty(parameters.SortBy)) return;
+        commandText.Append($" ORDER BY {parameters.SortBy}");
+        if (!string.IsNullOrEmpty(parameters.SortOrder))
+        {
+            commandText.Append($" {parameters.SortOrder}");
+        }
     }
 
     public async Task<bool> UpdateAsync(Category category)
