@@ -1,5 +1,6 @@
 ﻿using Zlagoda.Application.Models;
 using Zlagoda.Application.Repositories;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Services;
 
@@ -22,9 +23,9 @@ public class CustomerCardService : ICustomerCardService
         return await _customerCardRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<CustomerCard>> GetAllAsync()
+    public async Task<IEnumerable<CustomerCard>> GetAllAsync(CustomerCardQueryParameters? parameters)
     {
-        return await _customerCardRepository.GetAllAsync();
+        return await _customerCardRepository.GetAllAsync(parameters);
     }
 
     public async Task<CustomerCard?> UpdateAsync(CustomerCard customerCard)

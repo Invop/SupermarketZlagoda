@@ -1,6 +1,9 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data;
+using System.Text;
+using Microsoft.Data.SqlClient;
 using Zlagoda.Application.Database;
 using Zlagoda.Application.Models;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Repositories;
 
@@ -83,14 +86,65 @@ public class CustomerCardRepository : ICustomerCardRepository
         return null;
     }
 
-
-    public async Task<IEnumerable<CustomerCard>> GetAllAsync()
+    private SqlCommand GetCommandWithParameters(CustomerCardQueryParameters parameters, SqlCommand command)
     {
-        
+        if (parameters.Percentage != null)
+        {
+            command.Parameters.AddWithValue("@Percentage", parameters.Percentage);
+        }
+        if (!string.IsNullOrWhiteSpace(parameters.StartSurname))
+        {
+            command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
+        }
+    
+        return command;
+    }
+
+    private void AppendAdditionalCriteria(StringBuilder commandText, CustomerCardQueryParameters? parameters)
+    {
+        if (parameters == null) return;
+        if (!string.IsNullOrWhiteSpace(parameters.StartSurname))
+        {
+            commandText.Append(" AND (cust_surname LIKE @StartSurname + '%' OR cust_surname = @StartSurname)");
+        }
+        if (parameters.Percentage != null)
+        {
+            commandText.Append(" AND [percent] = @Percentage");
+        }
+        if (!string.IsNullOrEmpty(parameters.SortBy))
+        {
+            var sortColumns = parameters.SortBy.Split(','); 
+            commandText.Append(" ORDER BY ");
+            for (int i = 0; i < sortColumns.Length; i++)
+            {
+                commandText.Append(sortColumns[i]);
+                if (!string.IsNullOrEmpty(parameters.SortOrder))
+                {
+                    commandText.Append($" {parameters.SortOrder}");
+                }
+                if (i < sortColumns.Length - 1)
+                {
+                    commandText.Append(", "); 
+                }
+            }
+        }
+    }
+    
+    public async Task<IEnumerable<CustomerCard>> GetAllAsync(CustomerCardQueryParameters? parameters)
+    {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Customer_Cards";
-        using var command = new SqlCommand(commandText, connection);
-        using var reader = await command.ExecuteReaderAsync();
+        var commandText = new StringBuilder(@"SELECT * FROM Customer_Cards
+                                                WHERE 1=1");
+
+        AppendAdditionalCriteria(commandText, parameters);
+
+        await using var command = new SqlCommand(commandText.ToString(), connection);
+        if(parameters != null)
+        {
+            GetCommandWithParameters(parameters, command);
+        }
+
+        await using var reader = await command.ExecuteReaderAsync();
         var customerCards = new List<CustomerCard>();
         while (await reader.ReadAsync())
         {
@@ -114,6 +168,8 @@ public class CustomerCardRepository : ICustomerCardRepository
         }
         return customerCards;
     }
+
+
 
     public async Task<bool> UpdateAsync(CustomerCard customerCard)
     {
