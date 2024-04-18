@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zlagoda.Api.Mapping;
 using Zlagoda.Application.Services;
+using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Contracts.Requests;
 
 namespace Zlagoda.Api.Controllers;
@@ -23,17 +24,16 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
         {
             return NotFound();
         }
-        return Ok(category.MapToResponse());
+        return Ok(category.MapToCategoryResponse());
     }
     
     [HttpGet(ApiEndpoints.Categories.GetAll)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] CategoryQueryParameters? parameters)
     {
-        var categories = await categoryService.GetAllAsync();
-        var categoriesResponse = categories.MapToResponse();
+        var categories = await categoryService.GetAllAsync(parameters);
+        var categoriesResponse = categories.MapToCategoryResponse();
         return Ok(categoriesResponse);
     }
-
 
     [HttpPut(ApiEndpoints.Categories.Update)]
     public async Task<IActionResult> Update([FromRoute] Guid id,
@@ -46,7 +46,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return NotFound();
         }
 
-        var response = category.MapToResponse();
+        var response = category.MapToCategoryResponse();
         return Ok(response);
     }
     

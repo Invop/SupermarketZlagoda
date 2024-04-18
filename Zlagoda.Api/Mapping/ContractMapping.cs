@@ -110,7 +110,7 @@ public static class ContractMapping
         };
     }
 
-    public static CategoryResponse MapToResponse(this Category category)
+    public static CategoryResponse MapToCategoryResponse(this Category category)
     {
         return new CategoryResponse()
         {
@@ -119,11 +119,11 @@ public static class ContractMapping
         };
     }
     
-    public static CategoriesResponse MapToResponse(this IEnumerable<Category> movies)
+    public static CategoriesResponse MapToCategoryResponse(this IEnumerable<Category> categories)
     {
         return new CategoriesResponse
         {
-            Items = movies.Select(MapToResponse)
+            Items = categories.Select(MapToCategoryResponse)
         };
     }
 

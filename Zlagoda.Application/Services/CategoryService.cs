@@ -1,5 +1,6 @@
 ﻿using Zlagoda.Application.Models;
 using Zlagoda.Application.Repositories;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Services;
 
@@ -22,9 +23,9 @@ public class CategoryService : ICategoryService
         return await _categoryRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Category>> GetAllAsync()
+    public async Task<IEnumerable<Category>> GetAllAsync(CategoryQueryParameters? parameters)
     {
-        return await _categoryRepository.GetAllAsync();
+        return await _categoryRepository.GetAllAsync(parameters);
     }
 
     public async Task<Category?> UpdateAsync(Category category)

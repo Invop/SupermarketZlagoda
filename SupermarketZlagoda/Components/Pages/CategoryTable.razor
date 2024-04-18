@@ -2,7 +2,7 @@
 @inject IDialogService DialogService
 <FluentToolbar id="toolbar-fluent-components">
     <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new category</FluentButton>
-    <FluentRadioGroup @bind-Value="_sortType">
+    <FluentRadioGroup @bind-Value="SortType">
         <FluentRadio Value="@(0)" Checked="true">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
     </FluentRadioGroup>
