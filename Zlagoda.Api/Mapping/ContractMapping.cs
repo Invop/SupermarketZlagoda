@@ -157,7 +157,7 @@ public static class ContractMapping
         };
     }
 
-    public static EmployeeResponse MapToProductResponse(this Employee em)
+    public static EmployeeResponse MapToEmployeeResponse(this Employee em)
     {
         return new EmployeeResponse()
         {
@@ -176,11 +176,11 @@ public static class ContractMapping
         };
     }
     
-    public static EmployeesResponse MapToProductResponse(this IEnumerable<Employee> employees)
+    public static EmployeesResponse MapToEmployeeResponse(this IEnumerable<Employee> employees)
     {
         return new EmployeesResponse
         {
-            Items = employees.Select(MapToProductResponse)
+            Items = employees.Select(MapToEmployeeResponse)
         };
     }
 

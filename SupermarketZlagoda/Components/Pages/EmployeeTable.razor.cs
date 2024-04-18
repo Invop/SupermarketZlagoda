@@ -12,15 +12,69 @@ public partial class EmployeeTable
 {
     private int _sortType = 0;
     private bool _cashiersOnly = false;
-    private string _surnameSearchTerm = string.Empty;
+    private string _searchTerm = string.Empty;
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Employee> _items = Enumerable.Empty<Employee>().AsQueryable();
-    private static readonly HttpClient Client = new HttpClient();
+    private static readonly HttpClient Client = new();
     
     protected override async Task OnInitializedAsync()
     {
-        await UpdateTable();
+        await GetEmployeesAsync();
     }
+    
+    private int SortType
+    {
+        get => _sortType;
+        set { _sortType = value;
+            _ = GetEmployeesAsync();
+        }
+    }
+    
+    public string SearchTerm
+    {
+        get => _searchTerm;
+        set { _searchTerm = value;  _ = GetEmployeesAsync();}
+    }
+    
+    public bool CashiersOnly
+    {
+        get => _cashiersOnly;
+        set { _cashiersOnly = value;  _ = GetEmployeesAsync();}
+    }
+    
+    private async Task GetEmployeesAsync()
+    {
+        var sortType = _sortType == 0 ? "asc" : "desc";
+        var response = await Client.GetAsync($"https://localhost:5001/api/employees/?SortBy=empl_surname {sortType}, empl_name {sortType}, empl_patronymic {sortType}&CashiersOnly={_cashiersOnly}&StartSurname={_searchTerm}");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var employees = JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
+            if (employees != null) _items = employees.AsQueryable();
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
+    }
+    
+    private async Task PostEmployeeAsync(Employee employee)
+    {
+        var employeeJson = JsonConvert.SerializeObject(employee);
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var content = new StringContent(employeeJson, Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("https://localhost:5001/api/employees", content);
+
+        Console.WriteLine(response.IsSuccessStatusCode
+            ? "Employee successfully saved."
+            : $"Failed to save the employee. Status code: {response.StatusCode}");
+    }
+    
     private async Task OpenCreateDialogAsync()
     {
         var context = new Employee()
@@ -49,40 +103,8 @@ public partial class EmployeeTable
         {
             var item = result.Data as Employee;
             await PostEmployeeAsync(item);
-            await UpdateTable();
+            await GetEmployeesAsync();
         }
-    }
-    
-    private async Task UpdateTable()
-    {
-        var response = await Client.GetAsync("https://localhost:5001/api/employees");
-        if (response.IsSuccessStatusCode)
-        {
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var employeeList = JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
-            _items = employeeList.AsQueryable();
-            StateHasChanged();
-        }
-        else
-        {
-            Console.WriteLine($"Error: {response.StatusCode}");
-        }
-    }
-    
-    private async Task PostEmployeeAsync(Employee employee)
-    {
-        var employeeJson = JsonConvert.SerializeObject(employee);
-
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Accept.Clear();
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        var content = new StringContent(employeeJson, Encoding.UTF8, "application/json");
-        var response = await client.PostAsync("https://localhost:5001/api/employees", content);
-
-        Console.WriteLine(response.IsSuccessStatusCode
-            ? "Employee successfully saved."
-            : $"Failed to save the employee. Status code: {response.StatusCode}");
     }
     
     private async Task OpenEditDialogAsync(Employee context)
@@ -100,7 +122,7 @@ public partial class EmployeeTable
         {
             var item = result.Data as Employee;
             await UpdateEmployeeAsync(item);
-            await UpdateTable();
+            await GetEmployeesAsync();
         }  
     }
     
@@ -143,7 +165,7 @@ public partial class EmployeeTable
         if (!canceled)
         {
             await DeleteEmployeeAsync(context.Id);
-            await UpdateTable();
+            await GetEmployeesAsync();
         }
     }
     

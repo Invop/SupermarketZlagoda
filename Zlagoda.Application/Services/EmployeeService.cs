@@ -1,5 +1,6 @@
 ﻿using Zlagoda.Application.Models;
 using Zlagoda.Application.Repositories;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Services;
 
@@ -22,9 +23,9 @@ public class EmployeeService : IEmployeeService
         return await _employeeRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Employee>> GetAllAsync()
+    public async Task<IEnumerable<Employee>> GetAllAsync(EmployeeQueryParameters? parameters)
     {
-        return await _employeeRepository.GetAllAsync();
+        return await _employeeRepository.GetAllAsync(parameters);
     }
 
     public async Task<Employee?> UpdateAsync(Employee employee)
