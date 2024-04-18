@@ -36,14 +36,6 @@ public partial class CustomerCardTable
         set { _searchTerm = value;  _ = GetCustomerCardAsync();}
     }
     
-    private async Task GetUniquePercentageOptions()
-    {
-        var uniquePercentageValues = _items.Select(card => card.Percentage).Distinct().OrderBy(value => value).ToList();
-        PercentageOptions = uniquePercentageValues
-            .Select(value => new Option<int?> { Value = value, Text = value }).ToList();
-        PercentageOptions.Insert(0, new Option<int?> { Value = null, Text = null });
-    }
-    
     private async Task OnSelectedPercentageChanged()
     {
         await GetCustomerCardAsync();
@@ -53,10 +45,25 @@ public partial class CustomerCardTable
     {
         IsManager = UserState.IsManager;
         await GetCustomerCardAsync();
-        await GetUniquePercentageOptions();
+        await GetPercentageAsync();
     }
     
     #region Api
+    private async Task GetPercentageAsync()
+    {
+        var response = await Client.GetAsync("https://localhost:5001/api/customer-card");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var customerCardList = JsonConvert.DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString());
+            
+            var uniquePercentages = customerCardList.Select(card => card.Percentage).Distinct().OrderBy(value => value).ToList();
+            
+            PercentageOptions = uniquePercentages.Select(value => new Option<int?> { Value = value, Text = value}).ToList();
+            PercentageOptions.Insert(0, new Option<int?> { Value = null, Text = null });
+        }
+    }
+    
     private async Task GetCustomerCardAsync()
     {
         var sortType = _sortType == 0 ? "asc" : "desc";
@@ -68,6 +75,7 @@ public partial class CustomerCardTable
                 JsonConvert.DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString());
             if(customerCardList != null) _items = customerCardList.AsQueryable();
             StateHasChanged();
+            await GetPercentageAsync();
         }
         else
         {
