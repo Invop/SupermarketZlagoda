@@ -25,15 +25,19 @@
         <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
         <br/><br/>
         <FluentTextField style="width: 100%;" @bind-Value="@Content.Patronymic">Patronymic:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Patronymic"></FluentValidationMessage>
         <br/><br/>
         <FluentTextField style="width: 100%;" @bind-Value="@Content.Phone">Phone:</FluentTextField>
         <FluentValidationMessage For="() => Content.Phone"></FluentValidationMessage>
         <br/><br/>
         <FluentTextField style="width: 100%;" @bind-Value="@Content.City">City:</FluentTextField>
+        <FluentValidationMessage For="() => Content.City"></FluentValidationMessage>
         <br/><br/>
         <FluentTextField style="width: 100%;" @bind-Value="@Content.Street">Street:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Street"></FluentValidationMessage>
         <br/><br/>
         <FluentTextField style="width: 100%;" @bind-Value="@Content.Index">Index:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Index"></FluentValidationMessage>
         <br/><br/>
         <FluentNumberField style="width: 100%;" @bind-Value="@Content.Percentage">Percentage:</FluentNumberField>
     </EditForm>
