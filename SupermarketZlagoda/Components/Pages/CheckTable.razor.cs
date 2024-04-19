@@ -11,27 +11,17 @@ namespace SupermarketZlagoda.Components.Pages;
 public partial class CheckTable
 {
     private bool IsManager { get; set; } = false;
-    private string CheckSearchTerm = string.Empty;
+    private string _checkSearchTerm = String.Empty;
     private int _sortType = 0;
-    
+    private Option<string?> selectedEmployeeOption;
     private decimal TotalSum;
-    private string? employeeValue;
-    Option<string>? selectedEmployeeOption = employeeOptions[0];
     
-    private DateTime? DateFromValue;
-    private DateTime? DateToValue;
+    private DateTime? _dateFromValue = null;
+    private DateTime? _dateToValue = null;
     
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Check>? _items = Enumerable.Empty<Check>().AsQueryable();
-    static List<Option<string>> employeeOptions = new()
-    {
-        { new Option<string> { Value = "All", Text = "All" } },
-        { new Option<string> { Value = "First", Text = "First"} },
-        { new Option<string> { Value = "Second", Text = "Second" } },
-        { new Option<string> { Value = "Third", Text = "Third" } },
-        
-    };
-
+    private List<Option<string?>> employeeOptionsSort = new List<Option<string?>>();
     private static readonly HttpClient Client = new HttpClient();
     private Dictionary<Guid, string> _employees = new();
     private List<SelectOption> _employeesOptions = [];
@@ -43,9 +33,34 @@ public partial class CheckTable
     private List<SelectOption> _storeProductsOptions = [];
     
     public static List<Sale> SalesList { get; set; } = new List<Sale>();
+    
+    private DateTime? DateFromValue
+    {
+        get => _dateFromValue;
+        set { _dateFromValue = value;
+            _ = UpdateTable();
+        }
+    }
+    private DateTime? DateToValue
+    {
+        get => _dateToValue;
+        set { _dateToValue = value;
+            _ = UpdateTable();
+        }
+    }
+    private string CheckSearchTerm
+    {
+        get => _checkSearchTerm;
+        set { _checkSearchTerm = value;
+            _ = UpdateTable();
+        }
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         IsManager = UserState.IsManager;
+        await GetEmployeesInCheckAsync();
+        selectedEmployeeOption = employeeOptionsSort.FirstOrDefault();
         await UpdateEmployeeOptions();
         await UpdateCustomerOptions();
         await UpdateStoreProductOptions();
@@ -91,21 +106,63 @@ public partial class CheckTable
             Console.WriteLine($"Error Customer: {response.StatusCode}");
         }
     }
+    
+    private async Task GetEmployeesInCheckAsync()
+    {
+        var response = await Client.GetAsync($"https://localhost:5001/api/employees/?InCheck=true");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var employees = JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
+            if (employees != null)
+            {
+                employeeOptionsSort = employees.Select(e => new Option<string?> { Value = e.Id.ToString(), Text = $"{e.Surname} {e.Name} {e.Patronymic}" }).ToList();
+                employeeOptionsSort.Insert(0, new Option<string?> { Value = Guid.Empty.ToString(), Text = "All" });
+            }
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
+    }
+    private async Task OnSelectedEmployeeChanged()
+    {
+        await UpdateTable();
+    }
+    
     private async Task UpdateTable()
     {
-        var response = await Client.GetAsync("https://localhost:5001/api/check");
+        var formattedFromDate = _dateFromValue?.ToString("yyyy-MM-dd HH:mm:ss");
+        var formattedToDate = _dateToValue?.ToString("yyyy-MM-dd HH:mm:ss");
+
+        var response = await Client.GetAsync($"https://localhost:5001/api/check/?Employee={Guid.Parse(selectedEmployeeOption.Value)}&PrintTimeStart={formattedFromDate}&PrintTimeEnd={formattedToDate}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
             var checkList =
                 JsonConvert.DeserializeObject<List<Check>>(JObject.Parse(responseJson)["items"].ToString());
-            _items = checkList.AsQueryable();
+            if(checkList != null)_items = checkList.AsQueryable();
             StateHasChanged();
+            await GetEmployeesInCheckAsync();
         }
         else
         {
             Console.WriteLine($"Error Update: {response.StatusCode}");
         }
+    }
+
+    private async Task SetTodayDate()
+    {
+        _dateFromValue = DateTime.Now.Date;
+        _dateToValue = DateTime.Now.Date.AddDays(1).AddTicks(-1);
+        await UpdateTable();
+    }
+    private async Task ResetDate()
+    {
+        _dateFromValue = null;
+        _dateToValue = null;
+        await UpdateTable();
     }
     
     private async Task OpenCreateDialogAsync()

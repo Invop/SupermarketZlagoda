@@ -13,30 +13,37 @@
     </FluentStack>
 </FluentDialogHeader>
 
+@* Body *@
+
+<FluentDialogBody>
+    <EditForm EditContext="_editContext">
+        <DataAnnotationsValidator />
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.Surname">Surname:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Surname"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.Name">Name:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.Patronymic">Patronymic:</FluentTextField>
+        <br/><br/>
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.Phone">Phone:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Phone"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.City">City:</FluentTextField>
+        <br/><br/>
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.Street">Street:</FluentTextField>
+        <br/><br/>
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.Index">Index:</FluentTextField>
+        <br/><br/>
+        <FluentNumberField style="width: 100%;" @bind-Value="@Content.Percentage">Percentage:</FluentNumberField>
+    </EditForm>
+    </FluentDialogBody>
+
 @* Footer *@
 <FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Disabled="@(!_editContext.Validate())" Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
     <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
 </FluentDialogFooter>
-
-@* Body *@
-<FluentDialogBody>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.Surname">Surname:</FluentTextField>
-    <br/><br/>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.Name">Name:</FluentTextField>
-    <br/><br/>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.Patronymic">Patronymic:</FluentTextField>
-    <br/><br/>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.Phone">Phone:</FluentTextField>
-    <br/><br/>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.City">City:</FluentTextField>
-    <br/><br/>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.Street">Street:</FluentTextField>
-    <br/><br/>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.Index">Index:</FluentTextField>
-    <br/><br/>
-    <FluentNumberField style="width: 100%;" @bind-Value="@Content.Percentage">Percentage:</FluentNumberField>
-</FluentDialogBody>
 
 @code {
     
@@ -46,15 +53,27 @@
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
-    
+    private EditContext _editContext = default!;
     private async Task SaveAsync()
     {
-        await Dialog.CloseAsync(Content);
+        if (_editContext.Validate())
+        {
+            await Dialog.CloseAsync(Content);
+        }
     }
 
     private async Task CancelAsync()
     {
         await Dialog.CancelAsync();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        InitializeEditContextForContent();
+    }
+    
+    private void InitializeEditContextForContent()
+    {
+        _editContext = new EditContext(Content);
     }
     
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Text;
 using Zlagoda.Application.Database;
 using Zlagoda.Application.Models;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Repositories;
 
@@ -57,13 +59,59 @@ public class CheckRepository : ICheckRepository
         }
         return null;
     }
-    public async Task<IEnumerable<Check>> GetAllAsync()
+    
+    private SqlCommand GetCommandWithParameters(CheckQueryParameters parameters, SqlCommand command)
+    {
+        if (parameters.PrintTimeEnd != null && parameters.PrintTimeStart != null)
+        {
+            command.Parameters.AddWithValue("@PrintTimeStart", parameters.PrintTimeStart);
+            command.Parameters.AddWithValue("@PrintTimeEnd", parameters.PrintTimeEnd);
+        }
+        if (parameters.Employee != Guid.Empty)
+        {
+            command.Parameters.AddWithValue("@Employee", parameters.Employee);
+        }
+        // if (parameters.StartIdCheck != null)
+        // {
+        //     command.Parameters.AddWithValue("@StartIdCheck", parameters.StartIdCheck);
+        // }
+
+        return command;
+    }
+
+    
+    private void AppendAdditionalCriteria(StringBuilder commandText, CheckQueryParameters? parameters)
+    {
+        if (parameters == null) return;
+        if (parameters.PrintTimeStart != null && parameters.PrintTimeEnd != null)
+        {
+            commandText.Append(" AND (print_date >= @PrintTimeStart AND print_date <= @PrintTimeEnd)");
+        }
+        // if (parameters.StartIdCheck != null)
+        // {
+        //     commandText.Append(" AND (check_number LIKE @StartIdCheck + '%' OR check_number = @StartIdCheck)");
+        // }
+        if (parameters.Employee != Guid.Empty)
+        {
+            commandText.Append(" AND id_employee = @Employee");
+        }
+    }
+    public async Task<IEnumerable<Check>> GetAllAsync(CheckQueryParameters? parameters)
     {
         
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT * FROM Checks";
-        using var command = new SqlCommand(commandText, connection);
-        using var reader = await command.ExecuteReaderAsync();
+        var commandText = new StringBuilder(@"SELECT * FROM Checks
+                                                WHERE 1=1");
+
+        AppendAdditionalCriteria(commandText, parameters);
+
+        await using var command = new SqlCommand(commandText.ToString(), connection);
+        if(parameters != null)
+        {
+            GetCommandWithParameters(parameters, command);
+        }
+
+        await using var reader = await command.ExecuteReaderAsync();
         var checks = new List<Check>();
         while (await reader.ReadAsync())
         {

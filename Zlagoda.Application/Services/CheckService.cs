@@ -1,5 +1,6 @@
 ﻿using Zlagoda.Application.Models;
 using Zlagoda.Application.Repositories;
+using Zlagoda.Contracts.QueryParameters;
 
 namespace Zlagoda.Application.Services;
 
@@ -22,9 +23,9 @@ public class CheckService : ICheckService
         return await _checkRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Check>> GetAllAsync()
+    public async Task<IEnumerable<Check>> GetAllAsync(CheckQueryParameters? parameters)
     {
-        return await _checkRepository.GetAllAsync();
+        return await _checkRepository.GetAllAsync(parameters);
     }
     
     public async Task<bool> DeleteByIdAsync(Guid id)

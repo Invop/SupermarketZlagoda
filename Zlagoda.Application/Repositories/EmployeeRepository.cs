@@ -82,6 +82,10 @@ public class EmployeeRepository : IEmployeeRepository
         {
             commandText.Append(" AND (empl_surname LIKE @StartSurname + '%' OR empl_surname = @StartSurname)");
         }
+        if (parameters.InCheck)
+        {
+            commandText.Append(" AND id_employee IN (SELECT id_employee FROM Checks)");
+        }
         if (!string.IsNullOrEmpty(parameters.SortBy))
         {
             commandText.Append($" ORDER BY {parameters.SortBy}");
