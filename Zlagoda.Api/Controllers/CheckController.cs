@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zlagoda.Api.Mapping;
-using Zlagoda.Application.Repositories;
+using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Application.Services;
 using Zlagoda.Contracts.Requests;
 
@@ -36,9 +36,9 @@ public class CheckController : ControllerBase
     }
     
     [HttpGet(ApiEndpoints.Checks.GetAll)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] CheckQueryParameters? parameters)
     {
-        var checks = await _checkService.GetAllAsync();
+        var checks = await _checkService.GetAllAsync(parameters);
         var checksResponse = checks.MapToChecksResponse();
         return Ok(checksResponse);
     }
