@@ -9,7 +9,19 @@ namespace SupermarketZlagoda.Components.Charts;
 
 public partial class SalesSummary : ComponentBase
 {
-    private string? SelectedEmployeeId { get; set; }
+    private string? _selectedEmployeeId;
+
+    private string? SelectedEmployeeId
+    {
+        get => _selectedEmployeeId;
+        set
+        {
+            if (_selectedEmployeeId == value) return;
+            _selectedEmployeeId = value;
+            Console.WriteLine(_selectedEmployeeId);
+        }
+    }
+
     private Employee? SelectedEmployee { get; set; }
 
     private string? SelectedProductId { get; set; }
@@ -21,20 +33,21 @@ public partial class SalesSummary : ComponentBase
 
     private readonly List<Product> _products = [new Product { Id = Guid.Empty, Name = "None" }];
     private readonly List<Employee> _employees = [new Employee { Id = Guid.Empty, Surname = "None" }];
-    private BarChart barChart = default!;
-    private BarChartOptions barChartOptions = default!;
-    private ChartData chartData = default!;
+    private List<SalesSummary> _sales = new();
+    private BarChart _barChart = default!;
+    private BarChartOptions _barChartOptions = default!;
+    private ChartData _chartData = default!;
 
-    private int datasetsCount;
-    private int labelsCount;
+    private int _datasetsCount;
+    private int _labelsCount;
 
-    private readonly string[] months =
-    {
+    private readonly string[] _months =
+    [
         "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
         "December"
-    };
+    ];
 
-    private readonly Random random = new();
+    private readonly Random _random = new();
 
     private static readonly HttpClient Client = new();
 
@@ -42,12 +55,19 @@ public partial class SalesSummary : ComponentBase
     {
         _employees.AddRange(await GetAllEmployeesAsync() ?? []);
         _products.AddRange(await GetAllStoreProductsAsync() ?? []);
+        _sales = await GetAllSalesSummary() ?? [];
     }
 
+    protected override void OnInitialized()
+    {
+        _chartData = new ChartData { Labels = GetDefaultDataLabels(), Datasets = GetDefaultDataSets(3) };
+        _barChartOptions = new BarChartOptions
+            { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Index } };
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await barChart.InitializeAsync(chartData, barChartOptions);
+        if (firstRender) await _barChart.InitializeAsync(_chartData, _barChartOptions);
 
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -94,6 +114,31 @@ public partial class SalesSummary : ComponentBase
         return null;
     }
 
+    private async Task<List<SalesSummary>?> GetAllSalesSummary()
+    {
+        Console.WriteLine(SelectedEmployeeId is null);
+        Console.WriteLine(SelectedProductId is null);
+        Console.WriteLine(DateTimeFrom is null);
+        Console.WriteLine(DateTimeTo is null);
+        var response =
+            await Client.GetAsync(
+                $"https://localhost:5001/api/sale/summary?EmployId={SelectedEmployeeId}&ProductId={SelectedProductId}&PeriodFrom={DateTimeFrom}&PeriodTo={DateTimeTo}");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var salesList =
+                JsonConvert.DeserializeObject<List<SalesSummary>>(JObject.Parse(responseJson)["items"]?.ToString() ??
+                                                                  string.Empty);
+            if (!salesList.IsNullOrEmpty()) return salesList;
+        }
+        else
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
+
+        return null;
+    }
+
     #endregion
 
 
@@ -110,13 +155,13 @@ public partial class SalesSummary : ComponentBase
 
     private BarChartDataset GetRandomBarChartDataset()
     {
-        var c = ColorBuilder.CategoricalTwelveColors[datasetsCount].ToColor();
+        var c = ColorBuilder.CategoricalTwelveColors[_datasetsCount].ToColor();
 
-        datasetsCount += 1;
+        _datasetsCount += 1;
 
         return new BarChartDataset
         {
-            Label = $"Product {datasetsCount}",
+            Label = $"Product {_datasetsCount}",
             Data = GetRandomData(),
             BackgroundColor = new List<string> { c.ToRgbString() },
             BorderColor = new List<string> { c.ToRgbString() },
@@ -127,7 +172,7 @@ public partial class SalesSummary : ComponentBase
     private List<double> GetRandomData()
     {
         var data = new List<double>();
-        for (var index = 0; index < labelsCount; index++) data.Add(random.Next(200));
+        for (var index = 0; index < _labelsCount; index++) data.Add(_random.Next(200));
 
         return data;
     }
@@ -135,15 +180,15 @@ public partial class SalesSummary : ComponentBase
     private List<string> GetDefaultDataLabels()
     {
         var labels = new List<string>();
-        for (var index = 0; index < months.Length; index++) labels.Add(GetNextDataLabel());
+        for (var index = 0; index < _months.Length; index++) labels.Add(GetNextDataLabel());
 
         return labels;
     }
 
     private string GetNextDataLabel()
     {
-        labelsCount += 1;
-        return months[labelsCount - 1];
+        _labelsCount += 1;
+        return _months[_labelsCount - 1];
     }
 
     #endregion Data Preparation

@@ -26,15 +26,10 @@
     <FluentDatePicker Label="Date From:" @bind-Value="@DateTimeFrom"/>
     <FluentDatePicker Label="Date To:" @bind-Value="@DateTimeTo"/>
 </FluentToolbar>
-<BarChart @ref="barChart" Height="800" Width="1000" Class="mb-4"/>
+<BarChart @ref="_barChart" Height="800" Width="1000" Class="mb-4"/>
 
 
 @code {
 
-    protected override void OnInitialized()
-    {
-        chartData = new ChartData { Labels = GetDefaultDataLabels(), Datasets = GetDefaultDataSets(3) };
-        barChartOptions = new BarChartOptions { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Index } };
-    }
 
 }
