@@ -1,4 +1,5 @@
 using Microsoft.FluentUI.AspNetCore.Components;
+using Radzen;
 using SupermarketZlagoda.Components;
 using SupermarketZlagoda.Data;
 
@@ -12,10 +13,11 @@ namespace SupermarketZlagoda
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddScoped<UserState>();
-            builder.Services.AddBlazorBootstrap();
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            builder.Services.AddRadzenComponents();
             builder.Services.AddFluentUIComponents();
             var app = builder.Build();
 

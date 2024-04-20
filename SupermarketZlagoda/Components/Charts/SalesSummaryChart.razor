@@ -1,0 +1,55 @@
+﻿@page "/charts"
+@using Radzen.Blazor
+@using SupermarketZlagoda.Data.Model
+<h3>SalesSummary</h3>
+
+<FluentToolbar>
+    <FluentSelect TOption="Employee"
+                  Label="Select an employee"
+                  Items="@_employees"
+                  Id="empl-listbox"
+                  Width="200px"
+                  Height="250px"
+                  OptionValue="@(p => p.Id.ToString())"
+                  OptionText="@(p => p.Surname + p.Name)"
+                  @bind-Value="@SelectedEmployeeId"
+                  @bind-SelectedOption="@SelectedEmployee"/>
+    <FluentSelect TOption="Product"
+                  Label="Select a product"
+                  Items="@_products"
+                  Id="product-listbox"
+                  Width="200px"
+                  Height="250px"
+                  OptionValue="@(p => p.Id.ToString())"
+                  OptionText="@(p => p.Name)"
+                  @bind-Value="@SelectedProductId"
+                  @bind-SelectedOption="@SelectedProduct"/>
+    <FluentDatePicker Label="Date From:" @bind-Value="@DateTimeFrom"/>
+    <FluentDatePicker Label="Date To:" @bind-Value="@DateTimeTo"/>
+    <FluentButton OnClick="@ResetDateClick">Reset Dates</FluentButton>
+</FluentToolbar>
+@if (_chartData.Length > 0)
+{
+    <p>Sale amount = @SaleAmount</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+                <RadzenCard class="w-100 mb-4">
+                    <RadzenCheckBox @bind-Value="@_showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" Component="dataLabels"
+                                 Style="margin-left: 8px; vertical-align: middle;"/>
+                </RadzenCard>
+                <RadzenChart>
+                    <RadzenPieSeries Data="@_chartData" Title="Price" CategoryProperty="Name" ValueProperty="Price">
+                        <RadzenSeriesDataLabels Visible="@_showDataLabels"/>
+                    </RadzenPieSeries>
+                </RadzenChart>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <br/>
+    <p>No data to show</p>
+}

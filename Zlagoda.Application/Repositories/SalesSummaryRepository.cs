@@ -14,7 +14,7 @@ public class SalesSummaryRepository : ISalesSummaryRepository
         _dbConnectionFactory = dbConnectionFactory;
     }
 
-    public async Task<IEnumerable<SaleSummary>> GetAllAsync(SalesSummaryQueryParameters queryParameters)
+    public async Task<IEnumerable<SaleSummary>> GetAllAsync(SalesSummaryQueryParameters? queryParameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         using var command = connection.CreateCommand();
@@ -33,8 +33,8 @@ public class SalesSummaryRepository : ISalesSummaryRepository
                     INNER JOIN Employees e ON c.id_employee = e.id_employee
                     INNER JOIN Products p ON sp.id_product = p.id_product
                 WHERE 1=1
-                    AND (@EmployeeId IS NULL OR e.id_employee = @EmployeeId)
-                    AND (@ProductId IS NULL OR e.id_employee = @ProductId)                    
+                    AND (@EmployeeId IS NULL OR e.id_employee = @EmployeeId)    
+                    AND (@ProductId IS NULL OR sp.id_product = @ProductId)
                     AND (@StartDate IS NULL OR c.print_date >= @StartDate)
                     AND (@EndDate IS NULL OR c.print_date <= @EndDate)
                 GROUP BY
