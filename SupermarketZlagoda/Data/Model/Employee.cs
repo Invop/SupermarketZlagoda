@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SupermarketZlagoda.Data.Model;
 
@@ -35,7 +34,9 @@ public record Employee
     public DateOnly DateOfBirth { get; set; }
     
     [Required]
+    [MinLength(9, ErrorMessage = "Phone number is too short!")]
     [MaxLength(13, ErrorMessage = "Phone number is too long (13 characters limit).")]
+    [PhoneNumber(ErrorMessage = "Wrong format.")]
     public string PhoneNumber { get; set; }
     
     [Required]

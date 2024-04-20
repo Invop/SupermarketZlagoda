@@ -20,8 +20,9 @@ public record CustomerCard()
     public string? Patronymic { get; set; }
     
     [Required(ErrorMessage = "Phone number is required")]
-    [MinLength(10, ErrorMessage = "Phone number is too short!")]
-    [StringLength(13, ErrorMessage = "Phone number is too long (13 character limit).")]
+    [MinLength(9, ErrorMessage = "Phone number is too short!")]
+    [MaxLength(13, ErrorMessage = "Phone number is too long (13 characters limit).")]
+    [PhoneNumber(ErrorMessage = "Wrong format.")]
     public string Phone { get; set; }
     
     [StringLength(50, ErrorMessage = "City is too long (50 character limit).")]

@@ -1,7 +1,6 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace SupermarketZlagoda.Data.Model
+namespace SupermarketZlagoda.Data
 {
     public class MinimumAgeAttribute(int minimumAge) : ValidationAttribute
     {
