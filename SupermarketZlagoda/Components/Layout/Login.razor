@@ -1,0 +1,19 @@
+﻿@page "/login"
+@using SupermarketZlagoda.Data
+@inject User User
+
+<div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);">
+    <FluentEditForm Model="@User" EditContext="_editContext">
+        <DataAnnotationsValidator />
+        <FluentCard style="width: 400px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <h1 style="text-align: center;">Log In</h1>
+            <br/><br/>
+            <FluentTextField style="width: 100%;"
+                             @bind-Value="@UserLogin" Placeholder="Username"></FluentTextField>
+            <FluentTextField style="width: 100%; margin-top: 10px;" TextFieldType="TextFieldType.Password"
+                             Placeholder="Password"
+                             @bind-Value="@UserPassword"></FluentTextField>
+            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" style="width: 100%; margin-top: 10px;">Submit</FluentButton>
+        </FluentCard>
+    </FluentEditForm>
+</div>
