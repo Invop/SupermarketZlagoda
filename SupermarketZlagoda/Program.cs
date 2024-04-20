@@ -12,12 +12,13 @@ namespace SupermarketZlagoda
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddScoped<UserState>();
+            builder.Services.AddBlazorBootstrap();
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
             builder.Services.AddFluentUIComponents();
             var app = builder.Build();
-            builder.Services.AddBlazorBootstrap();
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

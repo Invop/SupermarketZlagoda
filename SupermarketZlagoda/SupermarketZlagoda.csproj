@@ -25,9 +25,5 @@
       <DependentUpon>CategoryTable.razor</DependentUpon>
     </Compile>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Charts\"/>
-  </ItemGroup>
   
 </Project>
