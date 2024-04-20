@@ -11,16 +11,21 @@
     </FluentStack>
 </FluentDialogHeader>
 
-@* Footer *@
-<FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
-    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
-</FluentDialogFooter>
-
 @* Body *@
 <FluentDialogBody>
-    <FluentTextField style="width: 100%;" @bind-Value="@Content.Name">Category name:</FluentTextField>
+    <EditForm EditContext="_editContext">
+        <DataAnnotationsValidator />
+        <FluentTextField style="width: 100%;" @bind-Value="@Content.Name">Category name:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
+    </EditForm>
 </FluentDialogBody>
+
+<FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit"
+                      Disabled="@(!_editContext.Validate())"
+                      Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+        <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+    </FluentDialogFooter>
 
 @code {
     [Parameter]
@@ -28,7 +33,13 @@
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
-
+    private EditContext _editContext = default!;
+    
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(Content);
+    }
+    
     private async Task SaveAsync()
     {
         await Dialog.CloseAsync(Content);
@@ -36,6 +47,7 @@
 
     private async Task CancelAsync()
     {
+        if (!_editContext.Validate()) return;
         await Dialog.CancelAsync();
     }
 

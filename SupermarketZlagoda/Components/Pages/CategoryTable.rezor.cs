@@ -50,7 +50,6 @@ public partial class CategoryTable
         var context = new Category { Name = "" };
         var dialog = await DialogService.ShowDialogAsync<CreateEditCategoryDialog>(context, new DialogParameters
         {
-            Height = "230px",
             Title = "Add new category",
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
@@ -86,7 +85,6 @@ public partial class CategoryTable
     {
         var dialog = await DialogService.ShowDialogAsync<CreateEditCategoryDialog>(context, new DialogParameters()
         {
-            Height = "230px",
             Title = $"Updating category {context.Name}",
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
