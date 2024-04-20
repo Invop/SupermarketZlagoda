@@ -7,6 +7,7 @@ namespace Zlagoda.Api.Mapping;
 public static class ContractMapping
 {
     #region Product
+
     public static Product MapToProduct(this CreateProductRequest request)
     {
         return new Product
@@ -28,7 +29,7 @@ public static class ContractMapping
             Characteristics = movie.Characteristics
         };
     }
-    
+
     public static ProductsResponse MapToProductResponse(this IEnumerable<Product> movies)
     {
         return new ProductsResponse
@@ -47,9 +48,11 @@ public static class ContractMapping
             Characteristics = request.Characteristics
         };
     }
+
     #endregion
 
     #region StoreProduct
+
     public static StoreProduct MapToStoreProduct(this CreateStoreProductRequest request)
     {
         return new StoreProduct
@@ -62,6 +65,7 @@ public static class ContractMapping
             IsPromotional = request.IsPromotional
         };
     }
+
     public static StoreProductResponse MapToStoreProductResponse(this StoreProduct movie)
     {
         return new StoreProductResponse()
@@ -74,7 +78,7 @@ public static class ContractMapping
             IsPromotional = movie.IsPromotional
         };
     }
-    
+
     public static StoreProductsResponse MapToStoreProductResponse(this IEnumerable<StoreProduct> storeProducts)
     {
         return new StoreProductsResponse
@@ -95,7 +99,6 @@ public static class ContractMapping
             IsPromotional = request.IsPromotional
         };
     }
-
 
     #endregion
 
@@ -118,7 +121,7 @@ public static class ContractMapping
             Name = category.Name
         };
     }
-    
+
     public static CategoriesResponse MapToCategoryResponse(this IEnumerable<Category> categories)
     {
         return new CategoriesResponse
@@ -130,14 +133,16 @@ public static class ContractMapping
     public static Category MapToCategory(this UpdateCategoryRequest request, Guid id)
     {
         return new Category
-        {   
+        {
             Id = id,
             Name = request.Name
         };
     }
+
     #endregion
-    
+
     #region Employee
+
     public static Employee MapToEmployee(this CreateEmployeeRequest request)
     {
         return new Employee
@@ -175,7 +180,7 @@ public static class ContractMapping
             ZipCode = em.ZipCode
         };
     }
-    
+
     public static EmployeesResponse MapToEmployeeResponse(this IEnumerable<Employee> employees)
     {
         return new EmployeesResponse
@@ -187,7 +192,7 @@ public static class ContractMapping
     public static Employee MapToEmployee(this UpdateEmployeeRequest request, Guid id)
     {
         return new Employee
-        {   
+        {
             Id = id,
             Surname = request.Surname,
             Name = request.Name,
@@ -202,9 +207,11 @@ public static class ContractMapping
             ZipCode = request.ZipCode
         };
     }
+
     #endregion
-    
+
     #region CustomerCard
+
     public static CustomerCard MapToCustomerCard(this CreateCustomerCardRequest request)
     {
         return new CustomerCard
@@ -236,7 +243,7 @@ public static class ContractMapping
             Percentage = customerCard.Percentage
         };
     }
-    
+
     public static CustomerCardsResponse MapToProductResponse(this IEnumerable<CustomerCard> customerCards)
     {
         return new CustomerCardsResponse
@@ -245,10 +252,10 @@ public static class ContractMapping
         };
     }
 
-    public static CustomerCard MapToCustomerCard(this UpdateCustomerCardRequest request,Guid id)
+    public static CustomerCard MapToCustomerCard(this UpdateCustomerCardRequest request, Guid id)
     {
         return new CustomerCard
-        {   
+        {
             Id = id,
             Surname = request.Surname,
             Name = request.Name,
@@ -260,9 +267,11 @@ public static class ContractMapping
             Percentage = request.Percentage
         };
     }
+
     #endregion
-    
+
     #region Check
+
     public static Check MapToCheck(this CreateCheckRequest request)
     {
         return new Check
@@ -288,7 +297,7 @@ public static class ContractMapping
             Vat = check.Vat
         };
     }
-    
+
     public static ChecksResponse MapToChecksResponse(this IEnumerable<Check> checks)
     {
         return new ChecksResponse
@@ -296,10 +305,11 @@ public static class ContractMapping
             Items = checks.Select(MapToCheckResponse)
         };
     }
-    
+
     #endregion
-    
+
     #region Sale
+
     public static Sale MapToSale(this CreateSaleRequest request)
     {
         return new Sale
@@ -321,7 +331,7 @@ public static class ContractMapping
             SellingPrice = sale.SellingPrice,
         };
     }
-    
+
     public static SalesResponse MapToSalesResponse(this IEnumerable<Sale> sales)
     {
         return new SalesResponse
@@ -330,6 +340,25 @@ public static class ContractMapping
         };
     }
 
-    
+    #endregion
+
+    #region SaleSummary
+
+    public static SaleSummaryResponse MapToSaleSummaryResponse(this SaleSummary sale)
+    {
+        return new SaleSummaryResponse
+        {
+            ProductName = sale.ProductName, SellingPrice = sale.SellingPrice, TotalQuantity = sale.TotalQuantity
+        };
+    }
+
+    public static SalesSummaryResponse MapToSalesSummaryResponse(this IEnumerable<SaleSummary> sales)
+    {
+        return new SalesSummaryResponse
+        {
+            Items = sales.Select(MapToSaleSummaryResponse)
+        };
+    }
+
     #endregion
 }

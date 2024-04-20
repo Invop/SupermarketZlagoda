@@ -17,6 +17,7 @@
                     <FluentNavLink Href="/store-products">Товари у магазині</FluentNavLink>
                     <FluentNavLink Href="/check">Чеки</FluentNavLink>
                 </FluentNavGroup>
+                <FluentNavLink Href="/charts">Статистика</FluentNavLink>
                 <FluentNavGroup Title="Профіль">
                     <FluentNavLink Tooltip="Інформація особу касира">Особиста Інформація</FluentNavLink>
                 </FluentNavGroup>
@@ -37,10 +38,11 @@
 </div>
 
 @code {
-    private bool expanded= true;
+    private bool expanded = true;
+
     protected override void OnInitialized()
     {
-        UserState.IsManager= true;
+        UserState.IsManager = true;
         base.OnInitialized();
     }
 

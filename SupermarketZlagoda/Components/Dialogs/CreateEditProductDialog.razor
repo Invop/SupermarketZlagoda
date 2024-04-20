@@ -1,64 +1,65 @@
-﻿@using SupermarketZlagoda.Data.Model
-@using Newtonsoft.Json
+﻿@using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
+@using SupermarketZlagoda.Data.Model
+@using ButtonType = Microsoft.FluentUI.AspNetCore.Components.ButtonType
 @inject IDialogService DialogService
 @implements IDialogContentComponent<Product>
-    @* Header *@
-    <FluentDialogHeader ShowDismiss="true">
-        <FluentStack VerticalAlignment="VerticalAlignment.Center">
-            <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
-            <FluentLabel Typo="Typography.PaneHeader">
-                @Dialog.Instance.Parameters.Title
-            </FluentLabel>
-        </FluentStack>
-    </FluentDialogHeader>
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())"/>
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
 
-    @* Footer *@
+@* Footer *@
 
-    @* Body *@
-    <FluentDialogBody>
+@* Body *@
+<FluentDialogBody>
 
-        <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
-            <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
-            <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
-            <br/><br/>
-            <FluentCombobox Items="@_categoryList"
-                            Label="Category:"
-                            OptionValue="@(category => category.Id.ToString())"
-                            OptionText="@(category => category.Name)"
-                            @bind-SelectedOption="@Category"
-                            Required="true">
-                <OptionTemplate Context="optionContext">
-                    @optionContext.Name
-                </OptionTemplate>
-            </FluentCombobox>
-            <FluentValidationMessage For="() => Content.CategoryId"></FluentValidationMessage>
-            <br/><br/>
-            <FluentTextArea style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea >
-        </EditForm>
-     
-    </FluentDialogBody>
-    
-    <FluentDialogFooter>
-        <FluentButton Type="ButtonType.Submit"
-                      Disabled="@(!_editContext.Validate())"
-                      Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
-        <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
-    </FluentDialogFooter>
+    <EditForm EditContext="_editContext">
+        <DataAnnotationsValidator/>
+        <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
+        <br/><br/>
+        <FluentCombobox Items="@_categoryList"
+                        Label="Category:"
+                        OptionValue="@(category => category.Id.ToString())"
+                        OptionText="@(category => category.Name)"
+                        @bind-SelectedOption="@Category"
+                        Required="true">
+            <OptionTemplate Context="optionContext">
+                @optionContext.Name
+            </OptionTemplate>
+        </FluentCombobox>
+        <FluentValidationMessage For="() => Content.CategoryId"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextArea style="width: 100%;" @bind-Value="@Content.Characteristics">Characteristics:</FluentTextArea >
+    </EditForm>
 
-    @code {
-        private const string CategoryApiUrl = "https://localhost:5001/api/categories";    
-    [Parameter]
-    public Product Content { get; set; } = default!;
-    [CascadingParameter]
-    public FluentDialog Dialog { get; set; } = default!;
+</FluentDialogBody>
+
+<FluentDialogFooter>
+    <FluentButton Type="ButtonType.Submit"
+                  Disabled="@(!_editContext.Validate())"
+                  Appearance="Appearance.Accent" OnClick="@SaveAsync">
+        Save
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@code {
+    private const string CategoryApiUrl = "https://localhost:5001/api/categories";
+    [Parameter] public Product Content { get; set; } = default!;
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = default!;
     private Category? Category { get; set; }
     private EditContext _editContext = default!;
     private List<Category>? _categoryList = [];
     private static readonly HttpClient Client = new();
-    
-    
+
+
     protected override async Task OnInitializedAsync()
     {
         InitializeEditContextForContent();
@@ -86,8 +87,8 @@
 
     private void SetCategory()
     {
-        Category = Content.CategoryId != Guid.Empty 
-            ? GetMatchingCategoryFromList() 
+        Category = Content.CategoryId != Guid.Empty
+            ? GetMatchingCategoryFromList()
             : GetFirstCategoryFromList();
     }
 
@@ -100,7 +101,7 @@
     {
         return _categoryList.ElementAtOrDefault(0);
     }
-    
+
     private async Task ShowErrorAsync()
     {
         var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 category");
@@ -115,10 +116,11 @@
             Console.WriteLine($"Error: {response.StatusCode}");
             return null;
         }
+
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<Category>>(JObject.Parse(content)["items"].ToString());
     }
-    
+
     private async Task SaveAsync()
     {
         if (_editContext.Validate())
@@ -132,5 +134,5 @@
     {
         await Dialog.CancelAsync();
     }
-    
+
 }
