@@ -77,22 +77,13 @@ public partial class EmployeeTable
     
     private async Task OpenCreateDialogAsync()
     {
-        var context = new Employee()
+        var context = new Employee
         {
-            Surname = "",
-            Name = "",
-            Role = "",
-            Salary = 0,
             DateOfBirth = DateOnly.FromDateTime(DateTime.Today),
-            DateOfStart = DateOnly.FromDateTime(DateTime.Today),
-            PhoneNumber = "",
-            City = "",
-            Street = "",
-            ZipCode = ""
+            DateOfStart = DateOnly.FromDateTime(DateTime.Today)
         };
         var dialog = await DialogService.ShowDialogAsync<CreateEditEmployeeDialog>(context, new DialogParameters()
         {
-            Height = "1000px",
             Title = "Add new employee",
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
@@ -111,7 +102,6 @@ public partial class EmployeeTable
     {
         var dialog = await DialogService.ShowDialogAsync<CreateEditEmployeeDialog>(context, new DialogParameters()
         {
-            Height = "1020px",
             Title = $"Updating {context.Surname} {context.Name} {context.Patronymic}",
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
