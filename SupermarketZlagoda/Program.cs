@@ -1,5 +1,3 @@
-
-
 using Microsoft.FluentUI.AspNetCore.Components;
 using SupermarketZlagoda.Components;
 using SupermarketZlagoda.Data;
@@ -9,7 +7,7 @@ namespace SupermarketZlagoda
     public class Program
     {
         public static void Main(string[] args)
-        {   
+        {
             //SqliteDataAccess.InitDatabaseAndTables();
 
             var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +17,7 @@ namespace SupermarketZlagoda
                 .AddInteractiveServerComponents();
             builder.Services.AddFluentUIComponents();
             var app = builder.Build();
-
+            builder.Services.AddBlazorBootstrap();
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -32,7 +30,6 @@ namespace SupermarketZlagoda
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
             app.Run();
-            
         }
     }
 }

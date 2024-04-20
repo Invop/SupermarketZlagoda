@@ -1,6 +1,7 @@
-﻿@using SupermarketZlagoda.Data.Model
-@using Newtonsoft.Json
+﻿@using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
+@using SupermarketZlagoda.Data.Model
+@using ButtonType = Microsoft.FluentUI.AspNetCore.Components.ButtonType
 @implements IDialogContentComponent<StoreProduct>
 @* Header *@
 <FluentDialogHeader ShowDismiss="true">
@@ -90,7 +91,7 @@
         {
             await HandleUpdateDialog();
         }
-        else if(!Content.IsPromotional)
+        else if (!Content.IsPromotional)
         {
             _products = await GetAllUnusedProducts();
             if (_products != null) Product = _products[0];
