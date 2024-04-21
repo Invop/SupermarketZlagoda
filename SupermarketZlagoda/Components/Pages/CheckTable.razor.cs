@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
@@ -14,7 +15,7 @@ public partial class CheckTable
     private string _checkSearchTerm = String.Empty;
     private int _sortType = 0;
     private Option<string?> selectedEmployeeOption;
-    private decimal TotalSum;
+    private decimal TotalSum = 0;
     
     private DateTime? _dateFromValue = null;
     private DateTime? _dateToValue = null;
@@ -133,6 +134,7 @@ public partial class CheckTable
     
     private async Task UpdateTable()
     {
+        TotalSum = 0;
         var formattedFromDate = _dateFromValue?.ToString("yyyy-MM-dd HH:mm:ss");
         var formattedToDate = _dateToValue?.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -142,7 +144,11 @@ public partial class CheckTable
             var responseJson = await response.Content.ReadAsStringAsync();
             var checkList =
                 JsonConvert.DeserializeObject<List<Check>>(JObject.Parse(responseJson)["items"].ToString());
-            if(checkList != null)_items = checkList.AsQueryable();
+            if (checkList != null)
+            {
+                _items = checkList.AsQueryable();
+                TotalSum = checkList.Sum(check => check.SumTotal);
+            }
             StateHasChanged();
             await GetEmployeesInCheckAsync();
         }
@@ -373,5 +379,12 @@ public partial class CheckTable
             PreventScroll = true,
         });
         var result = await dialog.Result;
+    }
+    
+    private async Task PrintTable()
+    {
+        var printer = new TablePrinter<Check>(_items);
+        var tableContent = printer.PrintTable();
+        await IJS.InvokeVoidAsync("printComponent", tableContent,"Checks");
     }
 }

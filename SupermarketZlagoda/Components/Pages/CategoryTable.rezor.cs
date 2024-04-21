@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
@@ -154,5 +155,11 @@ public partial class CategoryTable
         {
             Console.WriteLine($"Failed to delete the category. Status code: {response.StatusCode}");
         }
+    }
+    private async Task PrintTable()
+    {
+        var printer = new TablePrinter<Category>(_items);
+        var tableContent = printer.PrintTable();
+        await IJS.InvokeVoidAsync("printComponent", tableContent,"Categories");
     }
 }

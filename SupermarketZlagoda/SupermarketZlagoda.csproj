@@ -25,5 +25,9 @@
       <DependentUpon>CategoryTable.razor</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\printTables.js" />
+  </ItemGroup>
   
 </Project>

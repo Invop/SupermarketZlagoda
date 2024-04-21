@@ -4,7 +4,7 @@
 @using Newtonsoft.Json.Linq
 @inject IDialogService DialogService
 @implements IDialogContentComponent<Check>
-
+@inject IJSRuntime IJS
  @* Header *@
 <FluentDialogHeader ShowDismiss="true">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
@@ -18,6 +18,7 @@
  @* Footer *@
 <FluentDialogFooter>
     <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+    <FluentButton Icon="Print" OnClick="@PrintDialog">Print</FluentButton>
 </FluentDialogFooter>
 
  @* Body *@
@@ -86,5 +87,14 @@
             Console.WriteLine($"Error retrieving sales for check {Content.IdCheck}. Status code: {response.StatusCode}");
         }
     }
-
+    private async Task PrintDialog()
+    {
+        var checkPrinter = new TablePrinter<Check>(new List<Check> { Content });
+        var checkTable = checkPrinter.PrintTable();
+        var salesPrinter = new TablePrinter<Sale>(SalesList);
+        var salesTable = salesPrinter.PrintTable();
+        var separator = "<hr style='border-top: 1px solid #ccc; margin: 20px 0;'>";
+        var dialogContent = $"{checkTable}{separator}{salesTable}";
+        await IJS.InvokeVoidAsync("printComponent", dialogContent, "Check Details and Sales");
+    }
 }
