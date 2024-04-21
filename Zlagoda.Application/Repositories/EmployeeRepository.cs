@@ -19,9 +19,9 @@ public class EmployeeRepository : IEmployeeRepository
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var commandText =
             $@"INSERT INTO Employees (id_employee, empl_surname, empl_name, empl_patronymic, empl_role,
-                       salary, date_of_birth, date_of_start, phone_number, city, street, zip_code)
+                       salary, date_of_birth, date_of_start, phone_number, city, street, zip_code, user_login, user_password)
              VALUES (@Id, @Name, @Surname, @Patronymic, @Role, @Salary, @DateOfBirth,
-                     @DateOfStart, @PhoneNumber, @City, @Street, @ZipCode)";
+                     @DateOfStart, @PhoneNumber, @City, @Street, @ZipCode, @UserLogin, @UserPassword)";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", em.Id);
         command.Parameters.AddWithValue("@Surname", em.Surname);
@@ -38,6 +38,8 @@ public class EmployeeRepository : IEmployeeRepository
         command.Parameters.AddWithValue("@City", em.City);
         command.Parameters.AddWithValue("@Street", em.Street);
         command.Parameters.AddWithValue("@ZipCode", em.ZipCode);
+        command.Parameters.AddWithValue("@UserLogin", em.UserLogin);
+        command.Parameters.AddWithValue("@UserPassword", em.UserPassword);
         var result = await command.ExecuteNonQueryAsync();
         return result > 0;
     }
@@ -62,7 +64,9 @@ public class EmployeeRepository : IEmployeeRepository
                 PhoneNumber = reader.GetString(reader.GetOrdinal("phone_number")),
                 City = reader.GetString(reader.GetOrdinal("city")),
                 Street = reader.GetString(reader.GetOrdinal("street")),
-                ZipCode = reader.GetString(reader.GetOrdinal("zip_code"))
+                ZipCode = reader.GetString(reader.GetOrdinal("zip_code")),
+                UserLogin = reader.GetString(reader.GetOrdinal("user_login")),
+                UserPassword = reader.GetString(reader.GetOrdinal("user_password"))
             };
             if (!reader.IsDBNull(3))
                 employee.Patronymic = reader.GetString(reader.GetOrdinal("empl_patronymic"));
@@ -82,6 +86,14 @@ public class EmployeeRepository : IEmployeeRepository
         {
             commandText.Append(" AND (empl_surname LIKE @StartSurname + '%' OR empl_surname = @StartSurname)");
         }
+        if (!string.IsNullOrWhiteSpace(parameters.UserLogin))
+        {
+            commandText.Append(" AND user_login = @UserLogin");
+        }
+        if (!string.IsNullOrWhiteSpace(parameters.UserPassword))
+        {
+            commandText.Append(" AND user_password = @UserPassword");
+        }
         if (parameters.InCheck)
         {
             commandText.Append(" AND id_employee IN (SELECT id_employee FROM Checks)");
@@ -92,6 +104,23 @@ public class EmployeeRepository : IEmployeeRepository
         }
     }
     
+    private void GetCommandWithParameters(EmployeeQueryParameters parameters, SqlCommand command)
+    {
+        if (parameters is null) return;
+        if(!string.IsNullOrWhiteSpace(parameters.StartSurname))
+        {
+            command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
+        }
+        if(!string.IsNullOrWhiteSpace(parameters.UserLogin))
+        {
+            command.Parameters.AddWithValue("@UserLogin", parameters.UserLogin);
+        }
+        if(!string.IsNullOrWhiteSpace(parameters.UserPassword))
+        {
+            command.Parameters.AddWithValue("@UserPassword", parameters.UserPassword);
+        }
+    }
+    
     public async Task<IEnumerable<Employee>> GetAllAsync(EmployeeQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -99,10 +128,7 @@ public class EmployeeRepository : IEmployeeRepository
                                           WHERE 1=1");
         AppendAdditionalCriteria(commandText, parameters);
         await using var command = new SqlCommand(commandText.ToString(), connection);
-        if(parameters != null && !string.IsNullOrWhiteSpace(parameters.StartSurname))
-        {
-            command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
-        }
+        GetCommandWithParameters(parameters, command);
         await using var reader = await command.ExecuteReaderAsync();
         var employees = new List<Employee>();
         while (await reader.ReadAsync())
@@ -119,7 +145,9 @@ public class EmployeeRepository : IEmployeeRepository
                 PhoneNumber = reader.GetString(reader.GetOrdinal("phone_number")),
                 City = reader.GetString(reader.GetOrdinal("city")),
                 Street = reader.GetString(reader.GetOrdinal("street")),
-                ZipCode = reader.GetString(reader.GetOrdinal("zip_code"))
+                ZipCode = reader.GetString(reader.GetOrdinal("zip_code")),
+                UserLogin = reader.GetString(reader.GetOrdinal("user_login")),
+                UserPassword = reader.GetString(reader.GetOrdinal("user_password"))
             };
             if (!reader.IsDBNull(3))
                 employee.Patronymic = reader.GetString(reader.GetOrdinal("empl_patronymic"));
@@ -135,7 +163,7 @@ public class EmployeeRepository : IEmployeeRepository
             $@"UPDATE Employees
               SET empl_surname = @Surname, empl_name = @Name, empl_patronymic = @Patronymic, empl_role = @Role,
                   salary = @Salary, date_of_birth = @DateOfBirth, date_of_start = @DateOfStart,
-                  phone_number = @PhoneNumber, city = @City, street = @Street, zip_code = @Code
+                  phone_number = @PhoneNumber, city = @City, street = @Street, zip_code = @Code, user_login = @UserLogin, user_password = @UserPassword
               WHERE id_employee = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Surname", em.Surname);
@@ -153,6 +181,8 @@ public class EmployeeRepository : IEmployeeRepository
         command.Parameters.AddWithValue("@Street", em.Street);
         command.Parameters.AddWithValue("@Code", em.ZipCode);
         command.Parameters.AddWithValue("@Id", em.Id);
+        command.Parameters.AddWithValue("@UserLogin", em.UserLogin);
+        command.Parameters.AddWithValue("@UserPassword", em.UserPassword);
         var result = await command.ExecuteNonQueryAsync();
         return result > 0;
     }
@@ -160,7 +190,7 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "DELETE FROM Employees WHERE id_employee = @Id";
+        var commandText = $"DELETE FROM Employees WHERE id_employee = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", id);
         var result = await command.ExecuteNonQueryAsync();
@@ -170,7 +200,7 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<bool> ExistsByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = "SELECT COUNT(*) FROM Employees WHERE id_employee = @Id";
+        var commandText = $"SELECT COUNT(*) FROM Employees WHERE id_employee = @Id";
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Id", id);
         var result = await command.ExecuteScalarAsync();

@@ -1,4 +1,6 @@
 ﻿using SupermarketZlagoda.Data.Model;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SupermarketZlagoda.Data;
 

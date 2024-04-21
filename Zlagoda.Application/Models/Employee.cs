@@ -14,4 +14,6 @@ public class Employee
     public required string City { get; set; }
     public required string Street { get; set; }
     public required string ZipCode { get; set; }
+    public required string UserLogin { get; set; }
+    public required string UserPassword { get; set; }
 }

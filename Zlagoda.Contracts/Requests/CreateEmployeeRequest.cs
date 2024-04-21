@@ -13,4 +13,6 @@ public class CreateEmployeeRequest
     public required string City { get; init; }
     public required string Street { get; init; }
     public required string ZipCode { get; init; }
+    public required string UserLogin { get; set; }
+    public required string UserPassword { get; set; }
 }

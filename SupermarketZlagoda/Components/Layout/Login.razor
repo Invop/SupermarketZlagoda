@@ -1,6 +1,9 @@
 ﻿@page "/login"
 @using SupermarketZlagoda.Data
+@inject IDialogService DialogService
 @inject User User
+@inject UserState UserState
+@inject NavigationManager NavigationManager
 
 <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);">
     <FluentEditForm Model="@User" EditContext="_editContext">
@@ -13,7 +16,8 @@
             <FluentTextField style="width: 100%; margin-top: 10px;" TextFieldType="TextFieldType.Password"
                              Placeholder="Password"
                              @bind-Value="@UserPassword"></FluentTextField>
-            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" style="width: 100%; margin-top: 10px;">Submit</FluentButton>
+            <FluentButton Type="ButtonType.Submit" OnClick="@SignInAsync" Disabled="@IsButtonDisabled"
+                          Appearance="Appearance.Accent" style="width: 100%; margin-top: 10px;">Submit</FluentButton>
         </FluentCard>
     </FluentEditForm>
 </div>

@@ -1,5 +1,7 @@
 ﻿@using SupermarketZlagoda.Data
+@using SupermarketZlagoda.Data.Model
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 @inject User User
 <FluentLayout>
     <FluentHeader>
@@ -8,11 +10,11 @@
             <div style="text-align: right; color: white;">
                 @if (User.Authorized)
                 {
-                    <a href="/" style="color: white;">Logout</a>
+                    <button @onclick="Logout">Logout</button>
                 }
                 else
                 {
-                    <a href="/login" style="color: white;">Login</a>
+                    <button @onclick="Logout">Login</button>
                 }
             </div>
         </FluentStack>
@@ -48,9 +50,15 @@
 
 @code
 {
+    private void Logout()
+    {
+        OnInitialized();
+        NavigationManager.NavigateTo("/login");
+    }
     protected override void OnInitialized()
     {
         User.Authorized = false;
+        User.Data = new Employee();
         base.OnInitialized();
     }
 }

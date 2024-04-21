@@ -94,7 +94,9 @@ namespace Zlagoda.Application.Database;
                                                              phone_number VARCHAR(13) NOT NULL,
                                                              city VARCHAR(50) NOT NULL,
                                                              street VARCHAR(50) NOT NULL,
-                                                             zip_code VARCHAR(9) NOT NULL
+                                                             zip_code VARCHAR(9) NOT NULL,
+                                                             user_login VARCHAR(20) NOT NULL,
+                                                             user_password VARCHAR(64) NOT NULL
                                                          )
                                                  """;
      

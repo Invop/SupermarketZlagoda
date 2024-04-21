@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SupermarketZlagoda.Data.Model;
 
@@ -50,4 +52,28 @@ public record Employee
     [Required]
     [MaxLength(9, ErrorMessage = "ZipCode is too long (9 characters limit).")]
     public string ZipCode { get; set; }
+    
+    [Required]
+    [MinLength(3, ErrorMessage = "Login is too short!")]
+    [MaxLength(20, ErrorMessage = "Login is too long (20 characters limit).")]
+    public string UserLogin { get; set; }
+
+    private string _hashPassword;
+    public string UserPassword
+    {
+        get => _hashPassword;
+        set
+        {
+            _hashPassword = Hash(value);
+        }
+    }
+
+    public static string Hash(string value)
+    {
+        var hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
+        var builder = new StringBuilder();
+        foreach (var t in hashedBytes)
+            builder.Append(t.ToString("x2"));
+        return builder.ToString();
+    }
 }
