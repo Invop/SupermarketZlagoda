@@ -58,7 +58,7 @@ public partial class CheckTable
     
     protected override async Task OnInitializedAsync()
     {
-        IsManager = UserState.IsManager;
+        IsManager = User.IsManager;
         await GetEmployeesInCheckAsync();
         selectedEmployeeOption = employeeOptionsSort.FirstOrDefault();
         await UpdateEmployeeOptions();

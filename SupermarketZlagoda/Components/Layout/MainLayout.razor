@@ -2,7 +2,6 @@
 @using SupermarketZlagoda.Data.Model
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
-@inject User User
 <FluentLayout>
     <FluentHeader>
         <FluentStack Orientation="Orientation.Horizontal" Width="100%">
@@ -57,8 +56,7 @@
     }
     protected override void OnInitialized()
     {
-        User.Authorized = false;
-        User.Data = new Employee();
+        if (!User.Authorized) User.Data = new Employee();
         base.OnInitialized();
     }
 }

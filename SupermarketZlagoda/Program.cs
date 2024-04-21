@@ -13,8 +13,6 @@ namespace SupermarketZlagoda
             //SqliteDataAccess.InitDatabaseAndTables();
 
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddScoped<UserState>();
-            builder.Services.AddScoped<User>();
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();

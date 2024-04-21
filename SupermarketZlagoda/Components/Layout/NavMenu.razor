@@ -1,5 +1,4 @@
 ﻿@using SupermarketZlagoda.Data
-@inject UserState UserState
 <div class="navmenu">
     <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon"/>
     <label for="navmenu-toggle" class="navmenu-icon">
@@ -47,7 +46,7 @@
     private static bool _isManager = false;
     protected override void OnInitialized()
     {
-        _isManager = UserState.IsManager;
+        _isManager = User.IsManager;
         base.OnInitialized();
     }
 

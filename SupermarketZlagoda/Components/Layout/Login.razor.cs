@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SupermarketZlagoda.Data;
 using SupermarketZlagoda.Data.Model;
 
 namespace SupermarketZlagoda.Components.Layout;
@@ -38,7 +39,6 @@ public partial class Login
             return;
         }
         User.Data = list[0];
-        UserState.IsManager = User.Data.Role.Equals("Manager");
         User.Authorized = true;
         NavigationManager.NavigateTo("/");
         IsButtonDisabled = false;
