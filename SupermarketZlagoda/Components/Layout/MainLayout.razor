@@ -51,12 +51,12 @@
 {
     private void Logout()
     {
+        User.Authorized = false;
         OnInitialized();
         NavigationManager.NavigateTo("/login");
     }
     protected override void OnInitialized()
     {
         if (!User.Authorized) User.Data = new Employee();
-        base.OnInitialized();
     }
 }

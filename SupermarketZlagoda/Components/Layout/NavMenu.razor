@@ -7,7 +7,7 @@
     <nav class="sitenav" aria-labelledby="main-menu" onclick="document.getElementById('navmenu-toggle').click();">
         <FluentNavMenu Id="main-menu" Collapsible="true" Width="380" Title="Navigation menu" @bind-Expanded="expanded">
             <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink >
-            @if (_isManager)
+            @if (User.IsManager)
             {
                 <FluentNavGroup Title="Менеджер" Tooltip="Навігаційне меню менеджера" Icon="@(new Icons.Regular.Size24.EarthLeaf())">
                     <FluentNavGroup Title="Управління даними">
@@ -27,10 +27,10 @@
             {
                 <FluentNavGroup Title="Касир" Tooltip="Навігаційне меню касира" Icon="@(new Icons.Regular.Size24.EarthLeaf())">
                     <FluentNavGroup Title="Управління даними">
-                        <FluentNavLink >Товари</FluentNavLink>
-                        <FluentNavLink >Товари у магазині</FluentNavLink>
-                        <FluentNavLink >Постійні Клієнти</FluentNavLink>
-                        <FluentNavLink >Чеки</FluentNavLink>
+                        <FluentNavLink Href="/products">Товари</FluentNavLink>
+                        <FluentNavLink Href="/store-products">Товари у магазині</FluentNavLink>
+                        <FluentNavLink Href="/customer-card">Постійні Клієнти</FluentNavLink>
+                        <FluentNavLink Href="/check">Чеки</FluentNavLink>
                     </FluentNavGroup>
                     <FluentNavGroup Title="Профіль">
                         <FluentNavLink Tooltip="Інформація особу касира">Особиста Інформація</FluentNavLink>
@@ -43,12 +43,6 @@
 
 @code {
     private bool expanded= true;
-    private static bool _isManager = false;
-    protected override void OnInitialized()
-    {
-        _isManager = User.IsManager;
-        base.OnInitialized();
-    }
 
     private void OnClick()
     {
