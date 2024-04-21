@@ -2,10 +2,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
-using SupermarketZlagoda.Data;
 using SupermarketZlagoda.Data.Model;
 
 namespace SupermarketZlagoda.Components.Pages;
@@ -215,4 +215,11 @@ public partial class CustomerCardTable
     }
     
     #endregion
+
+    private async Task PrintTable()
+    {
+        var printer = new TablePrinter<CustomerCard>(_items);
+        var tableContent = printer.PrintTable();
+        await IJS.InvokeVoidAsync("printComponent", tableContent,"Customer cards");
+    }
 }

@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
@@ -320,4 +321,10 @@ public partial class StoreProductTable
     }
 
     #endregion
+    private async Task PrintTable()
+    {
+        var printer = new TablePrinter<StoreProduct>(_items);
+        var tableContent = printer.PrintTable();
+        await IJS.InvokeVoidAsync("printComponent", tableContent,"Store products");
+    }
 }

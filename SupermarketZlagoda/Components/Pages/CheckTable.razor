@@ -3,6 +3,7 @@
 @using Orientation = Microsoft.FluentUI.AspNetCore.Components.Orientation
 @inject UserState UserState
 @inject IDialogService DialogService
+@inject IJSRuntime IJS
 <FluentToolbar id="toolbar-fluent-components">
     @if (!IsManager)
     {
@@ -26,6 +27,7 @@
     <FluentDatePicker @bind-Value="@DateToValue"/>
     <FluentButton Icon="CalendarToday" OnClick="@(SetTodayDate)">Today</FluentButton>
     <FluentButton Icon="CalendarToday" OnClick="@(ResetDate)">Reset Date</FluentButton>
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr 1fr 1fr"
@@ -53,9 +55,9 @@
         This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
     </PaginationTextTemplate>
 </FluentPaginator>
-@if (IsManager)
-{
-    <div style="font-size: larger;  font-weight: bold; display: flex; justify-content: center;">
-        @* Total for @selectedEmployeeOption.Text is @TotalSum *@
-    </div>
+    @if (selectedEmployeeOption != null)
+    {
+        <div style="font-size: larger;  font-weight: bold; display: flex; justify-content: center;">
+            Total for @selectedEmployeeOption.Text is @TotalSum
+        </div>
 }

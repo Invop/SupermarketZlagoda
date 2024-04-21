@@ -1,5 +1,8 @@
 ﻿@page "/employees"
 @inject IDialogService DialogService
+@inject IJSRuntime IJS
+
+
 <FluentToolbar id="toolbar-fluent-components">
     <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new employee</FluentButton>
     <FluentRadioGroup @bind-Value="@SortType">
@@ -8,6 +11,7 @@
     </FluentRadioGroup>
     <FluentCheckbox @bind-Value="@CashiersOnly">Cashiers only</FluentCheckbox>
     <FluentTextField @bind-Value="@SearchTerm" Placeholder="Search by surname"></FluentTextField>
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 </FluentToolbar>
 <FluentDataGrid ResizableColumns="true" Items="@_items" ItemSize="54" Pagination="@_pagination" Virtualize="true"
                 GridTemplateColumns="1.4fr 1.9fr 1.7fr 2fr 0.9fr 1fr 1.4fr 1.4fr 1.6fr 0.8fr 1fr 1.2fr 1.3fr"
@@ -24,11 +28,12 @@
     <PropertyColumn Property="@(c => c.City)"/>
     <PropertyColumn Property="@(c => c.Street)"/>
     <PropertyColumn Property="@(c => c.ZipCode)"/>
-    
+
     <TemplateColumn Title="Actions">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialogAsync(context))"/>
     </TemplateColumn>
+
 </FluentDataGrid>
 <FluentPaginator State="@_pagination">
     <SummaryTemplate>

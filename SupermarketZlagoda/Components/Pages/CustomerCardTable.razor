@@ -3,6 +3,8 @@
 @inject UserState UserState
 @inject IDialogService DialogService
 
+@inject IJSRuntime IJS
+
 <FluentToolbar id="toolbar-fluent-components">
     @if (IsManager)
     {
@@ -25,6 +27,7 @@
     />
 }
     <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by surname"></FluentTextField>
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1.1fr 1fr 1.2fr 1fr 1.2fr 0.9fr 1fr 1fr 0.6fr"
                 Style="height: 600px; width: 1500px; overflow:auto;">
@@ -54,3 +57,4 @@
         This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
     </PaginationTextTemplate>
 </FluentPaginator>
+
