@@ -2,10 +2,10 @@
 
 namespace SupermarketZlagoda.Data;
 
-public static class User
+public class User
 {
-    public static Employee? Data { get; set; } = null;
+    public Employee? Data { get; set; } = null;
 
-    public static bool Authorized { get; set; } = false;
-    public static bool IsManager => Authorized && Data.Role.Equals("Manager");
+    public bool Authorized { get; set; } = false;
+    public bool IsManager { get; set; }
 }

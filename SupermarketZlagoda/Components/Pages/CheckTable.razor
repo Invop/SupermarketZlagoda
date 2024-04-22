@@ -1,6 +1,6 @@
 ﻿@page "/check"
-@using SupermarketZlagoda.Data
 @inject IDialogService DialogService
+@inject User User
 <FluentToolbar id="toolbar-fluent-components">
     @if (!IsManager)
     {
@@ -29,8 +29,8 @@
 <FluentDataGrid Items="@_items" ResizableColumns="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr 1fr 1fr"
                 Style="height: 600px; width: 1500px; overflow:auto;">
     <PropertyColumn Property="@(c => c.IdCheck)"/>
-    <PropertyColumn Title="IdEmployee" Property="@(c => _employees[c.IdEmployee])" />
-<PropertyColumn Title="IdCustomerCard" Property="@(c => c.IdCardCustomer.HasValue ? _customerCards[c.IdCardCustomer.Value] : string.Empty)" />
+    <PropertyColumn Title="IdEmployee" Property="@(c => _employees[c.IdEmployee])"/>
+    <PropertyColumn Title="IdCustomerCard" Property="@(c => c.IdCardCustomer.HasValue ? _customerCards[c.IdCardCustomer.Value] : string.Empty)"/>
     <PropertyColumn Property="@(c => c.PrintDate)"/>
     <PropertyColumn Property="@(c => c.SumTotal)"/>
     <PropertyColumn Property="@(c => c.Vat)"/>
@@ -54,6 +54,6 @@
 @if (IsManager)
 {
     <div style="font-size: larger;  font-weight: bold; display: flex; justify-content: center;">
-       @* Total for @selectedEmployeeOption.Text is @TotalSum *@
+        @* Total for @selectedEmployeeOption.Text is @TotalSum *@
     </div>
 }

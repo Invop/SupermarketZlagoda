@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
 using SupermarketZlagoda.Data.Model;
+
 namespace SupermarketZlagoda.Components.Pages;
 
 public partial class EmployeeTable
@@ -16,40 +17,53 @@ public partial class EmployeeTable
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Employee> _items = Enumerable.Empty<Employee>().AsQueryable();
     private static readonly HttpClient Client = new();
-    
+
     protected override async Task OnInitializedAsync()
     {
         await GetEmployeesAsync();
     }
-    
+
     private int SortType
     {
         get => _sortType;
-        set { _sortType = value;
+        set
+        {
+            _sortType = value;
             _ = GetEmployeesAsync();
         }
     }
-    
+
     public string SearchTerm
     {
         get => _searchTerm;
-        set { _searchTerm = value;  _ = GetEmployeesAsync();}
+        set
+        {
+            _searchTerm = value;
+            _ = GetEmployeesAsync();
+        }
     }
-    
+
     public bool CashiersOnly
     {
         get => _cashiersOnly;
-        set { _cashiersOnly = value;  _ = GetEmployeesAsync();}
+        set
+        {
+            _cashiersOnly = value;
+            _ = GetEmployeesAsync();
+        }
     }
-    
+
     private async Task GetEmployeesAsync()
     {
         var sortType = _sortType == 0 ? "asc" : "desc";
-        var response = await Client.GetAsync($"https://localhost:5001/api/employees/?SortBy=empl_surname {sortType}, empl_name {sortType}, empl_patronymic {sortType}&CashiersOnly={_cashiersOnly}&StartSurname={_searchTerm}");
+        var response =
+            await Client.GetAsync(
+                $"https://localhost:5001/api/employees/?SortBy=empl_surname {sortType}, empl_name {sortType}, empl_patronymic {sortType}&CashiersOnly={_cashiersOnly}&StartSurname={_searchTerm}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
-            var employees = JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
+            var employees =
+                JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
             if (employees != null) _items = employees.AsQueryable();
             StateHasChanged();
         }
@@ -58,7 +72,7 @@ public partial class EmployeeTable
             Console.WriteLine($"Error: {response.StatusCode}");
         }
     }
-    
+
     private async Task PostEmployeeAsync(Employee employee)
     {
         var employeeJson = JsonConvert.SerializeObject(employee);
@@ -74,13 +88,12 @@ public partial class EmployeeTable
             ? "Employee successfully saved."
             : $"Failed to save the employee. Status code: {response.StatusCode}");
     }
-    
+
     private async Task OpenCreateDialogAsync()
     {
         var context = new Employee
         {
-            DateOfBirth = DateOnly.FromDateTime(DateTime.Today),
-            DateOfStart = DateOnly.FromDateTime(DateTime.Today)
+            DateOfStart = DateTime.Today
         };
         var dialog = await DialogService.ShowDialogAsync<CreateEditEmployeeDialog>(context, new DialogParameters()
         {
@@ -97,7 +110,7 @@ public partial class EmployeeTable
             await GetEmployeesAsync();
         }
     }
-    
+
     private async Task OpenEditDialogAsync(Employee context)
     {
         var dialog = await DialogService.ShowDialogAsync<CreateEditEmployeeDialog>(context, new DialogParameters()
@@ -113,18 +126,18 @@ public partial class EmployeeTable
             var item = result.Data as Employee;
             await UpdateEmployeeAsync(item);
             await GetEmployeesAsync();
-        }  
+        }
     }
-    
+
     private async Task UpdateEmployeeAsync(Employee employee)
     {
-        var productJson = JsonConvert.SerializeObject(employee);
+        var employeeJson = JsonConvert.SerializeObject(employee);
 
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var content = new StringContent(productJson, Encoding.UTF8, "application/json");
+        var content = new StringContent(employeeJson, Encoding.UTF8, "application/json");
 
         var response
             = await client.PutAsync($"https://localhost:5001/api/employees/{employee.Id}", content);
@@ -133,7 +146,7 @@ public partial class EmployeeTable
             ? "Employee successfully updated."
             : $"Failed to update the employee. Status code: {response.StatusCode}");
     }
-    
+
     private async Task OpenDeleteDialogAsync(Employee context)
     {
         var dialog = await DialogService.ShowMessageBoxAsync(new DialogParameters<MessageBoxContent>()
@@ -158,7 +171,7 @@ public partial class EmployeeTable
             await GetEmployeesAsync();
         }
     }
-    
+
     private async Task DeleteEmployeeAsync(Guid id)
     {
         using var client = new HttpClient();

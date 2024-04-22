@@ -6,9 +6,8 @@ namespace SupermarketZlagoda.Data
     {
         public override bool IsValid(object value)
         {
-            if (value is not DateOnly dateOfBirth) return false;
-            return DateOnly.FromDateTime(DateTime.Today.AddYears(-minimumAge)) >= dateOfBirth;
+            if (value is not DateTime dateOfBirth) return false;
+            return DateTime.Today.AddYears(-minimumAge) >= dateOfBirth;
         }
-        
     }
 }

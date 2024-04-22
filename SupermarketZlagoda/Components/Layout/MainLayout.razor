@@ -1,25 +1,22 @@
-﻿@using SupermarketZlagoda.Data
-@using SupermarketZlagoda.Data.Model
+﻿@using Blazored.LocalStorage
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject ILocalStorageService localStorage
+@inject User User
 <FluentLayout>
     <FluentHeader>
         <FluentStack Orientation="Orientation.Horizontal" Width="100%">
             <div style="flex-grow: 1;">SupermarketZlagoda</div>
-            <div style="text-align: right; color: white;">
+            <div style="text-align: right;">
                 @if (User.Authorized)
                 {
-                    <button @onclick="Logout">Logout</button>
-                }
-                else
-                {
-                    <button @onclick="Logout">Login</button>
+                    <FluentButton OnClick="@LogOut">LogOut</FluentButton>
                 }
             </div>
         </FluentStack>
     </FluentHeader>
     <FluentStack Class="main" Orientation="Orientation.Horizontal" Width="100%">
-        @if (User.Authorized)
+        @if (User is { Authorized: true })
         {
             <NavMenu/>
         }
@@ -49,14 +46,27 @@
 
 @code
 {
-    private void Logout()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        User.Authorized = false;
-        OnInitialized();
-        NavigationManager.NavigateTo("/login");
+        if (firstRender)
+        {
+            var userAuthorized = await localStorage.ContainKeyAsync("Authorized");
+            if (userAuthorized)
+            {
+                User.Authorized = await localStorage.GetItemAsync<bool>("Authorized");
+                StateHasChanged();
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+        }
     }
-    protected override void OnInitialized()
+
+    private async Task LogOut()
     {
-        if (!User.Authorized) User.Data = new Employee();
+        await localStorage.RemoveItemAsync("user");
+        User.Authorized = false;
+        NavigationManager.NavigateTo("/login");
     }
 }

@@ -1,4 +1,7 @@
-﻿@using SupermarketZlagoda.Data
+﻿@using Blazored.LocalStorage
+@inject User User
+@inject ILocalStorageService localStorage
+
 <div class="navmenu">
     <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon"/>
     <label for="navmenu-toggle" class="navmenu-icon">
@@ -42,11 +45,19 @@
 </div>
 
 @code {
-    private bool expanded= true;
+    private bool expanded = true;
 
-    private void OnClick()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        throw new NotImplementedException();
+        if (firstRender)
+        {
+            var userRole = await localStorage.ContainKeyAsync("IsManager");
+            if (userRole)
+            {
+                User.IsManager = await localStorage.GetItemAsync<bool>("IsManager");
+                StateHasChanged();
+            }
+        }
     }
 
 }

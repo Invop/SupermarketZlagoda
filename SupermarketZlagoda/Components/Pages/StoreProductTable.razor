@@ -1,8 +1,8 @@
 ﻿@page "/store-products"
-@using SupermarketZlagoda.Data
 @inject IDialogService DialogService
+@inject User User
 <FluentToolbar id="toolbar-fluent-components">
-    @if(IsManager)
+    @if (IsManager)
     {
         <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new store product</FluentButton>
     }
@@ -30,14 +30,15 @@
     @if (IsManager)
     {
         <TemplateColumn Title="Actions" Align="@Align.End">
-                @if (!context.IsPromotional)
-                {   
-                    if(string.IsNullOrEmpty(context.UpcProm))
-                    {
-                        <FluentButton OnClick="@(() => OpenAddPromoStoreProductDialog(context))">Add Promo</FluentButton>
-                    }
-                    <FluentButton OnClick="@(() =>OpenCreateNewProductBatchDialog(context))">New batch of product</FluentButton>
+            @if (!context.IsPromotional)
+            {
+                if (string.IsNullOrEmpty(context.UpcProm))
+                {
+                    <FluentButton OnClick="@(() => OpenAddPromoStoreProductDialog(context))">Add Promo</FluentButton>
                 }
+
+                <FluentButton OnClick="@(() => OpenCreateNewProductBatchDialog(context))">New batch of product</FluentButton>
+            }
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>
         </TemplateColumn>

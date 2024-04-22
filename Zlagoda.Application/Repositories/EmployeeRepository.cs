@@ -14,6 +14,7 @@ public class EmployeeRepository : IEmployeeRepository
     {
         _dbConnectionFactory = dbConnectionFactory;
     }
+
     public async Task<bool> CreateAsync(Employee em)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -26,7 +27,7 @@ public class EmployeeRepository : IEmployeeRepository
         command.Parameters.AddWithValue("@Id", em.Id);
         command.Parameters.AddWithValue("@Surname", em.Surname);
         command.Parameters.AddWithValue("@Name", em.Name);
-        if(string.IsNullOrEmpty(em.Patronymic))
+        if (string.IsNullOrEmpty(em.Patronymic))
             command.Parameters.AddWithValue("@Patronymic", DBNull.Value);
         else
             command.Parameters.AddWithValue("@Patronymic", em.Patronymic);
@@ -59,8 +60,8 @@ public class EmployeeRepository : IEmployeeRepository
                 Name = reader.GetString(reader.GetOrdinal("empl_name")),
                 Role = reader.GetString(reader.GetOrdinal("empl_role")),
                 Salary = reader.GetDecimal(reader.GetOrdinal("salary")),
-                DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_birth"))),
-                DateOfStart = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_start"))),
+                DateOfBirth = reader.GetDateTime(reader.GetOrdinal("date_of_birth")),
+                DateOfStart = reader.GetDateTime(reader.GetOrdinal("date_of_start")),
                 PhoneNumber = reader.GetString(reader.GetOrdinal("phone_number")),
                 City = reader.GetString(reader.GetOrdinal("city")),
                 Street = reader.GetString(reader.GetOrdinal("street")),
@@ -72,9 +73,10 @@ public class EmployeeRepository : IEmployeeRepository
                 employee.Patronymic = reader.GetString(reader.GetOrdinal("empl_patronymic"));
             return employee;
         }
+
         return null;
     }
-    
+
     private void AppendAdditionalCriteria(StringBuilder commandText, EmployeeQueryParameters? parameters)
     {
         if (parameters == null) return;
@@ -82,45 +84,52 @@ public class EmployeeRepository : IEmployeeRepository
         {
             commandText.Append(" AND empl_role = 'Cashier'");
         }
+
         if (!string.IsNullOrWhiteSpace(parameters.StartSurname))
         {
             commandText.Append(" AND (empl_surname LIKE @StartSurname + '%' OR empl_surname = @StartSurname)");
         }
+
         if (!string.IsNullOrWhiteSpace(parameters.UserLogin))
         {
             commandText.Append(" AND user_login = @UserLogin");
         }
+
         if (!string.IsNullOrWhiteSpace(parameters.UserPassword))
         {
             commandText.Append(" AND user_password = @UserPassword");
         }
+
         if (parameters.InCheck)
         {
             commandText.Append(" AND id_employee IN (SELECT id_employee FROM Checks)");
         }
+
         if (!string.IsNullOrEmpty(parameters.SortBy))
         {
             commandText.Append($" ORDER BY {parameters.SortBy}");
         }
     }
-    
+
     private void GetCommandWithParameters(EmployeeQueryParameters parameters, SqlCommand command)
     {
         if (parameters is null) return;
-        if(!string.IsNullOrWhiteSpace(parameters.StartSurname))
+        if (!string.IsNullOrWhiteSpace(parameters.StartSurname))
         {
             command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
         }
-        if(!string.IsNullOrWhiteSpace(parameters.UserLogin))
+
+        if (!string.IsNullOrWhiteSpace(parameters.UserLogin))
         {
             command.Parameters.AddWithValue("@UserLogin", parameters.UserLogin);
         }
-        if(!string.IsNullOrWhiteSpace(parameters.UserPassword))
+
+        if (!string.IsNullOrWhiteSpace(parameters.UserPassword))
         {
             command.Parameters.AddWithValue("@UserPassword", parameters.UserPassword);
         }
     }
-    
+
     public async Task<IEnumerable<Employee>> GetAllAsync(EmployeeQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -140,8 +149,8 @@ public class EmployeeRepository : IEmployeeRepository
                 Name = reader.GetString(reader.GetOrdinal("empl_name")),
                 Role = reader.GetString(reader.GetOrdinal("empl_role")),
                 Salary = reader.GetDecimal(reader.GetOrdinal("salary")),
-                DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_birth"))),
-                DateOfStart = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_start"))),
+                DateOfBirth = reader.GetDateTime(reader.GetOrdinal("date_of_birth")),
+                DateOfStart = reader.GetDateTime(reader.GetOrdinal("date_of_start")),
                 PhoneNumber = reader.GetString(reader.GetOrdinal("phone_number")),
                 City = reader.GetString(reader.GetOrdinal("city")),
                 Street = reader.GetString(reader.GetOrdinal("street")),
@@ -153,13 +162,14 @@ public class EmployeeRepository : IEmployeeRepository
                 employee.Patronymic = reader.GetString(reader.GetOrdinal("empl_patronymic"));
             employees.Add(employee);
         }
+
         return employees;
     }
 
     public async Task<bool> UpdateAsync(Employee em)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = 
+        var commandText =
             $@"UPDATE Employees
               SET empl_surname = @Surname, empl_name = @Name, empl_patronymic = @Patronymic, empl_role = @Role,
                   salary = @Salary, date_of_birth = @DateOfBirth, date_of_start = @DateOfStart,
@@ -168,7 +178,7 @@ public class EmployeeRepository : IEmployeeRepository
         using var command = new SqlCommand(commandText, connection);
         command.Parameters.AddWithValue("@Surname", em.Surname);
         command.Parameters.AddWithValue("@Name", em.Name);
-        if(string.IsNullOrEmpty(em.Patronymic))
+        if (string.IsNullOrEmpty(em.Patronymic))
             command.Parameters.AddWithValue("@Patronymic", DBNull.Value);
         else
             command.Parameters.AddWithValue("@Patronymic", em.Patronymic);
