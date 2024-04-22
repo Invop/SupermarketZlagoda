@@ -1,5 +1,3 @@
-
-
 using Blazored.LocalStorage;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Radzen;
@@ -11,11 +9,10 @@ namespace SupermarketZlagoda
     public class Program
     {
         public static void Main(string[] args)
-        {   
+        {
             //SqliteDataAccess.InitDatabaseAndTables();
 
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddScoped<UserState>();
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
@@ -37,7 +34,6 @@ namespace SupermarketZlagoda
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
             app.Run();
-            
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿@page "/customer-card"
-@using SupermarketZlagoda.Data
-@inject UserState UserState
+@inject User User
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
 <FluentToolbar id="toolbar-fluent-components">
@@ -12,18 +11,17 @@
         <FluentRadio Value="@(0)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
     </FluentRadioGroup>
-@if (IsManager)
-{
-    <FluentSelect Items="@PercentageOptions"
-                  TOption="Option<int?>"
-                  Label="Select a discount percentage"
-                  Width="100px"
-                  OptionText="@(i => i.Text.ToString())"
-                  OptionValue="@(i => i.Value.ToString())"
-                  @bind-SelectedOption="@selectedPercentageOption"
-                  ValueChanged="@OnSelectedPercentageChanged"
-    />
-}
+    @if (IsManager)
+    {
+        <FluentSelect Items="@PercentageOptions"
+                      TOption="Option<int?>"
+                      Label="Select a discount percentage"
+                      Width="100px"
+                      OptionText="@(i => i.Text.ToString())"
+                      OptionValue="@(i => i.Value.ToString())"
+                      @bind-SelectedOption="@selectedPercentageOption"
+                      ValueChanged="@OnSelectedPercentageChanged"/>
+    }
     <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by surname"></FluentTextField>
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 </FluentToolbar>

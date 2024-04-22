@@ -1,11 +1,9 @@
 ﻿@page "/store-products"
-@using SupermarketZlagoda.Data
-@inject UserState UserState
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
 @inject User User
 <FluentToolbar id="toolbar-fluent-components">
-    @if(IsManager)
+    @if (IsManager)
     {
         <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new store product</FluentButton>
     }
@@ -18,7 +16,7 @@
     <MultiselectDropdown Options="_categoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
     <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by UPC" Style="margin-top: 10px;"></FluentTextField>
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
-    </FluentToolbar>
+</FluentToolbar>
 <FluentDataGrid Items="@_items" ItemSize="54" Virtualize="true" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 1fr" Style="height: 600px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Upc)"/>
     <PropertyColumn Property="@(c => c.UpcProm)"/>
@@ -34,14 +32,15 @@
     @if (IsManager)
     {
         <TemplateColumn Title="Actions" Align="@Align.End">
-                @if (!context.IsPromotional)
-                {   
-                    if(string.IsNullOrEmpty(context.UpcProm))
-                    {
-                        <FluentButton OnClick="@(() => OpenAddPromoStoreProductDialog(context))">Add Promo</FluentButton>
-                    }
-                    <FluentButton OnClick="@(() =>OpenCreateNewProductBatchDialog(context))">New batch of product</FluentButton>
+            @if (!context.IsPromotional)
+            {
+                if (string.IsNullOrEmpty(context.UpcProm))
+                {
+                    <FluentButton OnClick="@(() => OpenAddPromoStoreProductDialog(context))">Add Promo</FluentButton>
                 }
+
+                <FluentButton OnClick="@(() => OpenCreateNewProductBatchDialog(context))">New batch of product</FluentButton>
+            }
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>
         </TemplateColumn>

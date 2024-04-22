@@ -1,7 +1,6 @@
 ﻿@page "/check"
-@using SupermarketZlagoda.Data
 @using Orientation = Microsoft.FluentUI.AspNetCore.Components.Orientation
-@inject UserState UserState
+@inject User User
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
 <FluentToolbar id="toolbar-fluent-components">
@@ -55,9 +54,9 @@
         This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
     </PaginationTextTemplate>
 </FluentPaginator>
-    @if (selectedEmployeeOption != null)
-    {
-        <div style="font-size: larger;  font-weight: bold; display: flex; justify-content: center;">
-            Total for @selectedEmployeeOption.Text is @TotalSum
-        </div>
+@if (selectedEmployeeOption != null)
+{
+    <div style="font-size: larger;  font-weight: bold; display: flex; justify-content: center;">
+        Total for @selectedEmployeeOption.Text is @TotalSum
+    </div>
 }

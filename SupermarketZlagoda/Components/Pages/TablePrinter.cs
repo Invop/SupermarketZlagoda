@@ -1,5 +1,8 @@
 ﻿using System.Text;
 using SupermarketZlagoda.Data.Model;
+
+namespace SupermarketZlagoda.Components.Pages;
+
 public class TablePrinter<T>
 {
     private IEnumerable<T> _items;
@@ -24,12 +27,17 @@ public class TablePrinter<T>
         sb.Append("<tr>");
         foreach (var prop in properties)
         {
+            if (typeof(T) == typeof(Employee) && (prop.Name == "UserLogin" || prop.Name == "UserPassword"))
+                continue;
+
             sb.Append($"<th>{prop.Name}</th>");
         }
+
         if (typeof(T) == typeof(Sale))
         {
             sb.Append("<th>Total Price</th>");
         }
+
         sb.Append("</tr>");
 
         foreach (var item in _items)
@@ -37,8 +45,12 @@ public class TablePrinter<T>
             sb.Append("<tr>");
             foreach (var prop in properties)
             {
+                if (typeof(T) == typeof(Employee) && (prop.Name == "UserLogin" || prop.Name == "UserPassword"))
+                    continue;
+
                 sb.Append($"<td>{prop.GetValue(item)}</td>");
             }
+
             if (typeof(T) == typeof(Sale))
             {
                 var sale = (Sale)(object)item;
@@ -48,6 +60,7 @@ public class TablePrinter<T>
 
             sb.Append("</tr>");
         }
+
         sb.Append("</table></body></html>");
         return sb.ToString();
     }

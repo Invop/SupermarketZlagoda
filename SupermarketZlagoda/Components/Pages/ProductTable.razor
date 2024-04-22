@@ -1,10 +1,9 @@
 ﻿@page "/products"
-@using SupermarketZlagoda.Data
-@inject UserState UserState
+@inject User User
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
 <FluentToolbar id="toolbar-fluent-components">
-    @if(IsManager)
+    @if (IsManager)
     {
         <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new product</FluentButton>
     }
@@ -15,17 +14,17 @@
     <MultiselectDropdown Options="_categoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
     <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by Name" Style="margin-top: 10px;"></FluentTextField>
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
-    </FluentToolbar>
+</FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Id)"/>
-    <PropertyColumn Title="Category" Property="@(c => _categories[c.CategoryId])" />
-    <PropertyColumn Property="@(c => c.Name)" Align="Align.Center" />
-    <PropertyColumn Property="@(c => c.Characteristics)" Align="Align.End" />
-    @if(IsManager)
+    <PropertyColumn Title="Category" Property="@(c => _categories[c.CategoryId])"/>
+    <PropertyColumn Property="@(c => c.Name)" Align="Align.Center"/>
+    <PropertyColumn Property="@(c => c.Characteristics)" Align="Align.End"/>
+    @if (IsManager)
     {
         <TemplateColumn Title="Actions" Align="@Align.End">
-            <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))" />
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>
         </TemplateColumn>
     }
 </FluentDataGrid>
