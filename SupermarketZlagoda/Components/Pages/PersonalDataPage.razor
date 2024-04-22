@@ -10,8 +10,8 @@
         <p><strong>Patronymic:</strong> @User.Data.Patronymic</p>
         <p><strong>Role:</strong> @User.Data.Role</p>
         <p><strong>Salary:</strong> @User.Data.Salary</p>
-        <p><strong>Date of Birth:</strong> @User.Data.DateOfBirth.ToString("yyyy-MM-dd")</p>
-        <p><strong>Date of Start:</strong> @User.Data.DateOfStart.ToString("yyyy-MM-dd")</p>
+        <p><strong>Date of Birth:</strong> @User.Data.DateOfBirth.ToString("dd.MM.yyyy")</p>
+        <p><strong>Date of Start:</strong> @User.Data.DateOfStart.ToString("dd.MM.yyyy")</p>
         <p><strong>Phone Number:</strong> @User.Data.PhoneNumber</p>
         <p><strong>City:</strong> @User.Data.City</p>
         <p><strong>Street:</strong> @User.Data.Street</p>
@@ -24,7 +24,6 @@
 @code {
     private async Task ChangePassword()
     {
-        // Реалізуйте код для зміни пароля
-        // Наприклад, перенаправте користувача на сторінку зміни пароля
+        
     }
 }
