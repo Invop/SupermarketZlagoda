@@ -64,7 +64,7 @@ public partial class StoreProductTable
 
     protected override async Task OnInitializedAsync()
     {
-        IsManager = UserState.IsManager;
+        IsManager = User.IsManager;
         await GetCategoryOptions();
         await GetStoreProductsAsync();
     }

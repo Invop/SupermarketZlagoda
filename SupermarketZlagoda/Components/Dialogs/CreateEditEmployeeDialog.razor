@@ -4,7 +4,7 @@
 @* Header *@
 <FluentDialogHeader ShowDismiss="true">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
-        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())"/>
         <FluentLabel Typo="Typography.PaneHeader">
             @Dialog.Instance.Parameters.Title
         </FluentLabel>
@@ -14,82 +14,94 @@
 @* Body *@
 <FluentDialogBody>
     <EditForm EditContext="_editContext">
-        <DataAnnotationsValidator />
+        <DataAnnotationsValidator/>
         <FluentTextField @bind-Value="@Content.Surname">Surname:</FluentTextField>
-            <FluentValidationMessage For="() => Content.Surname"></FluentValidationMessage>
-            <br/><br/>
-            <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
-            <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
-            <br/><br/>
-            <FluentTextField @bind-Value="@Content.Patronymic">Patronymic:</FluentTextField>
-            <FluentValidationMessage For="() => Content.Patronymic"></FluentValidationMessage>
-            <br/><br/>
-            <FluentSelect Items="@StringOptions"
-                          OptionText="@(i => i.Text)"
-                          OptionValue="@(i => i.Value)"
-                          OptionSelected="@(i => i.Selected)"
-                          @bind-Value="@Content.Role" 
-                          Label="Role:"/>
-            <FluentValidationMessage For="() => Content.Role"></FluentValidationMessage>
-            <br/><br/>
-            <FluentNumberField Min="0" @bind-Value="@Content.Salary">Salary:</FluentNumberField>
-            <FluentValidationMessage For="() => Content.Salary"></FluentValidationMessage>
-            <br/><br/>
-            <FluentDatePicker Value="@Content.DateOfStart.ToDateTime(TimeOnly.MinValue)"
-                              ValueChanged="@(e => Content.DateOfStart = DateOnly.FromDateTime((DateTime)e))"
-                              Label="Date of start"/>
-            <FluentValidationMessage For="() => Content.DateOfStart"></FluentValidationMessage>
-            <br/><br/>
-            <FluentDatePicker Value="@Content.DateOfBirth.ToDateTime(TimeOnly.MinValue)"
-                              ValueChanged="@(e => Content.DateOfBirth = DateOnly.FromDateTime((DateTime)e))"
-                              Label="Date of birth"/>
-            <FluentValidationMessage For="() => Content.DateOfBirth"></FluentValidationMessage>
-            <br/><br/>
-            <FluentTextField @bind-Value="@Content.PhoneNumber">Phone number:</FluentTextField>
-            <FluentValidationMessage For="() => Content.PhoneNumber"></FluentValidationMessage>
-            <br/><br/>
-            <FluentTextField @bind-Value="@Content.City">City:</FluentTextField>
-            <FluentValidationMessage For="() => Content.City"></FluentValidationMessage>
-            <br/><br/>
-            <FluentTextField @bind-Value="@Content.Street">Street:</FluentTextField>
-            <FluentValidationMessage For="() => Content.Street"></FluentValidationMessage>
-            <br/><br/>
-            <FluentTextField @bind-Value="@Content.ZipCode">Zip code:</FluentTextField>
-            <FluentValidationMessage For="() => Content.ZipCode"></FluentValidationMessage>
-            <style>
-                .fluent-dialog-body * {
-                    width: 100%;
-                }
-            </style>
+        <FluentValidationMessage For="() => Content.Surname"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField @bind-Value="@Content.Name">Name:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Name"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField @bind-Value="@Content.Patronymic">Patronymic:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Patronymic"></FluentValidationMessage>
+        <br/><br/>
+        <FluentSelect Items="@StringOptions"
+                      OptionText="@(i => i.Text)"
+                      OptionValue="@(i => i.Value)"
+                      OptionSelected="@(i => i.Selected)"
+                      @bind-Value="@Content.Role"
+                      Label="Role:"/>
+        <FluentValidationMessage For="() => Content.Role"></FluentValidationMessage>
+        <br/><br/>
+        <FluentNumberField Min="0" @bind-Value="@Content.Salary">Salary:</FluentNumberField>
+        <FluentValidationMessage For="() => Content.Salary"></FluentValidationMessage>
+        <br/><br/>
+        <FluentDatePicker @bind-Value="@Content.DateOfStart"
+                          Label="Date of start"/>
+        <FluentValidationMessage For="() => Content.DateOfStart"></FluentValidationMessage>
+        <br/><br/>
+        <FluentDatePicker @bind-Value="@Content.DateOfBirth"
+                          Label="Date of birth"/>
+        <FluentValidationMessage For="() => Content.DateOfBirth"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField @bind-Value="@Content.PhoneNumber">Phone number:</FluentTextField>
+        <FluentValidationMessage For="() => Content.PhoneNumber"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField @bind-Value="@Content.City">City:</FluentTextField>
+        <FluentValidationMessage For="() => Content.City"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField @bind-Value="@Content.Street">Street:</FluentTextField>
+        <FluentValidationMessage For="() => Content.Street"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField @bind-Value="@Content.ZipCode">Zip code:</FluentTextField>
+        <FluentValidationMessage For="() => Content.ZipCode"></FluentValidationMessage>
+        <br/><br/>
+        <FluentTextField @bind-Value="@Content.UserLogin">User login:</FluentTextField>
+        <FluentValidationMessage For="() => Content.UserLogin"></FluentValidationMessage>
+        <br/><br/>
+
+        <UpdatePasswordDialog IsDialog="false" Content="UserPassword" OnPasswordUpdate="PasswordUpdated"/>
+        <style>.fluent-dialog-body * { width: 100%; }</style>
     </EditForm>
 </FluentDialogBody>
 <FluentDialogFooter>
-        <FluentButton Type="ButtonType.Submit"
-                      Disabled="@(!_editContext.Validate())"
-                      Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
-        <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
-    </FluentDialogFooter>
-@code {
-    [Parameter]
-    public Employee Content { get; set; } = default!;
+    <FluentButton Type="ButtonType.Submit"
+                  Disabled="@(!_editContext.Validate() || string.IsNullOrEmpty(NewPassword) || NewPassword.Length < 6)"
+                  Appearance="Appearance.Accent"
+                  OnClick="@SaveAsync">
+        Save
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
 
-    [CascadingParameter]
-    public FluentDialog Dialog { get; set; } = default!;
+@code {
+    [Parameter] public Employee Content { get; set; } = default!;
+
+    public PasswordModel UserPassword = new();
+    private string NewPassword { get; set; } = string.Empty;
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = default!;
+
     private EditContext _editContext = default!;
+
     static readonly List<Option<string>> StringOptions =
     [
         new Option<string> { Value = "Manager", Text = "Manager" },
         new Option<string> { Value = "Cashier", Text = "Cashier", Selected = true }
     ];
-    
+
+    private void PasswordUpdated(string newPassword)
+    {
+        NewPassword = newPassword;
+    }
+
     protected override void OnInitialized()
     {
         _editContext = new EditContext(Content);
     }
-    
+
     private async Task SaveAsync()
     {
         if (!_editContext.Validate()) return;
+        Content.UserPassword = UserPassword.NewPassword;
         await Dialog.CloseAsync(Content);
     }
 

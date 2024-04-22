@@ -2,9 +2,7 @@
 @using SupermarketZlagoda.Data
 @inject UserState UserState
 @inject IDialogService DialogService
-
 @inject IJSRuntime IJS
-
 <FluentToolbar id="toolbar-fluent-components">
     @if (IsManager)
     {
@@ -57,4 +55,3 @@
         This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
     </PaginationTextTemplate>
 </FluentPaginator>
-

@@ -1,3 +1,6 @@
+
+
+using Blazored.LocalStorage;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Radzen;
 using SupermarketZlagoda.Components;
@@ -8,7 +11,7 @@ namespace SupermarketZlagoda
     public class Program
     {
         public static void Main(string[] args)
-        {
+        {   
             //SqliteDataAccess.InitDatabaseAndTables();
 
             var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +19,10 @@ namespace SupermarketZlagoda
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
-
-            builder.Services.AddRadzenComponents();
             builder.Services.AddFluentUIComponents();
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddScoped<User>();
+            builder.Services.AddRadzenComponents();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -33,6 +37,7 @@ namespace SupermarketZlagoda
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
             app.Run();
+            
         }
     }
 }

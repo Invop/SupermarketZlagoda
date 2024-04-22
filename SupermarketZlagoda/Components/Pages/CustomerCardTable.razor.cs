@@ -43,7 +43,7 @@ public partial class CustomerCardTable
     
     protected override async Task OnInitializedAsync()
     {
-        IsManager = UserState.IsManager;
+        IsManager = User.IsManager;
         await GetCustomerCardAsync();
         await GetPercentageAsync();
     }

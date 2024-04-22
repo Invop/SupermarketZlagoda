@@ -1,0 +1,117 @@
+﻿@page "/profile"
+@using System.Net.Http.Headers
+@using System.Text
+@using Blazored.LocalStorage
+@using Newtonsoft.Json
+@using SupermarketZlagoda.Components.Dialogs
+@using SupermarketZlagoda.Data.Model
+@inject User User
+@inject ILocalStorageService LocalStorage
+@inject IDialogService _dialogService
+<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <FluentCard style="width: 400px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <h1 style="text-align: center;">User Profile</h1>
+        <br/>
+        @if (User.Data != null)
+        {
+            <p>
+                <strong>Name:</strong> @User.Data?.Name
+            </p>
+            <p>
+                <strong>Surname:</strong> @User.Data?.Surname
+            </p>
+            <p>
+                <strong>Patronymic:</strong> @User.Data?.Patronymic
+            </p>
+            <p>
+                <strong>Role:</strong> @User.Data?.Role
+            </p>
+            <p>
+                <strong>Salary:</strong> @User.Data?.Salary
+            </p>
+            <p>
+                <strong>Date of Birth:</strong> @User.Data?.DateOfBirth.ToDateOnly()
+            </p>
+            <p>
+                <strong>Date of Start:</strong> @User.Data?.DateOfStart.ToDateOnly()
+            </p>
+            <p>
+                <strong>Phone Number:</strong> @User.Data?.PhoneNumber
+            </p>
+            <p>
+                <strong>City:</strong> @User.Data?.City
+            </p>
+            <p>
+                <strong>Street:</strong> @User.Data?.Street
+            </p>
+            <p>
+                <strong>Zip Code:</strong> @User.Data?.ZipCode
+            </p>
+        }
+    </FluentCard>
+    <br/>
+    <FluentButton Type="ButtonType.Button" Appearance="Appearance.Accent" style="width: 200px;" @onclick="ChangePassword">Change Password</FluentButton>
+</div>
+
+@code {
+
+    private readonly PasswordModel _passwordModel = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var userData = await LocalStorage.ContainKeyAsync("Authorized");
+            if (userData)
+            {
+                User.Data = await LocalStorage.GetItemAsync<Employee?>("UserData");
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task ChangePassword()
+    {
+        var dialogInstance = await _dialogService.ShowDialogAsync<UpdatePasswordDialog>(_passwordModel
+            , new DialogParameters
+            {
+                Title = "Change Password",
+                Height = "400px"
+            });
+
+        var result = await dialogInstance.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            var dialogData = (PasswordModel)result.Data;
+            var empl = User.Data;
+            if (empl != null)
+            {
+                empl.UserPassword = dialogData.NewPassword;
+
+                await UpdateEmployeeAsync(empl);
+                await _dialogService.ShowSuccessAsync("Password changed");
+            }
+            else
+                await _dialogService.ShowErrorAsync("Unable to update");
+        }
+    }
+
+    private async Task UpdateEmployeeAsync(Employee employee)
+    {
+        var employeeJson = JsonConvert.SerializeObject(employee);
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var content = new StringContent(employeeJson, Encoding.UTF8, "application/json");
+
+        var response
+            = await client.PutAsync($"https://localhost:5001/api/employees/{employee.Id}", content);
+
+        Console.WriteLine(response.IsSuccessStatusCode
+            ? "Employee successfully updated."
+            : $"Failed to update the employee. Status code: {response.StatusCode}");
+    }
+
+}

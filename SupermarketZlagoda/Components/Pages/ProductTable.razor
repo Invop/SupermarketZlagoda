@@ -3,7 +3,6 @@
 @inject UserState UserState
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
-
 <FluentToolbar id="toolbar-fluent-components">
     @if(IsManager)
     {
@@ -15,8 +14,8 @@
     </FluentRadioGroup>
     <MultiselectDropdown Options="_categoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
     <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by Name" Style="margin-top: 10px;"></FluentTextField>
-        <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
-</FluentToolbar>
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
+    </FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Style="height: 600px; width: 1500px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Id)"/>
     <PropertyColumn Title="Category" Property="@(c => _categories[c.CategoryId])" />

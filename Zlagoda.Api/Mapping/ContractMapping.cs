@@ -158,7 +158,9 @@ public static class ContractMapping
             PhoneNumber = request.PhoneNumber,
             City = request.City,
             Street = request.Street,
-            ZipCode = request.ZipCode
+            ZipCode = request.ZipCode,
+            UserLogin = request.UserLogin,
+            UserPassword = request.UserPassword
         };
     }
 
@@ -177,7 +179,9 @@ public static class ContractMapping
             PhoneNumber = em.PhoneNumber,
             City = em.City,
             Street = em.Street,
-            ZipCode = em.ZipCode
+            ZipCode = em.ZipCode,
+            UserLogin = em.UserLogin,
+            UserPassword = em.UserPassword
         };
     }
 
@@ -204,7 +208,9 @@ public static class ContractMapping
             PhoneNumber = request.PhoneNumber,
             City = request.City,
             Street = request.Street,
-            ZipCode = request.ZipCode
+            ZipCode = request.ZipCode,
+            UserLogin = request.UserLogin,
+            UserPassword = request.UserPassword
         };
     }
 
