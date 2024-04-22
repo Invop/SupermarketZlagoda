@@ -35,14 +35,24 @@
         <div class="row">
             <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
                 <RadzenCard class="w-100 mb-4">
-                    <RadzenCheckBox @bind-Value="@_showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                    <RadzenLabel Text="Show Data Labels" Component="dataLabels"
+                    <!-- Checkbox to switch between charts -->
+                    <RadzenCheckBox @bind-Value="@_showPriceChart" Name="chartSwitch"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Price Chart" Component="chartSwitch"
                                  Style="margin-left: 8px; vertical-align: middle;"/>
                 </RadzenCard>
                 <RadzenChart>
-                    <RadzenPieSeries Data="@_chartData" Title="Price" CategoryProperty="Name" ValueProperty="Price">
-                        <RadzenSeriesDataLabels Visible="@_showDataLabels"/>
-                    </RadzenPieSeries>
+                    @if (_showPriceChart)
+                    {
+                        <RadzenPieSeries Data="@_chartData" Title="Price" CategoryProperty="Name" ValueProperty="Price">
+                        </RadzenPieSeries>
+                    }
+                    else
+                    {
+                        <RadzenPieSeries Data="@_chartData" Title="Quantity" CategoryProperty="Name"
+                                         ValueProperty="Quantity">
+
+                        </RadzenPieSeries>
+                    }
                 </RadzenChart>
             </div>
         </div>

@@ -70,11 +70,13 @@ public partial class SalesSummaryChart : ComponentBase
 
 
     private bool _showDataLabels;
+    private bool _showPriceChart = true;
 
     private class DataItem
     {
         public string? Name { get; set; }
         public decimal Price { get; set; }
+        public int? Quantity { get; set; }
     }
 
     private static readonly HttpClient Client = new();
@@ -88,7 +90,8 @@ public partial class SalesSummaryChart : ComponentBase
         _products.AddRange(await GetAllStoreProductsAsync() ?? []);
         _sales = await GetAllSalesSummary() ?? [];
         _chartData = _sales.Select(s =>
-                new DataItem { Name = s.ProductName ?? string.Empty, Price = s.SellingPrice ?? 0 })
+                new DataItem
+                    { Name = s.ProductName ?? string.Empty, Price = s.SellingPrice ?? 0, Quantity = s.TotalQuantity })
             .ToArray();
         SaleAmount = _chartData.Sum(x => x.Price);
     }
@@ -102,7 +105,8 @@ public partial class SalesSummaryChart : ComponentBase
     {
         _sales = await GetAllSalesSummary() ?? [];
         _chartData = _sales.Select(s =>
-                new DataItem { Name = s.ProductName ?? string.Empty, Price = s.SellingPrice ?? 0 })
+                new DataItem
+                    { Name = s.ProductName ?? string.Empty, Price = s.SellingPrice ?? 0, Quantity = s.TotalQuantity })
             .ToArray();
         SaleAmount = _chartData.Sum(x => x.Price);
         StateHasChanged();
