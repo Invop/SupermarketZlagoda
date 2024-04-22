@@ -6,6 +6,7 @@ using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
+using SupermarketZlagoda.Data;
 using SupermarketZlagoda.Data.Model;
 
 namespace SupermarketZlagoda.Components.Pages;
@@ -21,59 +22,71 @@ public partial class CustomerCardTable
     private IQueryable<CustomerCard>? _items = Enumerable.Empty<CustomerCard>().AsQueryable();
     static List<Option<int?>> PercentageOptions = new() { };
     private static readonly HttpClient Client = new HttpClient();
-    
+
     private int SortType
     {
         get => _sortType;
-        set { _sortType = value;
+        set
+        {
+            _sortType = value;
             _ = GetCustomerCardAsync();
         }
     }
-    
+
     public string SearchTerm
     {
         get => _searchTerm;
-        set { _searchTerm = value;  _ = GetCustomerCardAsync();}
+        set
+        {
+            _searchTerm = value;
+            _ = GetCustomerCardAsync();
+        }
     }
-    
+
     private async Task OnSelectedPercentageChanged()
     {
         await GetCustomerCardAsync();
     }
-    
+
     protected override async Task OnInitializedAsync()
     {
         IsManager = User.IsManager;
         await GetCustomerCardAsync();
         await GetPercentageAsync();
     }
-    
+
     #region Api
+
     private async Task GetPercentageAsync()
     {
         var response = await Client.GetAsync("https://localhost:5001/api/customer-card");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
-            var customerCardList = JsonConvert.DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString());
-            
-            var uniquePercentages = customerCardList.Select(card => card.Percentage).Distinct().OrderBy(value => value).ToList();
-            
-            PercentageOptions = uniquePercentages.Select(value => new Option<int?> { Value = value, Text = value}).ToList();
+            var customerCardList =
+                JsonConvert.DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString());
+
+            var uniquePercentages = customerCardList.Select(card => card.Percentage).Distinct().OrderBy(value => value)
+                .ToList();
+
+            PercentageOptions = uniquePercentages.Select(value => new Option<int?> { Value = value, Text = value })
+                .ToList();
             PercentageOptions.Insert(0, new Option<int?> { Value = null, Text = null });
         }
     }
-    
+
     private async Task GetCustomerCardAsync()
     {
         var sortType = _sortType == 0 ? "asc" : "desc";
-        var response = await Client.GetAsync($"https://localhost:5001/api/customer-card/?SortBy=cust_surname,cust_name,cust_patronymic&SortOrder={sortType}&StartSurname={_searchTerm}&Percentage={selectedPercentageOption?.Value}");
+        var response =
+            await Client.GetAsync(
+                $"https://localhost:5001/api/customer-card/?SortBy=cust_surname,cust_name,cust_patronymic&SortOrder={sortType}&StartSurname={_searchTerm}&Percentage={selectedPercentageOption?.Value}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
             var customerCardList =
                 JsonConvert.DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString());
-            if(customerCardList != null) _items = customerCardList.AsQueryable();
+            if (customerCardList != null) _items = customerCardList.AsQueryable();
             StateHasChanged();
             await GetPercentageAsync();
         }
@@ -82,7 +95,7 @@ public partial class CustomerCardTable
             Console.WriteLine($"Error: {response.StatusCode}");
         }
     }
-    
+
     private async Task UpdateCustomerCardAsync(CustomerCard customerCard)
     {
         var customerCardJson = JsonConvert.SerializeObject(customerCard);
@@ -100,7 +113,7 @@ public partial class CustomerCardTable
             ? "Customer card successfully updated."
             : $"Failed to update the customer card. Status code: {response.StatusCode}");
     }
-    
+
 
     private async Task PostCustomerCardAsync(CustomerCard customerCard)
     {
@@ -135,9 +148,11 @@ public partial class CustomerCardTable
             Console.WriteLine($"Failed to delete the customer card. Status code: {response.StatusCode}");
         }
     }
+
     #endregion
-    
+
     #region Dialogs
+
     private async Task OpenCreateDialogAsync()
     {
         var context = new CustomerCard()
@@ -167,7 +182,7 @@ public partial class CustomerCardTable
             await GetCustomerCardAsync();
         }
     }
-    
+
     private async Task OpenEditDialogAsync(CustomerCard context)
     {
         var dialog = await DialogService.ShowDialogAsync<CreateEditCustomerCardDialog>(context, new DialogParameters()
@@ -185,9 +200,8 @@ public partial class CustomerCardTable
             await UpdateCustomerCardAsync(item);
             await GetCustomerCardAsync();
         }
-
     }
-    
+
     private async Task OpenDeleteDialog(CustomerCard context)
     {
         var dialog = await DialogService.ShowMessageBoxAsync(new DialogParameters<MessageBoxContent>()
@@ -213,13 +227,13 @@ public partial class CustomerCardTable
             await GetCustomerCardAsync();
         }
     }
-    
+
     #endregion
 
     private async Task PrintTable()
     {
         var printer = new TablePrinter<CustomerCard>(_items);
         var tableContent = printer.PrintTable();
-        await IJS.InvokeVoidAsync("printComponent", tableContent,"Customer cards");
+        await IJS.InvokeVoidAsync("printComponent", tableContent, "Customer cards");
     }
 }

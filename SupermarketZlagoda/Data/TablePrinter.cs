@@ -1,17 +1,10 @@
 ﻿using System.Text;
 using SupermarketZlagoda.Data.Model;
 
-namespace SupermarketZlagoda.Components.Pages;
+namespace SupermarketZlagoda.Data;
 
-public class TablePrinter<T>
+public class TablePrinter<T>(IEnumerable<T> items)
 {
-    private IEnumerable<T> _items;
-
-    public TablePrinter(IEnumerable<T> items)
-    {
-        _items = items;
-    }
-
     public string PrintTable()
     {
         var sb = new StringBuilder();
@@ -27,7 +20,7 @@ public class TablePrinter<T>
         sb.Append("<tr>");
         foreach (var prop in properties)
         {
-            if (typeof(T) == typeof(Employee) && (prop.Name == "UserLogin" || prop.Name == "UserPassword"))
+            if (typeof(T) == typeof(Employee) && prop.Name is "UserLogin" or "UserPassword")
                 continue;
 
             sb.Append($"<th>{prop.Name}</th>");
@@ -40,12 +33,12 @@ public class TablePrinter<T>
 
         sb.Append("</tr>");
 
-        foreach (var item in _items)
+        foreach (var item in items)
         {
             sb.Append("<tr>");
             foreach (var prop in properties)
             {
-                if (typeof(T) == typeof(Employee) && (prop.Name == "UserLogin" || prop.Name == "UserPassword"))
+                if (typeof(T) == typeof(Employee) && prop.Name is "UserLogin" or "UserPassword")
                     continue;
 
                 sb.Append($"<td>{prop.GetValue(item)}</td>");

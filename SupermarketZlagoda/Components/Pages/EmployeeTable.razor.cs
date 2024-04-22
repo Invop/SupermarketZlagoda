@@ -6,6 +6,7 @@ using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
+using SupermarketZlagoda.Data;
 using SupermarketZlagoda.Data.Model;
 
 namespace SupermarketZlagoda.Components.Pages;
@@ -185,12 +186,11 @@ public partial class EmployeeTable
             ? "Employee successfully deleted."
             : $"Failed to delete the employee. Status code: {response.StatusCode}");
     }
-    
+
     private async Task PrintTable()
     {
         var printer = new TablePrinter<Employee>(_items);
         var tableContent = printer.PrintTable();
-        await IJS.InvokeVoidAsync("printComponent", tableContent,"Employees");
+        await IJS.InvokeVoidAsync("printComponent", tableContent, "Employees");
     }
-
 }
