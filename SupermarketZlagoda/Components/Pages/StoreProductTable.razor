@@ -14,7 +14,9 @@
     <FluentCheckbox Label="Hide promotions" @bind-Value="HidePromotional"></FluentCheckbox>
     <FluentCheckbox Label="Hide non-promotions" @bind-Value="HideNonPromotional"></FluentCheckbox>
     <MultiselectDropdown Options="_categoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
-    <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by UPC" Style="margin-top: 10px;"></FluentTextField>
+    <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by UPC/product name"
+                     Style="margin-top: 10px;">
+    </FluentTextField>
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ItemSize="54" Virtualize="true" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 1fr" Style="height: 600px; overflow:auto;">

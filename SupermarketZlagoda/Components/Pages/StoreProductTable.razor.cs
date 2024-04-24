@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
@@ -22,14 +21,17 @@ public partial class StoreProductTable
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<StoreProduct>? _items = Enumerable.Empty<StoreProduct>().AsQueryable();
     private static readonly HttpClient Client = new HttpClient();
-    
+
     private int SortType
     {
         get => _sortType;
-        set { _sortType = value;
+        set
+        {
+            _sortType = value;
             _ = GetStoreProductsAsync();
         }
     }
+
     public bool HidePromotional
     {
         get => _hidePromotional;
@@ -40,9 +42,11 @@ public partial class StoreProductTable
             {
                 _hideNonPromotional = false;
             }
+
             _ = GetStoreProductsAsync();
         }
     }
+
     public bool HideNonPromotional
     {
         get => _hideNonPromotional;
@@ -53,13 +57,19 @@ public partial class StoreProductTable
             {
                 _hidePromotional = false;
             }
+
             _ = GetStoreProductsAsync();
         }
     }
+
     public string SearchTerm
     {
         get => _searchTerm;
-        set { _searchTerm = value;  _ = GetStoreProductsAsync();}
+        set
+        {
+            _searchTerm = value;
+            _ = GetStoreProductsAsync();
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -68,14 +78,18 @@ public partial class StoreProductTable
         await GetCategoryOptions();
         await GetStoreProductsAsync();
     }
+
     private string GenerateQueryStringFromCategoryOptions()
     {
-        return string.Join("&", _categoryOptions.Where(option => option.Selected).Select(option => $"Category={option.Value}"));
+        return string.Join("&",
+            _categoryOptions.Where(option => option.Selected).Select(option => $"Category={option.Value}"));
     }
+
     private async Task HandleSelectCategoryChange(List<SelectOption> selectedOptions)
     {
         await GetStoreProductsAsync();
     }
+
     #region Api
 
     private async Task GetCategoryOptions()
@@ -96,18 +110,22 @@ public partial class StoreProductTable
             Console.WriteLine($"Error: {response.StatusCode}");
         }
     }
+
     private async Task GetStoreProductsAsync()
-    {   
+    {
         var sortType = _sortType == 0 ? "asc" : "desc";
         bool? filterPromo = null;
         if (_hideNonPromotional) filterPromo = true;
         if (_hidePromotional) filterPromo = false;
         var categoryQuery = GenerateQueryStringFromCategoryOptions();
-        var response = await Client.GetAsync($"https://localhost:5001/api/store-products/?SortBy=products_number&SortOrder={sortType}&Promo={filterPromo}&{categoryQuery}&StartUpc={_searchTerm}");
+        var response =
+            await Client.GetAsync(
+                $"https://localhost:5001/api/store-products/?SortBy=products_number&SortOrder={sortType}&Promo={filterPromo}&{categoryQuery}&SearchQuery={_searchTerm}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
-            var productList = JsonConvert.DeserializeObject<List<StoreProduct>>(JObject.Parse(responseJson)["items"].ToString());
+            var productList =
+                JsonConvert.DeserializeObject<List<StoreProduct>>(JObject.Parse(responseJson)["items"].ToString());
             if (productList != null) _items = productList.AsQueryable();
             StateHasChanged();
         }
@@ -116,10 +134,11 @@ public partial class StoreProductTable
             Console.WriteLine($"Error: {response.StatusCode}");
         }
     }
+
     private async Task<StoreProduct?> GetProductByPromUpc(string upc)
     {
         var response = await Client.GetAsync($"https://localhost:5001/api/store-products/promo/{upc}");
-    
+
         if (response is { IsSuccessStatusCode: true, Content: not null })
         {
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -133,11 +152,12 @@ public partial class StoreProductTable
                     return product;
                 }
             }
-        } 
-    
+        }
+
         Console.WriteLine($"Error: {response.StatusCode}");
         return null;
     }
+
     private async Task PostStoreProductAsync(StoreProduct product)
     {
         var productJson = JsonConvert.SerializeObject(product);
@@ -153,6 +173,7 @@ public partial class StoreProductTable
             ? "Store Product successfully saved."
             : $"Failed to save the product. Status code: {response.StatusCode}");
     }
+
     private async Task UpdateStoreProductAsync(StoreProduct product, string contextUpc)
     {
         var productJson = JsonConvert.SerializeObject(product);
@@ -169,6 +190,7 @@ public partial class StoreProductTable
             ? "Product successfully updated."
             : $"Failed to update the product. Status code: {response.StatusCode}");
     }
+
     private async Task DeleteProductAsync(string? upc)
     {
         using var client = new HttpClient();
@@ -181,11 +203,11 @@ public partial class StoreProductTable
             ? "Product successfully deleted."
             : $"Failed to delete the product. Status code: {response.StatusCode}");
     }
-    
+
     #endregion
-    
+
     #region Dialogs
-    
+
     private async Task OpenCreateDialogAsync()
     {
         var context = new StoreProduct();
@@ -204,38 +226,41 @@ public partial class StoreProductTable
             await GetStoreProductsAsync();
         }
     }
+
     private async Task OpenAddPromoStoreProductDialog(StoreProduct context)
-    {   
+    {
         StoreProduct promoStoreProduct = new StoreProduct
-        {   
+        {
             ProductId = context.ProductId,
             Quantity = context.Quantity,
             Price = context.Price * 0.8m,
             IsPromotional = true,
         };
-        var dialog = await DialogService.ShowDialogAsync<CreateEditStoreProductDialog>(promoStoreProduct, new DialogParameters()
-        {
-            Height = "400px",
-            Title = $"Create new promo product",
-            PreventDismissOnOverlayClick = true,
-            PreventScroll = true,
-        });
-        
+        var dialog = await DialogService.ShowDialogAsync<CreateEditStoreProductDialog>(promoStoreProduct,
+            new DialogParameters
+            {
+                Height = "400px",
+                Title = "Create new promo product",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true
+            });
+
         var result = await dialog.Result;
         if (result is { Cancelled: false, Data: not null })
         {
             var item = result.Data as StoreProduct;
             context.UpcProm = item.Upc;
             context.Quantity -= item.Quantity;
-            await UpdateStoreProductAsync(context,context.Upc);
+            await UpdateStoreProductAsync(context, context.Upc);
             await PostStoreProductAsync(item);
             await GetStoreProductsAsync();
         }
     }
+
     private async Task OpenCreateNewProductBatchDialog(StoreProduct context)
-    {   
+    {
         StoreProduct product = new StoreProduct
-        {   
+        {
             Upc = context.Upc,
             Price = context.Price,
             IsPromotional = false,
@@ -247,7 +272,7 @@ public partial class StoreProductTable
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
         });
-        
+
         var result = await dialog.Result;
         if (result is { Cancelled: false, Data: not null })
         {
@@ -256,10 +281,11 @@ public partial class StoreProductTable
             Console.WriteLine(item.Quantity);
             context.Quantity += item.Quantity;
             context.Price = item.Price;
-            await UpdateStoreProductAsync(context,context.Upc);
+            await UpdateStoreProductAsync(context, context.Upc);
             await GetStoreProductsAsync();
         }
     }
+
     private async Task OpenEditDialogAsync(StoreProduct context)
     {
         var prevUpc = context.Upc;
@@ -270,7 +296,7 @@ public partial class StoreProductTable
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
         });
-        
+
         var result = await dialog.Result;
         if (result is { Cancelled: false, Data: not null })
         {
@@ -279,13 +305,14 @@ public partial class StoreProductTable
             {
                 var notPromoProduct = await GetProductByPromUpc(prevUpc);
                 notPromoProduct.Quantity -= item.Quantity;
-                await UpdateStoreProductAsync(notPromoProduct,notPromoProduct.Upc);
+                await UpdateStoreProductAsync(notPromoProduct, notPromoProduct.Upc);
             }
-            await UpdateStoreProductAsync(item,prevUpc);
+
+            await UpdateStoreProductAsync(item, prevUpc);
             await GetStoreProductsAsync();
         }
-            
     }
+
     private async Task OpenDeleteDialog(StoreProduct context)
     {
         var dialog = await DialogService.ShowMessageBoxAsync(new DialogParameters<MessageBoxContent>()
@@ -321,10 +348,11 @@ public partial class StoreProductTable
     }
 
     #endregion
+
     private async Task PrintTable()
     {
         var printer = new TablePrinter<StoreProduct>(_items);
         var tableContent = printer.PrintTable();
-        await IJS.InvokeVoidAsync("printComponent", tableContent,"Store products");
+        await IJS.InvokeVoidAsync("printComponent", tableContent, "Store products");
     }
 }
