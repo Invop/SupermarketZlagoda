@@ -120,6 +120,7 @@ public class StoreProductRepository : IStoreProductRepository
             command.Parameters.AddWithValue("@SearchQuery", parameters.SearchQuery);
         }
 
+        command.Parameters.AddWithValue("@MinProductPerCheckCount", parameters.MinProductPerCheckCount ?? 0);
         return command;
     }
 
@@ -133,7 +134,7 @@ public class StoreProductRepository : IStoreProductRepository
 
         if (!string.IsNullOrWhiteSpace(parameters.SearchQuery))
         {
-            commandText.Append(IsValidUPC(parameters.SearchQuery)
+            commandText.Append(IsValidUpc(parameters.SearchQuery)
                 ? " AND (UPC LIKE @SearchQuery + '%' OR UPC = @SearchQuery)"
                 : " AND (product_name LIKE @SearchQuery + '%' OR product_name = @SearchQuery)");
         }
@@ -154,7 +155,7 @@ public class StoreProductRepository : IStoreProductRepository
         }
     }
 
-    public bool IsValidUPC(string upc)
+    private bool IsValidUpc(string upc)
     {
         return upc.All(char.IsDigit);
     }
@@ -162,10 +163,14 @@ public class StoreProductRepository : IStoreProductRepository
     public async Task<IEnumerable<StoreProduct>> GetAllAsync(StoreProductQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = new StringBuilder(@"SELECT * FROM Store_Products 
-                                          INNER JOIN Products 
-                                          ON Store_Products.id_product = Products.id_product 
-                                          WHERE 1=1");
+        var commandText = new StringBuilder("""
+                                            SELECT sp.*, COUNT(s.check_number) AS ChecksCount
+                                                                                      FROM Store_Products AS sp
+                                                                                      INNER JOIN Products p ON sp.id_product = p.id_product
+                                                                                      LEFT JOIN (SELECT * FROM Sales WHERE product_number >= @MinProductPerCheckCount) AS s ON sp.UPC = s.UPC
+                                                                                      LEFT JOIN Checks AS ch ON s.check_number = ch.check_number
+                                                                                      GROUP BY sp.UPC, sp.id_product, sp.selling_price, sp.products_number, sp.promotional_product, sp.UPC_prom
+                                            """);
 
         AppendAdditionalCriteria(commandText, parameters);
 
@@ -188,7 +193,10 @@ public class StoreProductRepository : IStoreProductRepository
                 ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
                 Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
                 Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
-                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
+                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product")),
+                ChecksCount = reader.IsDBNull(reader.GetOrdinal("ChecksCount"))
+                    ? 0
+                    : reader.GetInt32(reader.GetOrdinal("ChecksCount"))
             };
             storeProducts.Add(storeProduct);
         }

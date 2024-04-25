@@ -9,4 +9,5 @@ public class StoreProductQueryParameters
 
     public string? StartUpc { get; set; }
     public string? SearchQuery { get; set; }
+    public int? MinProductPerCheckCount { get; set; } = 0;
 }

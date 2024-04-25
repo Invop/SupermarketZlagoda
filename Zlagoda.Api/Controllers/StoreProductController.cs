@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zlagoda.Api.Mapping;
-using Zlagoda.Application.Repositories;
 using Zlagoda.Application.Services;
 using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Contracts.Requests;
@@ -16,7 +15,7 @@ public class StoreProductController : ControllerBase
     {
         _productService = productService;
     }
-    
+
     [HttpPost(ApiEndpoints.StoreProducts.Create)]
     public async Task<IActionResult> Create([FromBody] CreateStoreProductRequest request)
     {
@@ -33,8 +32,11 @@ public class StoreProductController : ControllerBase
         {
             return NotFound();
         }
+
         return Ok(product.MapToStoreProductResponse());
     }
+
+
     [HttpGet(ApiEndpoints.StoreProducts.GetByPromoUpc)]
     public async Task<IActionResult> GetByPromoUpc([FromRoute] string upc)
     {
@@ -43,8 +45,10 @@ public class StoreProductController : ControllerBase
         {
             return NotFound();
         }
+
         return Ok(product.MapToStoreProductResponse());
     }
+
     [HttpGet(ApiEndpoints.StoreProducts.GetAll)]
     public async Task<IActionResult> GetAll([FromQuery] StoreProductQueryParameters? parameters)
     {
@@ -65,7 +69,7 @@ public class StoreProductController : ControllerBase
         [FromBody] UpdateStoreProductRequest request)
     {
         var product = request.MapToStoreProduct();
-        var updatedProduct = await _productService.UpdateAsync(product,prevUpc);
+        var updatedProduct = await _productService.UpdateAsync(product, prevUpc);
         if (updatedProduct is null)
         {
             return NotFound();
@@ -74,8 +78,8 @@ public class StoreProductController : ControllerBase
         var response = product.MapToStoreProductResponse();
         return Ok(response);
     }
-    
-    
+
+
     [HttpDelete(ApiEndpoints.StoreProducts.Delete)]
     public async Task<IActionResult> Delete([FromRoute] string upc)
     {
@@ -84,6 +88,7 @@ public class StoreProductController : ControllerBase
         {
             return NotFound();
         }
+
         return Ok();
     }
 }
