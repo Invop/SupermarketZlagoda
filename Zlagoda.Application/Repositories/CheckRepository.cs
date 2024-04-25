@@ -67,7 +67,7 @@ public class CheckRepository : ICheckRepository
             command.Parameters.AddWithValue("@PrintTimeStart", parameters.PrintTimeStart);
             command.Parameters.AddWithValue("@PrintTimeEnd", parameters.PrintTimeEnd);
         }
-        if (parameters.Employee != Guid.Empty)
+        if (parameters.Employee != null && parameters.Employee != Guid.Empty)
         {
             command.Parameters.AddWithValue("@Employee", parameters.Employee);
         }
@@ -96,21 +96,47 @@ public class CheckRepository : ICheckRepository
             commandText.Append(" AND id_employee = @Employee");
         }
     }
+
+    private StringBuilder WithProductsFromAllCategoriesQuery()
+    {
+        const string text
+            = """
+              SELECT *
+              FROM Checks
+              WHERE NOT EXISTS (SELECT *
+                                FROM Categories
+                                WHERE NOT EXISTS (SELECT *
+                                                  FROM Products
+                                                  WHERE Products.category_number = Categories.category_number
+                                                  AND Products.id_product IN (SELECT id_product
+                                                                              FROM Store_Products
+                                                                              WHERE Store_Products.UPC IN (SELECT UPC
+                                                                                                           FROM Sales
+                                                                                                           WHERE Sales.check_number = Checks.check_number))));
+              """;
+        return new StringBuilder(text);
+    }
+    
     public async Task<IEnumerable<Check>> GetAllAsync(CheckQueryParameters? parameters)
     {
         
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = new StringBuilder(@"SELECT * FROM Checks
+        StringBuilder commandText = new();
+        if (parameters.WithProductsFromAllCategories)
+        {
+            commandText = WithProductsFromAllCategoriesQuery();
+        }
+        else
+        {
+            commandText = new StringBuilder(@"SELECT * FROM Checks
                                                 WHERE 1=1");
-
-        AppendAdditionalCriteria(commandText, parameters);
-
+            AppendAdditionalCriteria(commandText, parameters);
+        }
         await using var command = new SqlCommand(commandText.ToString(), connection);
-        if(parameters != null)
+        if (parameters != null)
         {
             GetCommandWithParameters(parameters, command);
         }
-
         await using var reader = await command.ExecuteReaderAsync();
         var checks = new List<Check>();
         while (await reader.ReadAsync())
@@ -129,7 +155,7 @@ public class CheckRepository : ICheckRepository
         }
         return checks;
     }
-    
+
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();

@@ -16,6 +16,7 @@ public partial class CheckTable
     private int _sortType = 0;
     private Option<string?> selectedEmployeeOption;
     private decimal TotalSum = 0;
+    private bool _withProductsFromAllCategories;
     
     private DateTime? _dateFromValue = null;
     private DateTime? _dateToValue = null;
@@ -53,6 +54,16 @@ public partial class CheckTable
     {
         get => _checkSearchTerm;
         set { _checkSearchTerm = value;
+            _ = UpdateTable();
+        }
+    }
+    
+    private bool WithProductsFromAllCategories
+    {
+        get => _withProductsFromAllCategories;
+        set
+        {
+            _withProductsFromAllCategories = value;
             _ = UpdateTable();
         }
     }
@@ -137,8 +148,12 @@ public partial class CheckTable
         TotalSum = 0;
         var formattedFromDate = _dateFromValue?.ToString("yyyy-MM-dd HH:mm:ss");
         var formattedToDate = _dateToValue?.ToString("yyyy-MM-dd HH:mm:ss");
-
-        var response = await Client.GetAsync($"https://localhost:5001/api/check/?Employee={Guid.Parse(selectedEmployeeOption.Value)}&PrintTimeStart={formattedFromDate}&PrintTimeEnd={formattedToDate}");
+        var url = "https://localhost:5001/api/check/?";
+        if (!_withProductsFromAllCategories)
+            url +=
+                $"Employee={Guid.Parse(selectedEmployeeOption.Value)}&PrintTimeStart={formattedFromDate}&PrintTimeEnd={formattedToDate}";
+        else url += "WithProductsFromAllCategories=true";
+        var response = await Client.GetAsync(url);
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
