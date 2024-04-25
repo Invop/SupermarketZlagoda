@@ -66,16 +66,17 @@ public static class ContractMapping
         };
     }
 
-    public static StoreProductResponse MapToStoreProductResponse(this StoreProduct movie)
+    public static StoreProductResponse MapToStoreProductResponse(this StoreProduct storeProduct)
     {
-        return new StoreProductResponse()
+        return new StoreProductResponse
         {
-            Upc = movie.Upc,
-            UpcProm = movie.UpcProm,
-            ProductId = movie.ProductId,
-            Price = movie.Price,
-            Quantity = movie.Quantity,
-            IsPromotional = movie.IsPromotional
+            Upc = storeProduct.Upc,
+            UpcProm = storeProduct.UpcProm,
+            ProductId = storeProduct.ProductId,
+            Price = storeProduct.Price,
+            Quantity = storeProduct.Quantity,
+            IsPromotional = storeProduct.IsPromotional,
+            CheckCount = storeProduct.ChecksCount
         };
     }
 

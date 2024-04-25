@@ -11,4 +11,5 @@ public interface ICustomerCardRepository
     Task<bool> UpdateAsync(CustomerCard customerCard);
     Task<bool> DeleteByIdAsync(Guid id);
     Task<bool> ExistsByIdAsync(Guid id);
+    Task<IEnumerable<CustomerCard>> GetZapitDataAsync();
 }

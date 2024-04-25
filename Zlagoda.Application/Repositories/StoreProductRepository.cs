@@ -120,28 +120,30 @@ public class StoreProductRepository : IStoreProductRepository
             command.Parameters.AddWithValue("@SearchQuery", parameters.SearchQuery);
         }
 
+        command.Parameters.AddWithValue("@MinProductPerCheckCount", parameters.MinProductPerCheckCount ?? 0);
         return command;
     }
 
     private void AppendAdditionalCriteria(StringBuilder commandText, StoreProductQueryParameters? parameters)
     {
         if (parameters == null) return;
+        commandText.Append(" HAVING 1=1");
         if (parameters.Promo.HasValue)
         {
-            commandText.Append(" AND promotional_product = @Promo");
+            commandText.Append(" AND sp.promotional_product = @Promo");
         }
 
-        if (!string.IsNullOrWhiteSpace(parameters.SearchQuery))
+        if (!string.IsNullOrEmpty(parameters.SearchQuery))
         {
-            commandText.Append(IsValidUPC(parameters.SearchQuery)
-                ? " AND (UPC LIKE @SearchQuery + '%' OR UPC = @SearchQuery)"
-                : " AND (product_name LIKE @SearchQuery + '%' OR product_name = @SearchQuery)");
+            commandText.Append(IsValidUpc(parameters.SearchQuery)
+                ? " AND ((sp.UPC LIKE @SearchQuery + '%') OR (sp.UPC = @SearchQuery))"
+                : " AND ((p.product_name LIKE @SearchQuery + '%') OR (p.product_name = @SearchQuery))");
         }
 
         if (parameters.Category != null && parameters.Category.Any())
         {
             var ids = parameters.Category.Select((id, index) => $"@Category{index}").ToArray();
-            commandText.Append($" AND category_number IN ({string.Join(",", ids)})");
+            commandText.Append($" AND p.category_number IN ({string.Join(",", ids)})");
         }
 
         if (!string.IsNullOrEmpty(parameters.SortBy))
@@ -154,7 +156,7 @@ public class StoreProductRepository : IStoreProductRepository
         }
     }
 
-    public bool IsValidUPC(string upc)
+    private bool IsValidUpc(string upc)
     {
         return upc.All(char.IsDigit);
     }
@@ -162,10 +164,14 @@ public class StoreProductRepository : IStoreProductRepository
     public async Task<IEnumerable<StoreProduct>> GetAllAsync(StoreProductQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = new StringBuilder(@"SELECT * FROM Store_Products 
-                                          INNER JOIN Products 
-                                          ON Store_Products.id_product = Products.id_product 
-                                          WHERE 1=1");
+        var commandText = new StringBuilder("""
+                                            SELECT sp.*, COUNT(s.check_number) AS ChecksCount
+                                            FROM Store_Products AS sp
+                                            INNER JOIN Products p ON sp.id_product = p.id_product
+                                            LEFT JOIN (SELECT * FROM Sales WHERE product_number >= @MinProductPerCheckCount) AS s ON sp.UPC = s.UPC
+                                            LEFT JOIN Checks AS ch ON s.check_number = ch.check_number
+                                            GROUP BY sp.UPC, sp.id_product, sp.selling_price, sp.products_number, sp.promotional_product, sp.UPC_prom, p.category_number
+                                            """);
 
         AppendAdditionalCriteria(commandText, parameters);
 
@@ -188,7 +194,10 @@ public class StoreProductRepository : IStoreProductRepository
                 ProductId = reader.GetGuid(reader.GetOrdinal("id_product")),
                 Price = reader.GetDecimal(reader.GetOrdinal("selling_price")),
                 Quantity = reader.GetInt32(reader.GetOrdinal("products_number")),
-                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product"))
+                IsPromotional = reader.GetBoolean(reader.GetOrdinal("promotional_product")),
+                ChecksCount = reader.IsDBNull(reader.GetOrdinal("ChecksCount"))
+                    ? 0
+                    : reader.GetInt32(reader.GetOrdinal("ChecksCount"))
             };
             storeProducts.Add(storeProduct);
         }

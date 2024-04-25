@@ -8,4 +8,5 @@ public class StoreProduct
     public required decimal Price { get; set; }
     public required int Quantity { get; set; }
     public required bool IsPromotional { get; set; }
+    public int ChecksCount { get; set; }
 }

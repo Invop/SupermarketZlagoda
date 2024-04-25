@@ -14,17 +14,22 @@
     <FluentCheckbox Label="Hide promotions" @bind-Value="HidePromotional"></FluentCheckbox>
     <FluentCheckbox Label="Hide non-promotions" @bind-Value="HideNonPromotional"></FluentCheckbox>
     <MultiselectDropdown Options="_categoryOptions" OnSelectChanged="@HandleSelectCategoryChange"/>
-    <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by UPC/product name"
-                     Style="margin-top: 10px;">
-    </FluentTextField>
+    <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"/>
+    <br/>
+    <br/>
+    <br/>
+    <FluentTextField @bind-Value="SearchTerm" Label="Пошук:" Placeholder="Search by UPC/name"/>
+    <FluentNumberField TValue="int" Min="0" Step="1" @bind-Value="@MinSoldCount" Label="Кількість проданих товарів :"/>
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 </FluentToolbar>
+<br/>
 <FluentDataGrid Items="@_items" ItemSize="54" Virtualize="true" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 1fr" Style="height: 600px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Upc)"/>
     <PropertyColumn Property="@(c => c.UpcProm)"/>
     <PropertyColumn Property="@(c => c.ProductId)"/>
     <PropertyColumn Property="@(c => c.Price)"/>
     <PropertyColumn Property="@(c => c.Quantity)"/>
+    <PropertyColumn Property="@(c => c.CheckCount)"/>
     <TemplateColumn Title="PromotionalProduct">
         @if (context.IsPromotional)
         {

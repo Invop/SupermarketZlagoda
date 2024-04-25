@@ -20,4 +20,6 @@ public record StoreProduct
     public decimal Price { get; set; } = decimal.Zero;
 
     public int Quantity { get; set; } = 0;
+
+    public int CheckCount { get; set; }
 }

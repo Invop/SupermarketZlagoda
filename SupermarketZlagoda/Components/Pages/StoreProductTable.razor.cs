@@ -72,6 +72,19 @@ public partial class StoreProductTable
         }
     }
 
+    private int _minSoldCount;
+
+    private int MinSoldCount
+    {
+        get => _minSoldCount;
+        set
+        {
+            _minSoldCount = value;
+            Console.WriteLine(_minSoldCount);
+            _ = GetStoreProductsAsync();
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         IsManager = User.IsManager;
@@ -120,7 +133,7 @@ public partial class StoreProductTable
         var categoryQuery = GenerateQueryStringFromCategoryOptions();
         var response =
             await Client.GetAsync(
-                $"https://localhost:5001/api/store-products/?SortBy=products_number&SortOrder={sortType}&Promo={filterPromo}&{categoryQuery}&SearchQuery={_searchTerm}");
+                $"https://localhost:5001/api/store-products/?SortBy=products_number&SortOrder={sortType}&Promo={filterPromo}&{categoryQuery}&SearchQuery={_searchTerm}&MinProductPerCheckCount={MinSoldCount}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();

@@ -12,7 +12,7 @@ public class CustomerCardService : ICustomerCardService
     {
         _customerCardRepository = customerCardRepository;
     }
-    
+
     public async Task<bool> CreateAsync(CustomerCard customerCard)
     {
         return await _customerCardRepository.CreateAsync(customerCard);
@@ -35,6 +35,7 @@ public class CustomerCardService : ICustomerCardService
         {
             return null;
         }
+
         await _customerCardRepository.UpdateAsync(customerCard);
         return customerCard;
     }
@@ -42,5 +43,10 @@ public class CustomerCardService : ICustomerCardService
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
         return await _customerCardRepository.DeleteByIdAsync(id);
+    }
+
+    public async Task<IEnumerable<CustomerCard>> GetZapitDataAsync()
+    {
+        return await _customerCardRepository.GetZapitDataAsync();
     }
 }
