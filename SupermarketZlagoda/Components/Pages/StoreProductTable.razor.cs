@@ -80,6 +80,7 @@ public partial class StoreProductTable
         set
         {
             _minSoldCount = value;
+            Console.WriteLine(_minSoldCount);
             _ = GetStoreProductsAsync();
         }
     }
