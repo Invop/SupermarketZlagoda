@@ -43,6 +43,8 @@ public partial class CustomerCardTable
         }
     }
 
+    private IQueryable<CustomerCard>? _zapitdata = Enumerable.Empty<CustomerCard>().AsQueryable();
+
     private async Task OnSelectedPercentageChanged()
     {
         await GetCustomerCardAsync();
@@ -51,11 +53,24 @@ public partial class CustomerCardTable
     protected override async Task OnInitializedAsync()
     {
         IsManager = User.IsManager;
+        await GetZapitData();
         await GetCustomerCardAsync();
         await GetPercentageAsync();
     }
 
     #region Api
+
+    private async Task GetZapitData()
+    {
+        var response = await Client.GetAsync("https://localhost:5001/api/customer-card/zapit");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            _zapitdata = JsonConvert
+                .DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString())
+                .AsQueryable();
+        }
+    }
 
     private async Task GetPercentageAsync()
     {

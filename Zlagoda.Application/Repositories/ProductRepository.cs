@@ -12,11 +12,13 @@ public class ProductRepository : IProductRepository
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
     private readonly Lazy<IStoreProductService> _storeProductService;
+
     public ProductRepository(IDbConnectionFactory dbConnectionFactory, Lazy<IStoreProductService> storeProductService)
     {
         _dbConnectionFactory = dbConnectionFactory;
         _storeProductService = storeProductService;
     }
+
     public async Task<bool> CreateAsync(Product product)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -45,6 +47,7 @@ public class ProductRepository : IProductRepository
             };
             return product;
         }
+
         return null;
     }
 
@@ -57,10 +60,12 @@ public class ProductRepository : IProductRepository
                 new SqlParameter($"@Category{index}", SqlDbType.UniqueIdentifier) { Value = id }).ToArray();
             command.Parameters.AddRange(categoryParameters);
         }
+
         if (!string.IsNullOrWhiteSpace(parameters.ProductTitleMatch))
         {
             command.Parameters.AddWithValue("@ProductTitleMatch", $"{parameters.ProductTitleMatch}");
         }
+
         return command;
     }
 
@@ -73,10 +78,13 @@ public class ProductRepository : IProductRepository
             var ids = parameters.Category.Select((id, index) => $"@Category{index}").ToArray();
             commandText.Append($" AND category_number IN ({string.Join(",", ids)})");
         }
+
         if (!string.IsNullOrWhiteSpace(parameters.ProductTitleMatch))
         {
-            commandText.Append(" AND (product_name LIKE '%'+ @ProductTitleMatch +'%' OR product_name = @ProductTitleMatch)");
+            commandText.Append(
+                " AND (product_name LIKE '%'+ @ProductTitleMatch +'%' OR product_name = @ProductTitleMatch)");
         }
+
         if (!string.IsNullOrEmpty(parameters.SortBy))
         {
             commandText.Append($" ORDER BY {parameters.SortBy}");
@@ -85,7 +93,6 @@ public class ProductRepository : IProductRepository
                 commandText.Append($" {parameters.SortOrder}");
             }
         }
-
     }
 
     public async Task<IEnumerable<Product>> GetAllAsync(ProductQueryParameters? parameters)
@@ -95,7 +102,7 @@ public class ProductRepository : IProductRepository
 
         AppendAdditionalCriteria(commandText, parameters);
         using var command = new SqlCommand(commandText.ToString(), connection);
-        if(parameters != null)
+        if (parameters != null)
         {
             GetCommandWithParameters(parameters, command);
         }
@@ -116,7 +123,7 @@ public class ProductRepository : IProductRepository
 
         return products;
     }
-    
+
     public async Task<IEnumerable<Product>> GetAllSortedDescendingAsync()
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -135,19 +142,18 @@ public class ProductRepository : IProductRepository
             };
             products.Add(product);
         }
+
         return products;
     }
 
     public async Task<IEnumerable<Product>> GetAllUnusedAsync()
     {
-        var allStoreItems = await _storeProductService.Value.GetAllAsync(null);
+        var allStoreItems = await _storeProductService.Value.GetAllAsync(new StoreProductQueryParameters
+            { MinProductPerCheckCount = 0 });
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var unusedProductIds = allStoreItems.Select(item => item.ProductId).Distinct();
         var productIds = unusedProductIds.ToList();
-         if (productIds.Count == 0)
-         {
-             return await GetAllAsync(null);
-         }
+        if (productIds.Count == 0) return await GetAllAsync(null);
 
         string idsString = string.Join(",", productIds.Select(id => $"'{id}'"));
         var commandText = $"SELECT * FROM Products WHERE id_product NOT IN ({idsString})";
@@ -165,8 +171,8 @@ public class ProductRepository : IProductRepository
             };
             products.Add(product);
         }
+
         return products;
-        
     }
 
     public async Task<IEnumerable<Product>> GetAllUnusedAndCurrentAsync(Guid id)
@@ -215,5 +221,4 @@ public class ProductRepository : IProductRepository
         var result = await command.ExecuteScalarAsync();
         return Convert.ToInt32(result) > 0;
     }
-    
 }

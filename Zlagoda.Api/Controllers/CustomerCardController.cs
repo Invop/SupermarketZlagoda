@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zlagoda.Api.Mapping;
-using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Application.Services;
+using Zlagoda.Contracts.QueryParameters;
 using Zlagoda.Contracts.Requests;
 
 namespace Zlagoda.Api.Controllers;
@@ -15,7 +15,7 @@ public class CustomerCardController : ControllerBase
     {
         _customerCardService = customerCardService;
     }
-    
+
     [HttpPost(ApiEndpoints.CustomerCards.Create)]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCardRequest request)
     {
@@ -32,9 +32,18 @@ public class CustomerCardController : ControllerBase
         {
             return NotFound();
         }
+
         return Ok(customerCard.MapToProductResponse());
     }
-    
+
+    [HttpGet(ApiEndpoints.CustomerCards.GetZapitData)]
+    public async Task<IActionResult> GetAll()
+    {
+        var customerCards = await _customerCardService.GetZapitDataAsync();
+        var customerCardsResponse = customerCards.MapToProductResponse();
+        return Ok(customerCardsResponse);
+    }
+
     [HttpGet(ApiEndpoints.CustomerCards.GetAll)]
     public async Task<IActionResult> GetAll([FromQuery] CustomerCardQueryParameters? parameters)
     {
@@ -58,8 +67,8 @@ public class CustomerCardController : ControllerBase
         var response = customerCard.MapToProductResponse();
         return Ok(response);
     }
-    
-    
+
+
     [HttpDelete(ApiEndpoints.CustomerCards.Delete)]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
@@ -68,6 +77,7 @@ public class CustomerCardController : ControllerBase
         {
             return NotFound();
         }
+
         return Ok();
     }
 }

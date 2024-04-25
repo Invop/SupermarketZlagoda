@@ -53,3 +53,36 @@
         This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
     </PaginationTextTemplate>
 </FluentPaginator>
+
+
+<FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"/>
+<h1>Всі карти клієнтів, які мають хоча б один чек, де містяться тільки акційні товари</h1>
+
+<FluentDataGrid Items="@_zapitdata" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1.1fr 1fr 1.2fr 1fr 1.2fr 0.9fr 1fr 1fr 0.6fr"
+                Style="height: 600px; width: 1500px; overflow:auto;">
+    <PropertyColumn Property="@(c => c.Id)"/>
+    <PropertyColumn Property="@(c => c.Surname)"/>
+    <PropertyColumn Property="@(c => c.Name)"/>
+    <PropertyColumn Property="@(c => c.Patronymic)"/>
+    <PropertyColumn Property="@(c => c.Phone)"/>
+    <PropertyColumn Property="@(c => c.Percentage)"/>
+    <PropertyColumn Property="@(c => c.City)"/>
+    <PropertyColumn Property="@(c => c.Street)"/>
+    <PropertyColumn Property="@(c => c.Index)"/>
+    <TemplateColumn Title="Actions" Align="@Align.End">
+        <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
+        @if (IsManager)
+        {
+            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>
+        }
+    </TemplateColumn>
+
+</FluentDataGrid>
+<FluentPaginator State="@_pagination">
+    <SummaryTemplate>
+        There are <strong>@(_pagination.TotalItemCount ?? 0)</strong> rows
+    </SummaryTemplate>
+    <PaginationTextTemplate>
+        This is page <strong>@(_pagination.CurrentPageIndex + 1)</strong> out of a total of <strong>@(_pagination.LastPageIndex + 1)</strong> pages
+    </PaginationTextTemplate>
+</FluentPaginator>

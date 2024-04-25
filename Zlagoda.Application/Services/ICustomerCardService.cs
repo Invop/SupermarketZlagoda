@@ -10,4 +10,5 @@ public interface ICustomerCardService
     Task<IEnumerable<CustomerCard>> GetAllAsync(CustomerCardQueryParameters? parameters);
     Task<CustomerCard?> UpdateAsync(CustomerCard customerCard);
     Task<bool> DeleteByIdAsync(Guid id);
+    Task<IEnumerable<CustomerCard>> GetZapitDataAsync();
 }

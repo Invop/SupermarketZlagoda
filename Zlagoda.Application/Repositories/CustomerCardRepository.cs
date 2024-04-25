@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Data.SqlClient;
 using Zlagoda.Application.Database;
 using Zlagoda.Application.Models;
@@ -15,6 +14,7 @@ public class CustomerCardRepository : ICustomerCardRepository
     {
         _dbConnectionFactory = dbConnectionFactory;
     }
+
     public async Task<bool> CreateAsync(CustomerCard customerCard)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -25,26 +25,29 @@ public class CustomerCardRepository : ICustomerCardRepository
         command.Parameters.AddWithValue("@Id", customerCard.Id);
         command.Parameters.AddWithValue("@Surname", customerCard.Surname);
         command.Parameters.AddWithValue("@Name", customerCard.Name);
-        if(string.IsNullOrEmpty(customerCard.Patronymic))
+        if (string.IsNullOrEmpty(customerCard.Patronymic))
             command.Parameters.AddWithValue("@Patronymic", DBNull.Value);
         else
         {
             command.Parameters.AddWithValue("@Patronymic", customerCard.Patronymic);
         }
+
         command.Parameters.AddWithValue("@Phone", customerCard.Phone);
-        if(string.IsNullOrEmpty(customerCard.City))
+        if (string.IsNullOrEmpty(customerCard.City))
             command.Parameters.AddWithValue("@City", DBNull.Value);
         else
         {
             command.Parameters.AddWithValue("@City", customerCard.City);
         }
-        if(string.IsNullOrEmpty(customerCard.Street))
+
+        if (string.IsNullOrEmpty(customerCard.Street))
             command.Parameters.AddWithValue("@Street", DBNull.Value);
         else
         {
             command.Parameters.AddWithValue("@Street", customerCard.Street);
         }
-        if(string.IsNullOrEmpty(customerCard.Index))
+
+        if (string.IsNullOrEmpty(customerCard.Index))
             command.Parameters.AddWithValue("@Index", DBNull.Value);
         else
         {
@@ -83,6 +86,7 @@ public class CustomerCardRepository : ICustomerCardRepository
                 customerCard.Index = reader.GetString(reader.GetOrdinal("zip_code"));
             return customerCard;
         }
+
         return null;
     }
 
@@ -92,11 +96,12 @@ public class CustomerCardRepository : ICustomerCardRepository
         {
             command.Parameters.AddWithValue("@Percentage", parameters.Percentage);
         }
+
         if (!string.IsNullOrWhiteSpace(parameters.StartSurname))
         {
             command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
         }
-    
+
         return command;
     }
 
@@ -107,13 +112,15 @@ public class CustomerCardRepository : ICustomerCardRepository
         {
             commandText.Append(" AND (cust_surname LIKE @StartSurname + '%' OR cust_surname = @StartSurname)");
         }
+
         if (parameters.Percentage != null)
         {
             commandText.Append(" AND [percent] = @Percentage");
         }
+
         if (!string.IsNullOrEmpty(parameters.SortBy))
         {
-            var sortColumns = parameters.SortBy.Split(','); 
+            var sortColumns = parameters.SortBy.Split(',');
             commandText.Append(" ORDER BY ");
             for (int i = 0; i < sortColumns.Length; i++)
             {
@@ -122,14 +129,15 @@ public class CustomerCardRepository : ICustomerCardRepository
                 {
                     commandText.Append($" {parameters.SortOrder}");
                 }
+
                 if (i < sortColumns.Length - 1)
                 {
-                    commandText.Append(", "); 
+                    commandText.Append(", ");
                 }
             }
         }
     }
-    
+
     public async Task<IEnumerable<CustomerCard>> GetAllAsync(CustomerCardQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -139,7 +147,7 @@ public class CustomerCardRepository : ICustomerCardRepository
         AppendAdditionalCriteria(commandText, parameters);
 
         await using var command = new SqlCommand(commandText.ToString(), connection);
-        if(parameters != null)
+        if (parameters != null)
         {
             GetCommandWithParameters(parameters, command);
         }
@@ -166,9 +174,9 @@ public class CustomerCardRepository : ICustomerCardRepository
                 customerCard.Index = reader.GetString(reader.GetOrdinal("zip_code"));
             customerCards.Add(customerCard);
         }
+
         return customerCards;
     }
-
 
 
     public async Task<bool> UpdateAsync(CustomerCard customerCard)
@@ -181,26 +189,29 @@ public class CustomerCardRepository : ICustomerCardRepository
         command.Parameters.AddWithValue("@Id", customerCard.Id);
         command.Parameters.AddWithValue("@Surname", customerCard.Surname);
         command.Parameters.AddWithValue("@Name", customerCard.Name);
-        if(string.IsNullOrEmpty(customerCard.Patronymic))
+        if (string.IsNullOrEmpty(customerCard.Patronymic))
             command.Parameters.AddWithValue("@Patronymic", DBNull.Value);
         else
         {
             command.Parameters.AddWithValue("@Patronymic", customerCard.Patronymic);
         }
+
         command.Parameters.AddWithValue("@Phone", customerCard.Phone);
-        if(string.IsNullOrEmpty(customerCard.City))
+        if (string.IsNullOrEmpty(customerCard.City))
             command.Parameters.AddWithValue("@City", DBNull.Value);
         else
         {
             command.Parameters.AddWithValue("@City", customerCard.City);
         }
-        if(string.IsNullOrEmpty(customerCard.Street))
+
+        if (string.IsNullOrEmpty(customerCard.Street))
             command.Parameters.AddWithValue("@Street", DBNull.Value);
         else
         {
             command.Parameters.AddWithValue("@Street", customerCard.Street);
         }
-        if(string.IsNullOrEmpty(customerCard.Index))
+
+        if (string.IsNullOrEmpty(customerCard.Index))
             command.Parameters.AddWithValue("@Index", DBNull.Value);
         else
         {
@@ -231,5 +242,50 @@ public class CustomerCardRepository : ICustomerCardRepository
         var result = await command.ExecuteScalarAsync();
         return Convert.ToInt32(result) > 0;
     }
-    
+
+    public async Task<IEnumerable<CustomerCard>> GetZapitDataAsync()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        const string commandText = """
+                                   
+                                                       SELECT DISTINCT cc.card_number, cc.cust_surname, cc.cust_name, cc.cust_patronymic, cc.phone_number, cc.city, cc.street, cc.zip_code, cc.[percent]
+                                                       FROM Customer_Cards cc
+                                                       WHERE NOT EXISTS (
+                                                           SELECT 1
+                                                           FROM Checks c
+                                                           JOIN Sales s ON c.check_number = s.check_number
+                                                           JOIN Store_Products sp ON s.UPC = sp.UPC
+                                                           WHERE cc.card_number = c.card_number
+                                                           HAVING COUNT(DISTINCT CASE WHEN sp.promotional_product = 1 THEN 1 END) <> 1
+                                                       )
+                                   """;
+
+
+        using var command = new SqlCommand(commandText, connection);
+
+        using var reader = await command.ExecuteReaderAsync();
+        var customerCards = new List<CustomerCard>();
+        while (await reader.ReadAsync())
+        {
+            var customerCard = new CustomerCard
+            {
+                Id = reader.GetGuid(reader.GetOrdinal("card_number")),
+                Surname = reader.GetString(reader.GetOrdinal("cust_surname")),
+                Name = reader.GetString(reader.GetOrdinal("cust_name")),
+                Phone = reader.GetString(reader.GetOrdinal("phone_number")),
+                Percentage = reader.GetInt32(reader.GetOrdinal("percent"))
+            };
+            if (!reader.IsDBNull(reader.GetOrdinal("cust_patronymic")))
+                customerCard.Patronymic = reader.GetString(reader.GetOrdinal("cust_patronymic"));
+            if (!reader.IsDBNull(reader.GetOrdinal("city")))
+                customerCard.City = reader.GetString(reader.GetOrdinal("city"));
+            if (!reader.IsDBNull(reader.GetOrdinal("street")))
+                customerCard.Street = reader.GetString(reader.GetOrdinal("street"));
+            if (!reader.IsDBNull(reader.GetOrdinal("zip_code")))
+                customerCard.Index = reader.GetString(reader.GetOrdinal("zip_code"));
+            customerCards.Add(customerCard);
+        }
+
+        return customerCards;
+    }
 }
