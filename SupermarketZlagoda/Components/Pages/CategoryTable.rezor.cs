@@ -14,6 +14,8 @@ namespace SupermarketZlagoda.Components.Pages;
 public partial class CategoryTable
 {
     private int _sortType = 0;
+    private bool _withCounts;
+    private int? _minStoreProdCount;
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Category> _items = Enumerable.Empty<Category>().AsQueryable();
     private static readonly HttpClient Client = new HttpClient();
@@ -28,11 +30,32 @@ public partial class CategoryTable
             _ = GetCategoriesAsync();
         }
     }
+    private int? MinStoreProdCount
+    {
+        get => _minStoreProdCount;
+        set { _minStoreProdCount = value;
+            _ = GetCategoriesAsync();
+        }
+    }
+    private bool WithCounts
+    {
+        get => _withCounts;
+        set { _withCounts = value;
+            _minStoreProdCount = _withCounts ? 0 : null;
+            _ = GetCategoriesAsync();
+        }
+    }
 
     private async Task GetCategoriesAsync()
     {   
-        var sortType = _sortType == 0 ? "asc" : "desc";
-        var response = await Client.GetAsync($"https://localhost:5001/api/categories/?SortBy=category_name&SortOrder={sortType}");
+        var url = "https://localhost:5001/api/categories/?";
+        if (!_withCounts)
+        {
+            var sortType = _sortType == 0 ? "asc" : "desc";
+            url += $"SortBy=category_name&SortOrder={sortType}";
+        }
+        else url += $"MinStoreProdCount={_minStoreProdCount}";
+        var response = await Client.GetAsync(url);
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();

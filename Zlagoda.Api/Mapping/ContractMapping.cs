@@ -119,7 +119,9 @@ public static class ContractMapping
         return new CategoryResponse()
         {
             Id = category.Id,
-            Name = category.Name
+            Name = category.Name,
+            CountStoreProducts = category.CountStoreProducts,
+            CountPromoProducts = category.CountPromoProducts
         };
     }
 

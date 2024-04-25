@@ -44,13 +44,41 @@ public class CategoryRepository : ICategoryRepository
 
         return null;
     }
+
+    private StringBuilder WithCountsQuery()
+    {
+        var text
+            = """
+              SELECT c.category_number,
+                     category_name,
+                     COUNT(sp.id_product) AS total_products,
+                     SUM(IIF(sp.UPC_prom IS NOT NULL, 1, 0)) AS promo_products
+              FROM Categories c LEFT JOIN Products p ON c.category_number = p.category_number
+                   LEFT JOIN Store_Products sp ON p.id_product = sp.id_product
+              WHERE sp.promotional_product IS NULL OR sp.promotional_product = 0
+              GROUP BY c.category_number, category_name
+              HAVING COUNT(sp.id_product) >= @min;
+              """;
+        return new StringBuilder(text);
+    }
     
     public async Task<IEnumerable<Category>> GetAllAsync(CategoryQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = new StringBuilder("SELECT * FROM Categories");
-        AppendAdditionalCriteria(commandText, parameters);
+        StringBuilder commandText = new();
+        var countIsNotNull = parameters.MinStoreProdCount is not null;
+        if (countIsNotNull)
+        {
+            commandText = WithCountsQuery();
+        }
+        else
+        {
+            commandText = new StringBuilder("SELECT * FROM Categories");
+            AppendAdditionalCriteria(commandText, parameters);
+        }
         using var command = new SqlCommand(commandText.ToString(), connection);
+        if (countIsNotNull)
+            command.Parameters.AddWithValue("@min", parameters.MinStoreProdCount);
         using var reader = await command.ExecuteReaderAsync();
         var categories = new List<Category>();
         while (await reader.ReadAsync())
@@ -60,6 +88,11 @@ public class CategoryRepository : ICategoryRepository
                 Id = reader.GetGuid(reader.GetOrdinal("category_number")),
                 Name = reader.GetString(reader.GetOrdinal("category_name"))
             };
+            if (countIsNotNull)
+            {
+                category.CountStoreProducts = reader.GetInt32(reader.GetOrdinal("total_products"));
+                category.CountPromoProducts = reader.GetInt32(reader.GetOrdinal("promo_products"));
+            }
             categories.Add(category);
         }
         return categories;
