@@ -12,7 +12,7 @@ namespace SupermarketZlagoda.Components.Pages;
 public partial class CheckTable
 {
     private bool IsManager { get; set; } = false;
-    private string _checkSearchTerm = String.Empty;
+    private string? _checkSearchTerm = String.Empty;
     private int _sortType = 0;
     private Option<string?> selectedEmployeeOption;
     private decimal TotalSum = 0;
@@ -50,7 +50,7 @@ public partial class CheckTable
             _ = UpdateTable();
         }
     }
-    private string CheckSearchTerm
+    private string? CheckSearchTerm
     {
         get => _checkSearchTerm;
         set { _checkSearchTerm = value;
@@ -88,8 +88,8 @@ public partial class CheckTable
                 .DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
             foreach (var employee in employees)
             {
-                _employees[employee.Id] = employee.Surname;
-                _employeesOptions.Add(new SelectOption(employee.Id, employee.Surname));
+                _employees[employee.Id] = $"{employee.Surname} {employee.Name} {employee.Patronymic}";
+                _employeesOptions.Add(new SelectOption(employee.Id, $"{employee.Surname} {employee.Name} {employee.Patronymic}"));
             }
         }
         else
@@ -109,8 +109,8 @@ public partial class CheckTable
             
             foreach (var customerCard in customers)
             {
-                _customerCards[customerCard.Id] = customerCard.Surname;
-                _customerCardsOptions.Add(new SelectOption(customerCard.Id, customerCard.Surname));
+                _customerCards[customerCard.Id] = $"{customerCard.Surname} {customerCard.Name} {customerCard.Patronymic}";
+                _customerCardsOptions.Add(new SelectOption(customerCard.Id, $"{customerCard.Surname} {customerCard.Name} {customerCard.Patronymic}"));
             }
         }
         else
@@ -151,7 +151,7 @@ public partial class CheckTable
         var url = "https://localhost:5001/api/check/?";
         if (!_withProductsFromAllCategories)
             url +=
-                $"Employee={Guid.Parse(selectedEmployeeOption.Value)}&PrintTimeStart={formattedFromDate}&PrintTimeEnd={formattedToDate}";
+                $"Employee={Guid.Parse(selectedEmployeeOption.Value)}&PrintTimeStart={formattedFromDate}&PrintTimeEnd={formattedToDate}&StartIdCheck={CheckSearchTerm}";
         else url += "WithProductsFromAllCategories=true";
         var response = await Client.GetAsync(url);
         if (response.IsSuccessStatusCode)

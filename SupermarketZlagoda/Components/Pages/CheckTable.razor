@@ -6,8 +6,8 @@
 <FluentToolbar id="toolbar-fluent-components">
     @if (!IsManager)
     {
-        <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new check</FluentButton>
-        <FluentTextField @bind-Value="CheckSearchTerm" Placeholder="Search by Id"></FluentTextField>
+        <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)" >Add new check</FluentButton>
+        <FluentTextField @bind-Value="CheckSearchTerm" Placeholder="Search by Id" Disabled="@WithProductsFromAllCategories"></FluentTextField>
     }
     @if (IsManager)
     {
