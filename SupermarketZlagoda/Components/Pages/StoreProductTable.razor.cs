@@ -255,7 +255,12 @@ public partial class StoreProductTable
 
     private async Task OpenAddPromoStoreProductDialog(StoreProduct context)
     {
-        if (context.Quantity <= 0) return;
+        if (context.Quantity <= 0)
+        {
+            var msg = await DialogService.ShowInfoAsync("Quantity != 0");
+            var msgResult = await msg.Result;
+            return;
+        }
 
         StoreProduct promoStoreProduct = new StoreProduct
         {
