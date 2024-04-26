@@ -71,10 +71,10 @@ public class CheckRepository : ICheckRepository
         {
             command.Parameters.AddWithValue("@Employee", parameters.Employee);
         }
-        // if (parameters.StartIdCheck != null)
-        // {
-        //     command.Parameters.AddWithValue("@StartIdCheck", parameters.StartIdCheck);
-        // }
+        if (!string.IsNullOrEmpty(parameters.StartIdCheck))
+        {
+            command.Parameters.AddWithValue("@StartIdCheck", parameters.StartIdCheck);
+        }
 
         return command;
     }
@@ -87,10 +87,11 @@ public class CheckRepository : ICheckRepository
         {
             commandText.Append(" AND (print_date >= @PrintTimeStart AND print_date <= @PrintTimeEnd)");
         }
-        // if (parameters.StartIdCheck != null)
-        // {
-        //     commandText.Append(" AND (check_number LIKE @StartIdCheck + '%' OR check_number = @StartIdCheck)");
-        // }
+        if (!string.IsNullOrEmpty(parameters.StartIdCheck))
+        {
+            commandText.Append(" AND CAST(check_number AS nvarchar(MAX)) LIKE '%' + @StartIdCheck + '%'");
+        }
+
         if (parameters.Employee != Guid.Empty)
         {
             commandText.Append(" AND id_employee = @Employee");

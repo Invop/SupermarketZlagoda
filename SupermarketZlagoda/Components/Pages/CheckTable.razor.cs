@@ -8,9 +8,7 @@ using Newtonsoft.Json.Linq;
 using SupermarketZlagoda.Components.Dialogs;
 using SupermarketZlagoda.Data;
 using SupermarketZlagoda.Data.Model;
-
 namespace SupermarketZlagoda.Components.Pages;
-
 public partial class CheckTable
 {
     private bool IsManager { get; set; } = false;
@@ -19,55 +17,47 @@ public partial class CheckTable
     private Option<string?> selectedEmployeeOption;
     private decimal TotalSum = 0;
     private bool _withProductsFromAllCategories;
-
+    
     private DateTime? _dateFromValue = null;
     private DateTime? _dateToValue = null;
-
+    
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Check>? _items = Enumerable.Empty<Check>().AsQueryable();
     private List<Option<string?>> employeeOptionsSort = new List<Option<string?>>();
     private static readonly HttpClient Client = new HttpClient();
     private Dictionary<Guid, string> _employees = new();
     private List<SelectOption> _employeesOptions = [];
-
+    
     private Dictionary<Guid, string>? _customerCards = new();
     private List<SelectOption> _customerCardsOptions = [];
-
+    
     private Dictionary<Guid, string>? _storeProducts = new();
     private List<SelectOption> _storeProductsOptions = [];
-
+    
     public static List<Sale> SalesList { get; set; } = new List<Sale>();
-
+    
     private DateTime? DateFromValue
     {
         get => _dateFromValue;
-        set
-        {
-            _dateFromValue = value;
+        set { _dateFromValue = value;
             _ = UpdateTable();
         }
     }
-
     private DateTime? DateToValue
     {
         get => _dateToValue;
-        set
-        {
-            _dateToValue = value;
+        set { _dateToValue = value;
             _ = UpdateTable();
         }
     }
-
-    private string CheckSearchTerm
+    private string? CheckSearchTerm
     {
         get => _checkSearchTerm;
-        set
-        {
-            _checkSearchTerm = value;
+        set { _checkSearchTerm = value;
             _ = UpdateTable();
         }
     }
-
+    
     private bool WithProductsFromAllCategories
     {
         get => _withProductsFromAllCategories;
@@ -77,7 +67,7 @@ public partial class CheckTable
             _ = UpdateTable();
         }
     }
-
+    
     protected override async Task OnInitializedAsync()
     {
         IsManager = User.IsManager;
@@ -88,7 +78,6 @@ public partial class CheckTable
         await UpdateStoreProductOptions();
         await UpdateTable();
     }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -101,7 +90,6 @@ public partial class CheckTable
             }
         }
     }
-
     private async Task UpdateEmployeeOptions()
     {
         var response = await Client.GetAsync("https://localhost:5001/api/employees");
@@ -121,7 +109,7 @@ public partial class CheckTable
             Console.WriteLine($"Error Employee: {response.StatusCode}");
         }
     }
-
+    
     private async Task UpdateCustomerOptions()
     {
         var response = await Client.GetAsync("https://localhost:5001/api/customer-card");
@@ -130,7 +118,7 @@ public partial class CheckTable
             var responseJson = await response.Content.ReadAsStringAsync();
             var customers = JsonConvert
                 .DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString());
-
+            
             foreach (var customerCard in customers)
             {
                 _customerCards[customerCard.Id] = customerCard.Surname;
@@ -142,22 +130,19 @@ public partial class CheckTable
             Console.WriteLine($"Error Customer: {response.StatusCode}");
         }
     }
-
+    
     private async Task GetEmployeesInCheckAsync()
     {
         var response = await Client.GetAsync($"https://localhost:5001/api/employees/?InCheck=true");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
-            var employees =
-                JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
+            var employees = JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
             if (employees != null)
             {
-                employeeOptionsSort = employees.Select(e => new Option<string?>
-                    { Value = e.Id.ToString(), Text = $"{e.Surname} {e.Name} {e.Patronymic}" }).ToList();
+                employeeOptionsSort = employees.Select(e => new Option<string?> { Value = e.Id.ToString(), Text = $"{e.Surname} {e.Name} {e.Patronymic}" }).ToList();
                 employeeOptionsSort.Insert(0, new Option<string?> { Value = Guid.Empty.ToString(), Text = "All" });
             }
-
             StateHasChanged();
         }
         else
@@ -165,12 +150,11 @@ public partial class CheckTable
             Console.WriteLine($"Error: {response.StatusCode}");
         }
     }
-
     private async Task OnSelectedEmployeeChanged()
     {
         await UpdateTable();
     }
-
+    
     private async Task UpdateTable()
     {
         TotalSum = 0;
@@ -192,7 +176,6 @@ public partial class CheckTable
                 _items = checkList.AsQueryable();
                 TotalSum = checkList.Sum(check => check.SumTotal);
             }
-
             StateHasChanged();
             await GetEmployeesInCheckAsync();
         }
@@ -208,14 +191,13 @@ public partial class CheckTable
         _dateToValue = DateTime.Now.Date.AddDays(1).AddTicks(-1);
         await UpdateTable();
     }
-
     private async Task ResetDate()
     {
         _dateFromValue = null;
         _dateToValue = null;
         await UpdateTable();
     }
-
+    
     private async Task OpenCreateDialogAsync()
     {
         var context = new Check
@@ -242,7 +224,7 @@ public partial class CheckTable
             await UpdateTable();
         }
     }
-
+    
     private async Task PostSaleAsync(Sale sale)
     {
         var saleJson = JsonConvert.SerializeObject(sale);
@@ -257,8 +239,9 @@ public partial class CheckTable
         Console.WriteLine(response.IsSuccessStatusCode
             ? "Sale successfully saved."
             : $"Failed to save the sale. Status code: {response.StatusCode}");
+        
     }
-
+    
     private async Task UpdateStoreProductOptions()
     {
         var response = await Client.GetAsync("https://localhost:5001/api/store-products");
@@ -267,7 +250,7 @@ public partial class CheckTable
             var responseJson = await response.Content.ReadAsStringAsync();
             var customers = JsonConvert
                 .DeserializeObject<List<StoreProduct>>(JObject.Parse(responseJson)["items"].ToString());
-
+            
             foreach (var storeProduct in customers)
             {
                 _storeProducts[storeProduct.ProductId] = storeProduct.Upc;
@@ -279,11 +262,11 @@ public partial class CheckTable
             Console.WriteLine($"Error Sale: {response.StatusCode}");
         }
     }
-
+    
     private async Task<StoreProduct?> GetProductByUpc(string upc)
     {
         var response = await Client.GetAsync($"https://localhost:5001/api/store-products/{upc}");
-
+    
         if (response is { IsSuccessStatusCode: true, Content: not null })
         {
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -297,12 +280,11 @@ public partial class CheckTable
                     return product;
                 }
             }
-        }
-
+        } 
+    
         Console.WriteLine($"Error: {response.StatusCode}");
         return null;
     }
-
     private async Task UpdateStoreProductAsync(StoreProduct product, string contextUpc)
     {
         var productJson = JsonConvert.SerializeObject(product);
@@ -319,7 +301,7 @@ public partial class CheckTable
             ? "Product successfully updated."
             : $"Failed to update the product. Status code: {response.StatusCode}");
     }
-
+    
     private async Task PostCheckAsync(Check check)
     {
         var employeeJson = JsonConvert.SerializeObject(check);
@@ -352,8 +334,9 @@ public partial class CheckTable
         {
             Console.WriteLine($"Failed to save the check. Status code: {response.StatusCode}");
         }
+        
     }
-
+    
     private async Task OpenDeleteDialogAsync(Check check)
     {
         var dialog = await DialogService.ShowMessageBoxAsync(new DialogParameters<MessageBoxContent>
@@ -378,7 +361,6 @@ public partial class CheckTable
             await UpdateTable();
         }
     }
-
     private async Task DeleteSaleAsync(Guid guid)
     {
         using var client = new HttpClient();
@@ -396,7 +378,6 @@ public partial class CheckTable
             Console.WriteLine($"Failed to delete the check. Status code: {response.StatusCode}");
         }
     }
-
     private async Task DeleteCheckAsync(Guid guid)
     {
         using var client = new HttpClient();
@@ -414,7 +395,7 @@ public partial class CheckTable
             Console.WriteLine($"Failed to delete the check. Status code: {response.StatusCode}");
         }
     }
-
+    
     private async Task OpenCheckAsync(Check check)
     {
         var dialog = await DialogService.ShowDialogAsync<OpenCheckDialog>(check, new DialogParameters()
@@ -426,11 +407,11 @@ public partial class CheckTable
         });
         var result = await dialog.Result;
     }
-
+    
     private async Task PrintTable()
     {
         var printer = new TablePrinter<Check>(_items);
         var tableContent = printer.PrintTable();
-        await IJS.InvokeVoidAsync("printComponent", tableContent, "Checks");
+        await IJS.InvokeVoidAsync("printComponent", tableContent,"Checks");
     }
 }

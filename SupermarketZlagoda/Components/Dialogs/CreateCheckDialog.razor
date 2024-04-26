@@ -31,26 +31,26 @@
      <FluentCombobox Style="width: 100%" Items="@_customerList"
                                     Label="Customer:"
                                     OptionValue="@(customerCard => customerCard.Id.ToString())"
-                                    OptionText="@(customerCard => customerCard.Surname)"
+                                    OptionText="@(customerCard => customerCard.Surname + " " + customerCard.Name + " " + customerCard.Patronymic)"
                                     @bind-SelectedOption="@CustomerCard">
-                        <OptionTemplate Context="optionContext">
-                            @optionContext.Surname
-                        </OptionTemplate>
-                    </FluentCombobox>
+         <OptionTemplate Context="optionContext">
+             @($"{optionContext.Surname} {optionContext.Name} {optionContext.Patronymic}")
+         </OptionTemplate>
+         </FluentCombobox>
     <br/><br/>
     <FluentDatePicker Label="Print Date" ReadOnly="true" Value="@Content.PrintDate" ValueChanged="@(e =>@Content.PrintDate = e.ToDateTime())" />
     <FluentTimePicker ReadOnly="true" Value="@Content.PrintDate" ValueChanged="@(e => @Content.PrintDate = e.ToDateTime())" />
     <br/><br/>
     <FluentDivider></FluentDivider>
-    <FluentCombobox Style="width: 100%" Items="@_storeProductsList"
-                    Label="Add new product:"
-                    OptionValue="@(storeProduct => storeProduct.Upc)"
-                    OptionText="@(storeProduct => storeProduct.Upc)"
-                    @bind-SelectedOption="@StoreProduct">
-        <OptionTemplate Context="optionContext">
-            @optionContext.Upc
-        </OptionTemplate>
-    </FluentCombobox>
+<FluentCombobox Style="width: 100%" Items="@_storeProductsList"
+                Label="Add new product:"
+                OptionValue="@(storeProduct => storeProduct.Upc)"
+                OptionText="@(storeProduct => $"{storeProduct.Upc} - {_productNames[storeProduct.Upc]} {(storeProduct.IsPromotional ? "- Promotional" : "")}")"
+                @bind-SelectedOption="@StoreProduct">
+    <OptionTemplate Context="optionContext">
+           @($"{optionContext.Upc} - {_productNames[optionContext.Upc]} {(optionContext.IsPromotional ? " - Promotional" : "")}")
+            </OptionTemplate>
+</FluentCombobox>
     <br/><br/>
     <FluentButton Appearance="Appearance.Accent" OnClick="@AddNewSale" Style="width: 100%">Add product</FluentButton>
     <FluentDataGrid GridTemplateColumns="1fr 1fr 1fr 1fr" Items=SalesList.AsQueryable()>
@@ -99,7 +99,7 @@
 
     private List<Sale> SalesList = new List<Sale>();
 
-
+    private Dictionary<string, string> _productNames = new Dictionary<string, string>();
     protected override async Task OnInitializedAsync()
     {
         User.Data = await LocalStorage.GetItemAsync<Employee?>("UserData");
@@ -107,6 +107,11 @@
         await InitializeStoreProductListAsync();
         CheckStoreProductAndActIfNeeded();
         SetCustomerCard();
+        foreach (var storeProduct in _storeProductsList)
+        {
+            await GetProductNameAsync(storeProduct);
+        }
+        
     }
     
 
@@ -252,5 +257,35 @@
             Console.WriteLine($"Error retrieving sales for check {Content.IdCheck}. Status code: {response.StatusCode}");
         }
 
+    }
+    
+    private async Task GetProductNameAsync(StoreProduct storeProduct)
+    {
+        try
+        {
+            Guid id = storeProduct.ProductId;
+            var response = await Client.GetAsync($"https://localhost:5001/api/products/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var product = JsonConvert.DeserializeObject<Product>(responseJson);
+                if (product != null)
+                {
+                    _productNames.Add(storeProduct.Upc, product.Name);
+                }
+                else
+                {
+                    Console.WriteLine($"Product with ID {id} not found.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode} - Couldn't retrieve product name for id: {id}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting product name: {ex.Message}");
+        }
     }
 }
