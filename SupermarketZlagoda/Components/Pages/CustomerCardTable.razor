@@ -1,9 +1,12 @@
 ﻿@page "/customer-card"
+@using Blazored.LocalStorage
 @inject User User
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
+@inject ILocalStorageService localStorage
+
 <FluentToolbar id="toolbar-fluent-components">
-    @if (IsManager)
+    @if (User.IsManager)
     {
         <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new card customer</FluentButton>
     }
@@ -11,7 +14,7 @@
         <FluentRadio Value="@(0)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by surname<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
     </FluentRadioGroup>
-    @if (IsManager)
+    @if (User.IsManager)
     {
         <FluentSelect Items="@PercentageOptions"
                       TOption="Option<int?>"
@@ -49,7 +52,7 @@
     <PropertyColumn Property="@(c => c.ProductNumber)"/>
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
-        @if (IsManager)
+        @if (User.IsManager)
         {
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>
         }
@@ -87,7 +90,7 @@
         <PropertyColumn Property="@(c => c.Index)"/>
         <TemplateColumn Title="Actions" Align="@Align.End">
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
-            @if (IsManager)
+            @if (User.IsManager)
             {
                 <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialog(context))"/>
             }

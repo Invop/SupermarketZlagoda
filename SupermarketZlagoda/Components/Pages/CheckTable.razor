@@ -1,15 +1,17 @@
 ﻿@page "/check"
+@using Blazored.LocalStorage
 @using Orientation = Microsoft.FluentUI.AspNetCore.Components.Orientation
 @inject User User
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
+@inject ILocalStorageService localStorage
 <FluentToolbar id="toolbar-fluent-components">
-    @if (!IsManager)
+    @if (!User.IsManager)
     {
         <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new check</FluentButton>
         <FluentTextField @bind-Value="CheckSearchTerm" Placeholder="Search by Id"></FluentTextField>
     }
-    @if (IsManager)
+    @if (User.IsManager)
     {
         <FluentSelect Items=@employeeOptionsSort
                       TOption="Option<string?>"
@@ -41,7 +43,7 @@
     <PropertyColumn Property="@(c => c.Vat)"/>
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Open())" OnClick="@(() => OpenCheckAsync(context))"/>
-        @if (IsManager)
+        @if (User.IsManager)
         {
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialogAsync(context))"/>
         }

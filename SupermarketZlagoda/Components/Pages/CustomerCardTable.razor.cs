@@ -21,7 +21,7 @@ public partial class CustomerCardTable
 
     private DateTime? _dateFromValue = null;
     private DateTime? _dateToValue = null;
-    
+
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<CustomerCard>? _items = Enumerable.Empty<CustomerCard>().AsQueryable();
     static List<Option<int?>> PercentageOptions = new() { };
@@ -30,19 +30,23 @@ public partial class CustomerCardTable
     private DateTime? DateFromValue
     {
         get => _dateFromValue;
-        set { 
+        set
+        {
             _dateFromValue = value;
             _ = GetCustomerCardAsync();
         }
     }
+
     private DateTime? DateToValue
     {
         get => _dateToValue;
-        set { _dateToValue = value;
+        set
+        {
+            _dateToValue = value;
             _ = GetCustomerCardAsync();
         }
     }
-    
+
     private int SortType
     {
         get => _sortType;
@@ -76,6 +80,19 @@ public partial class CustomerCardTable
         await GetZapitData();
         await GetCustomerCardAsync();
         await GetPercentageAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var userRole = await localStorage.ContainKeyAsync("IsManager");
+            if (userRole)
+            {
+                User.IsManager = await localStorage.GetItemAsync<bool>("IsManager");
+                StateHasChanged();
+            }
+        }
     }
 
     #region Api
@@ -273,23 +290,26 @@ public partial class CustomerCardTable
         _dateToValue = DateTime.Now.Date.AddDays(1).AddTicks(-1);
         await GetCustomerCardAsync();
     }
+
     private async Task ResetDate()
     {
         _dateFromValue = null;
         _dateToValue = null;
         await GetCustomerCardAsync();
     }
-    
+
     private async Task PrintTable()
     {
         var printer = new TablePrinter<CustomerCard>(_items);
         var tableContent = printer.PrintTable();
         await IJS.InvokeVoidAsync("printComponent", tableContent, "Customer cards");
     }
-    
+
     private async Task ShowInformationAsync()
     {
-        var dialog = await DialogService.ShowInfoAsync("Для кожної карти клієнта вивести кількість одиниць товарів, куплених за вказаний період");
+        var dialog =
+            await DialogService.ShowInfoAsync(
+                "Для кожної карти клієнта вивести кількість одиниць товарів, куплених за вказаний період");
         var result = await dialog.Result;
     }
 }
