@@ -24,10 +24,16 @@
  @* Body *@
  <FluentDialogBody>
      <FluentDivider></FluentDivider>
-     <FluentDataGrid GridTemplateColumns="1fr 1fr 1fr" Items=SalesList.AsQueryable()>
+     <FluentDataGrid GridTemplateColumns="1fr 1fr 1fr 1fr 1fr" Items=SalesList.AsQueryable()>
          <TemplateColumn Title="UPC">
              <FluentTextField @bind-Value="@context.UPC" ReadOnly="true"/>
          </TemplateColumn>
+         <TemplateColumn Title="Name">
+             <FluentTextField Value="@_productNames[context.UPC].Item1" ReadOnly="true"/>
+         </TemplateColumn>
+         <TemplateColumn Title="Prom">
+             <FluentTextField Value="@_productNames[context.UPC].Item2.ToString()" ReadOnly="true"/>
+             </TemplateColumn>
          <TemplateColumn Title="Number">
              <FluentNumberField Value="@context.ProductNumber" ReadOnly="true"/>
          </TemplateColumn>
@@ -53,7 +59,7 @@
     
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
-
+    private Dictionary<string, Tuple<string, bool>> _productNames = new Dictionary<string, Tuple<string, bool>>();
     public List<Sale> SalesList { get; set; } = new List<Sale>();
     private static readonly HttpClient Client = new();
     
@@ -62,7 +68,7 @@
         await InitializeSaleList();
         foreach (var sale in SalesList)
         {
-            Console.WriteLine(sale);
+            await GetProductNameAsync(sale);
         }
     }
     
@@ -96,5 +102,45 @@
         var separator = "<hr style='border-top: 1px solid #ccc; margin: 20px 0;'>";
         var dialogContent = $"{checkTable}{separator}{salesTable}";
         await IJS.InvokeVoidAsync("printComponent", dialogContent, "Check Details and Sales");
+    }
+
+    private async Task GetProductNameAsync(Sale sale)
+    {
+        try
+        {
+            string upc = sale.UPC;
+            var response = await Client.GetAsync($"https://localhost:5001/api/store-products/{upc}");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var storeProduct = JsonConvert.DeserializeObject<StoreProduct>(responseJson);
+                if (storeProduct != null)
+                {
+                    Guid id = storeProduct.ProductId;
+                    var response1 = await Client.GetAsync($"https://localhost:5001/api/products/{id}");
+                    if (response1.IsSuccessStatusCode)
+                    {
+                        var ResponseJson = await response1.Content.ReadAsStringAsync();
+                        var product = JsonConvert.DeserializeObject<Product>(ResponseJson);
+                        if (product != null)
+                        {
+                            _productNames.Add(sale.UPC, new Tuple<string, bool>(product.Name, storeProduct.IsPromotional));
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Product with ID {id} not found.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {response.StatusCode} - Couldn't retrieve product name for id: {id}");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting product name: {ex.Message}");
+        }
     }
 }

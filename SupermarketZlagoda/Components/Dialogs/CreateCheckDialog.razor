@@ -45,18 +45,24 @@
 <FluentCombobox Style="width: 100%" Items="@_storeProductsList"
                 Label="Add new product:"
                 OptionValue="@(storeProduct => storeProduct.Upc)"
-                OptionText="@(storeProduct => $"{storeProduct.Upc} - {_productNames[storeProduct.Upc]} {(storeProduct.IsPromotional ? "- Promotional" : "")}")"
+                OptionText="@(storeProduct => $"{storeProduct.Upc} - {_productNames[storeProduct.Upc].Item1} {(storeProduct.IsPromotional ? "- Promotional" : "")}")"
                 @bind-SelectedOption="@StoreProduct">
     <OptionTemplate Context="optionContext">
-           @($"{optionContext.Upc} - {_productNames[optionContext.Upc]} {(optionContext.IsPromotional ? " - Promotional" : "")}")
+           @($"{optionContext.Upc} - {_productNames[optionContext.Upc].Item1} {(optionContext.IsPromotional ? " - Promotional" : "")}")
             </OptionTemplate>
 </FluentCombobox>
     <br/><br/>
     <FluentButton Appearance="Appearance.Accent" OnClick="@AddNewSale" Style="width: 100%">Add product</FluentButton>
-    <FluentDataGrid GridTemplateColumns="1fr 1fr 1fr 1fr" Items=SalesList.AsQueryable()>
+    <FluentDataGrid GridTemplateColumns="1fr 1.5fr 1fr 1fr 1fr 1fr" Items=SalesList.AsQueryable()>
         <TemplateColumn Title="UPC">
             <FluentTextField @bind-Value="@context.UPC" ReadOnly="true"/>
         </TemplateColumn>
+        <TemplateColumn Title="Name">
+            <FluentTextField Value="@_productNames[context.UPC].Item1" ReadOnly="true"/>
+        </TemplateColumn>
+        <TemplateColumn Title="Prom">
+            <FluentTextField Value="@(_productNames[context.UPC].Item2.ToString())" ReadOnly="true"/>
+            </TemplateColumn>
         <TemplateColumn Title="Number">
             <FluentNumberField Value="@context.ProductNumber" 
                                    ValueChanged="(int value) => HandleQuantityChanged(context, value)"
@@ -98,7 +104,7 @@
 
     private List<Sale> SalesList = new List<Sale>();
 
-    private Dictionary<string, string> _productNames = new Dictionary<string, string>();
+    private Dictionary<string, Tuple<string, bool>> _productNames = new Dictionary<string, Tuple<string, bool>>();
     protected override async Task OnInitializedAsync()
     {
         User.Data = await LocalStorage.GetItemAsync<Employee?>("UserData");
@@ -269,7 +275,7 @@
                 var product = JsonConvert.DeserializeObject<Product>(responseJson);
                 if (product != null)
                 {
-                    _productNames.Add(storeProduct.Upc, product.Name);
+                    _productNames.Add(storeProduct.Upc, new Tuple<string, bool>(product.Name, storeProduct.IsPromotional));
                 }
                 else
                 {
@@ -287,3 +293,8 @@
         }
     }
 }
+
+
+
+
+
