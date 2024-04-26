@@ -23,7 +23,8 @@
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 </FluentToolbar>
 <br/>
-<FluentDataGrid Items="@_items" ItemSize="54" Virtualize="true" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 1fr" Style="height: 600px; overflow:auto;">
+<FluentDataGrid Items="@_items" ItemSize="54" Virtualize="true" Pagination="@_pagination"
+                GridTemplateColumns="1fr 1fr 0.5fr 0.6fr 0.6fr 1fr 0.6fr 1fr" Style="height: 600px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Upc)"/>
     <PropertyColumn Property="@(c => c.UpcProm)"/>
     <PropertyColumn Property="@(c => c.ProductId)"/>
