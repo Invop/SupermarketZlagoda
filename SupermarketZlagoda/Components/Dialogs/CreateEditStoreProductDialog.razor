@@ -26,18 +26,18 @@
 
         @if (!Content.IsPromotional)
         {
-            <FluentCombobox Items="@_products"
-                            Label="Select ProductId:"
-                            OptionValue="@(product => product.Id.ToString())"
-                            OptionText="@(product => product.Name)"
-                            @bind-SelectedOption="@Product"
-                            Required="true">
-                <OptionTemplate Context="optionContext">
-                    @optionContext.Name
-                </OptionTemplate>
-            </FluentCombobox>
             @if (!_isUpdatingDialog)
             {
+                <FluentCombobox Items="@_products"
+                                Label="Select ProductId:"
+                                OptionValue="@(product => product.Id.ToString())"
+                                OptionText="@(product => product.Name)"
+                                @bind-SelectedOption="@Product"
+                                Required="true">
+                    <OptionTemplate Context="optionContext">
+                        @optionContext.Name
+                    </OptionTemplate>
+                </FluentCombobox>
                 <FluentNumberField Label="Quantity:" Min="1" @bind-Value="@(StoreProductQuantity)"/>
                 <FluentNumberField Label="Price:" Min="0.001" @bind-Value="@Content.Price"/>
             }
