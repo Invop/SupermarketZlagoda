@@ -111,6 +111,7 @@ public class CustomerCardRepository : ICustomerCardRepository
     private void AppendAdditionalCriteria(StringBuilder commandText, CustomerCardQueryParameters? parameters)
     {
         if (parameters == null) return;
+        commandText.Append(" HAVING 1=1");
         if (!string.IsNullOrWhiteSpace(parameters.StartSurname))
         {
             commandText.Append(" AND (cust_surname LIKE @StartSurname + '%' OR cust_surname = @StartSurname)");
