@@ -8,4 +8,5 @@ public record Sale
     public string UPC { get; set; }
     public int ProductNumber { get; set; }
     public decimal SellingPrice { get; set; }
+    public int MaxQuantity { get; set; }
 }
