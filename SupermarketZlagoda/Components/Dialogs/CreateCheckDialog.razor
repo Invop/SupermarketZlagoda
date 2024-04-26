@@ -189,11 +189,14 @@
 
     private async Task SaveAsync()
     {
-        Content.IdEmployee = User.Data.Id;
-        if (CustomerCard.Id == Guid.Empty) Content.IdCardCustomer = null;
-        else Content.IdCardCustomer = CustomerCard.Id;
-        await Dialog.CloseAsync(Content);
-        CheckTable.SalesList = SalesList;
+        if (SalesList.Count != 0)
+        {
+            Content.IdEmployee = User.Data.Id;
+            if (CustomerCard.Id == Guid.Empty) Content.IdCardCustomer = null;
+            else Content.IdCardCustomer = CustomerCard.Id;
+            await Dialog.CloseAsync(Content);
+            CheckTable.SalesList = SalesList;
+        }
     }
 
     private async Task CancelAsync()
