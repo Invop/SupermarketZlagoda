@@ -211,7 +211,7 @@ public partial class CheckTable
         var dialog = await DialogService.ShowDialogAsync<CreateCheckDialog>(context, new DialogParameters
         {
             Height = "auto",
-            Width = "600px",
+            Width = "800px",
             Title = "Add new сheck",
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
@@ -401,6 +401,7 @@ public partial class CheckTable
         var dialog = await DialogService.ShowDialogAsync<OpenCheckDialog>(check, new DialogParameters()
         {
             Height = "auto",
+            Width = "800px",
             Title = "Details of the check",
             PreventDismissOnOverlayClick = true,
             PreventScroll = true,
