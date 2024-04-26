@@ -36,13 +36,20 @@
                     @optionContext.Name
                 </OptionTemplate>
             </FluentCombobox>
-            <FluentNumberField Label="Quantity:" Min="1" @bind-Value="@(StoreProductQuantity)"/>
-            <FluentNumberField Label="Price:" Min="0.001" @bind-Value="@Content.Price"/>
+            @if (!_isUpdatingDialog)
+            {
+                <FluentNumberField Label="Quantity:" Min="1" @bind-Value="@(StoreProductQuantity)"/>
+                <FluentNumberField Label="Price:" Min="0.001" @bind-Value="@Content.Price"/>
+            }
         }
         else
         {
-            <FluentNumberField Label="Price:" ReadOnly="true" @bind-Value="@Content.Price"/>
-            <FluentNumberField Label="Quantity:" Min="1" Max="@_maxQuantityValue.ToString()" @bind-Value="@(StoreProductQuantity)"/>
+            @if (!_isUpdatingDialog)
+            {
+                <FluentNumberField Label="Price:" ReadOnly="true" @bind-Value="@Content.Price"/>
+                <FluentNumberField Label="Quantity:" Min="1" Max="@_maxQuantityValue.ToString()"
+                                   @bind-Value="@(StoreProductQuantity)"/>
+            }
         }
     </EditForm>
 
@@ -69,7 +76,7 @@
     private static readonly HttpClient Client = new();
     private List<Product>? _products = new();
     private int _maxQuantityValue = int.MaxValue;
-
+    bool _isUpdatingDialog;
     private string? CheckPromoItemUpc { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -93,9 +100,9 @@
 
     private async Task HandleDialogDependentLoading()
     {
-        var isUpdatingDialog = Dialog.Instance.Parameters.Title != null && Dialog.Instance.Parameters.Title.StartsWith("Updating");
+        _isUpdatingDialog = Dialog.Instance.Parameters.Title != null && Dialog.Instance.Parameters.Title.StartsWith("Updating");
 
-        if (isUpdatingDialog)
+        if (_isUpdatingDialog)
         {
             await HandleUpdateDialog();
         }
