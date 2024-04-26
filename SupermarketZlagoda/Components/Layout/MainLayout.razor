@@ -65,7 +65,9 @@
 
     private async Task LogOut()
     {
-        await localStorage.RemoveItemAsync("user");
+        await localStorage.RemoveItemAsync("Authorized");
+        await localStorage.RemoveItemAsync("UserData");
+        await localStorage.RemoveItemAsync("IsManager");
         User.Authorized = false;
         NavigationManager.NavigateTo("/login");
     }
