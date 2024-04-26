@@ -97,12 +97,17 @@ public partial class CustomerCardTable
 
     #region Api
 
+// Приватний асинхронний метод отримання даних запиту
     private async Task GetZapitData()
     {
+        // Отримання відповіді сервера на наш запит
         var response = await Client.GetAsync("https://localhost:5001/api/customer-card/zapit");
+        // Якщо стан відповіді успішний
         if (response.IsSuccessStatusCode)
         {
+            // Читання вмісту рядка у форматі JSON
             var responseJson = await response.Content.ReadAsStringAsync();
+            // Десереалізація рядка JSON і перетворення на список об'єктів типу CustomerCard
             _zapitdata = JsonConvert
                 .DeserializeObject<List<CustomerCard>>(JObject.Parse(responseJson)["items"].ToString())
                 .AsQueryable();

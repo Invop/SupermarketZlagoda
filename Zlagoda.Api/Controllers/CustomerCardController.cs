@@ -36,11 +36,15 @@ public class CustomerCardController : ControllerBase
         return Ok(customerCard.MapToProductResponse());
     }
 
+// Метод, який реагує на HTTP GET запити до  API 
     [HttpGet(ApiEndpoints.CustomerCards.GetZapitData)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetZapitData()
     {
+        // Викликаємо сервіс для отримання даних карточок клієнтів
         var customerCards = await _customerCardService.GetZapitDataAsync();
+        // Перетворюємо отримані дані до формату відповіді
         var customerCardsResponse = customerCards.MapToProductResponse();
+        // Повертаємо результуючу відповідь
         return Ok(customerCardsResponse);
     }
 

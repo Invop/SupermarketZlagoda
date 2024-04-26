@@ -102,9 +102,9 @@ public class CustomerCardRepository : ICustomerCardRepository
             command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
         }
 
-        command.Parameters.AddWithValue("@StartDate", parameters.StartDate ?? new DateTime(1753, 01,01,00,00,00));
+        command.Parameters.AddWithValue("@StartDate", parameters.StartDate ?? new DateTime(1753, 01, 01, 00, 00, 00));
         command.Parameters.AddWithValue("@EndDate", parameters.EndDate ?? DateTime.Today.AddDays(1));
-        
+
         return command;
     }
 
@@ -158,6 +158,7 @@ public class CustomerCardRepository : ICustomerCardRepository
         {
             GetCommandWithParameters(parameters, command);
         }
+
         await using var reader = await command.ExecuteReaderAsync();
         var customerCards = new List<CustomerCard>();
         while (await reader.ReadAsync())
@@ -252,9 +253,12 @@ public class CustomerCardRepository : ICustomerCardRepository
         return Convert.ToInt32(result) > 0;
     }
 
+    // Асинхронний метод для отримання даних запиту
     public async Task<IEnumerable<CustomerCard>> GetZapitDataAsync()
     {
+        // Створення нового з'єднання
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        //Запит 
         const string commandText = """
                                    
                                                        SELECT DISTINCT cc.card_number, cc.cust_surname, cc.cust_name, cc.cust_patronymic, cc.phone_number, cc.city, cc.street, cc.zip_code, cc.[percent]
@@ -269,11 +273,13 @@ public class CustomerCardRepository : ICustomerCardRepository
                                                        )
                                    """;
 
-
+        // Використання команди SQL
         using var command = new SqlCommand(commandText, connection);
-
+        // Запуск команди та отримання результату у вигляді рядку
         using var reader = await command.ExecuteReaderAsync();
+        // Створення нового списку карток клієнтів
         var customerCards = new List<CustomerCard>();
+        // Читання результатів та додавання їх до списку
         while (await reader.ReadAsync())
         {
             var customerCard = new CustomerCard
@@ -295,6 +301,7 @@ public class CustomerCardRepository : ICustomerCardRepository
             customerCards.Add(customerCard);
         }
 
+        // Повернення отриманого списку
         return customerCards;
     }
 }
