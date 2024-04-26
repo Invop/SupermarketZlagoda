@@ -19,8 +19,8 @@ public partial class CustomerCardTable
     private string? percentageValue;
     private Option<int?> selectedPercentageOption;
 
-    private DateTime? _dateFromValue = new DateTime(1753, 01,01,12,12,12);
-    private DateTime? _dateToValue = DateTime.Today.AddDays(1);
+    private DateTime? _dateFromValue = null;
+    private DateTime? _dateToValue = null;
     
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<CustomerCard>? _items = Enumerable.Empty<CustomerCard>().AsQueryable();
@@ -32,7 +32,6 @@ public partial class CustomerCardTable
         get => _dateFromValue;
         set { 
             _dateFromValue = value;
-            Console.WriteLine(_dateFromValue);
             _ = GetCustomerCardAsync();
         }
     }
@@ -40,7 +39,6 @@ public partial class CustomerCardTable
     {
         get => _dateToValue;
         set { _dateToValue = value;
-            Console.WriteLine(_dateToValue);
             _ = GetCustomerCardAsync();
         }
     }
@@ -287,5 +285,11 @@ public partial class CustomerCardTable
         var printer = new TablePrinter<CustomerCard>(_items);
         var tableContent = printer.PrintTable();
         await IJS.InvokeVoidAsync("printComponent", tableContent, "Customer cards");
+    }
+    
+    private async Task ShowInformationAsync()
+    {
+        var dialog = await DialogService.ShowInfoAsync("Для кожної карти клієнта вивести кількість одиниць товарів, куплених за вказаний період");
+        var result = await dialog.Result;
     }
 }

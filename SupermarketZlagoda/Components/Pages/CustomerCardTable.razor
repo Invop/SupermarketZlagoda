@@ -23,14 +23,17 @@
                       ValueChanged="@OnSelectedPercentageChanged"/>
     }
     <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by surname"></FluentTextField>
-    <FluentDivider Style="height: 30px;" Role="DividerRole.Separator" Orientation="Orientation.Vertical"></FluentDivider>
-        <span>Select dates</span>
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
+    <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"/>
+    <br/>
+    <br/>
+    <br/>
+    <FluentButton OnClick="@ShowInformationAsync" IconEnd="@(new Icons.Regular.Size16.Question())"></FluentButton>
+    <span>Select dates</span>
         <FluentDatePicker @bind-Value="@DateFromValue"/>
         <FluentDatePicker @bind-Value="@DateToValue"/>
         <FluentButton Icon="CalendarToday" OnClick="@(SetTodayDate)">Today</FluentButton>
     <FluentButton Icon="CalendarToday" OnClick="@(ResetDate)">Reset Date</FluentButton>
-    <FluentDivider Style="height: 30px;" Role="DividerRole.Separator" Orientation="Orientation.Vertical"></FluentDivider>
-    <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1.1fr 1fr 1.2fr 1fr 1.2fr 0.9fr 1fr 1fr 0.6fr"
                 Style="height: 600px; width: 1500px; overflow:auto;">

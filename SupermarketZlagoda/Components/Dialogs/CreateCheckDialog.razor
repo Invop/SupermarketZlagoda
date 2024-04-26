@@ -27,8 +27,7 @@
 
  @* Body *@
 <FluentDialogBody>
-    <FluentTextField Value="@User.Data?.Surname" ReadOnly="true" Style="width: 100%"> Employee: </FluentTextField>
-    <br/><br/>
+<FluentTextField Value="@($"{User.Data?.Surname} {User.Data?.Name} {User.Data?.Patronymic}")" ReadOnly="true" Style="width: 100%"> Employee: </FluentTextField>    <br/><br/>
      <FluentCombobox Style="width: 100%" Items="@_customerList"
                                     Label="Customer:"
                                     OptionValue="@(customerCard => customerCard.Id.ToString())"
