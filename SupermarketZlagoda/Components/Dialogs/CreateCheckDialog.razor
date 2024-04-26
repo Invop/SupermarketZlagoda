@@ -61,7 +61,7 @@
             <FluentNumberField Value="@context.ProductNumber" 
                                    ValueChanged="(int value) => HandleQuantityChanged(context, value)"
                                    Min="1" 
-                                   Max= "@_maxProductNumber.ToString()"/>
+                                   Max= "@context.MaxQuantity.ToString()"/>
         </TemplateColumn>
         <TemplateColumn Title="Price">
             <FluentNumberField Value="@context.SellingPrice" ReadOnly="true" />
@@ -88,7 +88,6 @@
     [CascadingParameter] 
     public FluentDialog Dialog { get; set; } = default!;
     private static readonly HttpClient Client = new();
-    private int _maxProductNumber;
     
 
     private CustomerCard? CustomerCard { get; set; }
@@ -205,7 +204,8 @@
                 CheckNumber = Content.IdCheck,
                 UPC = StoreProduct.Upc,
                 ProductNumber = 1,
-                SellingPrice = StoreProduct.Price
+                SellingPrice = StoreProduct.Price,
+                MaxQuantity = await GetMaxQuantity(StoreProduct.Upc)
             };
             await GetMaxQuantity(newSale.UPC);
             SalesList.Add(newSale);
@@ -243,20 +243,18 @@
     }
     
    
-    private async Task GetMaxQuantity(string? upc)
+    private async Task<int> GetMaxQuantity(string? upc)
     {
         var response = await Client.GetAsync($"https://localhost:5001/api/store-products/{upc}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
             var storeProduct = JsonConvert.DeserializeObject<StoreProduct>(responseJson);
-            _maxProductNumber = storeProduct.Quantity;
+            return storeProduct.Quantity;
         }
-        else
-        {
-            Console.WriteLine($"Error retrieving sales for check {Content.IdCheck}. Status code: {response.StatusCode}");
-        }
-
+        
+        Console.WriteLine($"Error retrieving sales for check {Content.IdCheck}. Status code: {response.StatusCode}");
+        return -1;
     }
     
     private async Task GetProductNameAsync(StoreProduct storeProduct)
