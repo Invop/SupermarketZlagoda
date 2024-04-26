@@ -170,7 +170,7 @@ public class StoreProductRepository : IStoreProductRepository
                                             INNER JOIN Products p ON sp.id_product = p.id_product
                                             LEFT JOIN (SELECT * FROM Sales WHERE product_number >= @MinProductPerCheckCount) AS s ON sp.UPC = s.UPC
                                             LEFT JOIN Checks AS ch ON s.check_number = ch.check_number
-                                            GROUP BY sp.UPC, sp.id_product, sp.selling_price, sp.products_number, sp.promotional_product, sp.UPC_prom, p.category_number
+                                            GROUP BY sp.UPC, sp.id_product, sp.selling_price, sp.products_number, sp.promotional_product, sp.UPC_prom, p.category_number, p.product_name
                                             """);
 
         AppendAdditionalCriteria(commandText, parameters);
