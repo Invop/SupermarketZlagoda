@@ -50,7 +50,7 @@
 
 <FluentDialogFooter>
     <FluentButton Type="ButtonType.Submit"
-                  Disabled="@(!_editContext.Validate())"
+                  Disabled="@(!_editContext.Validate() || (!string.IsNullOrEmpty(CheckPromoItemUpc) && CheckPromoItemUpc.Equals(Content.Upc)))"
                   Appearance="Appearance.Accent" OnClick="@SaveAsync">
         Save
     </FluentButton>
@@ -70,8 +70,17 @@
     private List<Product>? _products = new();
     private int _maxQuantityValue = int.MaxValue;
 
+    private string? CheckPromoItemUpc { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        if (Content.IsPromotional)
+        {
+            CheckPromoItemUpc = Content.UpcProm ?? string.Empty;
+            Console.WriteLine(CheckPromoItemUpc);
+            Content.UpcProm = null;
+        }
+
         InitializeEditContextForContent();
         GetMaxQuantityIfPromotional();
         await HandleDialogDependentLoading();
@@ -94,7 +103,11 @@
         else if (!Content.IsPromotional)
         {
             _products = await GetAllUnusedProducts();
-            if (_products != null) Product = _products[0];
+            if (_products is { Count: > 0 }) Product = _products[0];
+            else
+            {
+                await Dialog.CancelAsync();
+            }
         }
     }
 

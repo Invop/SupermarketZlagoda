@@ -257,6 +257,7 @@ public partial class StoreProductTable
     {
         StoreProduct promoStoreProduct = new StoreProduct
         {
+            UpcProm = context.Upc,
             ProductId = context.ProductId,
             Quantity = context.Quantity,
             Price = context.Price * 0.8m,
