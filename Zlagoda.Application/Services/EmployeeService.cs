@@ -40,4 +40,9 @@ public class EmployeeService : IEmployeeService
     {
         return await _employeeRepository.DeleteByIdAsync(id);
     }
+
+    public async Task<IEnumerable<Employee>> GetCashiersServedAllCustomers()
+    {
+        return await _employeeRepository.GetCashiersServedAllCustomers();
+    }
 }

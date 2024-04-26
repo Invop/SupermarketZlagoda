@@ -19,9 +19,11 @@ public partial class EmployeeTable
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<Employee> _items = Enumerable.Empty<Employee>().AsQueryable();
     private static readonly HttpClient Client = new();
+    private IQueryable<Employee>? allCashiers = Enumerable.Empty<Employee>().AsQueryable();
 
     protected override async Task OnInitializedAsync()
     {
+        await GetCashiersServedAllCustomers();
         await GetEmployeesAsync();
     }
 
@@ -89,6 +91,18 @@ public partial class EmployeeTable
         Console.WriteLine(response.IsSuccessStatusCode
             ? "Employee successfully saved."
             : $"Failed to save the employee. Status code: {response.StatusCode}");
+    }
+    
+    private async Task GetCashiersServedAllCustomers()
+    {
+        var response = await Client.GetAsync("https://localhost:5001/api/employees/GetCashiersServedAllCustomers");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            allCashiers = JsonConvert
+                .DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString())
+                .AsQueryable();
+        }
     }
 
     private async Task OpenCreateDialogAsync()

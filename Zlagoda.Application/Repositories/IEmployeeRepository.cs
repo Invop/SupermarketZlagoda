@@ -11,4 +11,5 @@ public interface IEmployeeRepository
     Task<bool> UpdateAsync(Employee employee);
     Task<bool> DeleteByIdAsync(Guid id);
     Task<bool> ExistsByIdAsync(Guid id);
+    Task<IEnumerable<Employee>> GetCashiersServedAllCustomers();
 }

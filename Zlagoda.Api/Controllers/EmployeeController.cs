@@ -54,4 +54,12 @@ public class EmployeeController(IEmployeeService employeeService) : ControllerBa
         if (!deleted) return NotFound();
         return Ok();
     }
+    
+    [HttpGet(ApiEndpoints.Employees.GetCashiersServedAllCustomers)]
+    public async Task<IActionResult> GetAll()
+    {
+        var employees = await employeeService.GetCashiersServedAllCustomers();
+        var employeesResponse = employees.MapToEmployeeResponse();
+        return Ok(employeesResponse);
+    }
 }

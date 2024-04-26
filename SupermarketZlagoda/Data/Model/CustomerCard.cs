@@ -34,5 +34,6 @@ public record CustomerCard()
     [StringLength(9, ErrorMessage = "Zip code is too long (50 character limit).")]
     public string? Index { get; set; }
     public int Percentage { get; set; }
-    
-}
+    public int ProductNumber { get; set; }
+
+    }

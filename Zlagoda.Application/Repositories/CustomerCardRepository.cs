@@ -102,6 +102,9 @@ public class CustomerCardRepository : ICustomerCardRepository
             command.Parameters.AddWithValue("@StartSurname", parameters.StartSurname);
         }
 
+        command.Parameters.AddWithValue("@StartDate", parameters.StartDate ?? new DateTime(1753, 01,01,00,00,00));
+        command.Parameters.AddWithValue("@EndDate", parameters.EndDate ?? DateTime.Today.AddDays(1));
+        
         return command;
     }
 
@@ -141,17 +144,19 @@ public class CustomerCardRepository : ICustomerCardRepository
     public async Task<IEnumerable<CustomerCard>> GetAllAsync(CustomerCardQueryParameters? parameters)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-        var commandText = new StringBuilder(@"SELECT * FROM Customer_Cards
-                                                WHERE 1=1");
-
+        var commandText = new StringBuilder("""
+                                            SELECT c.*, SUM(s.product_number) AS total_units_bought
+                                            FROM Customer_Cards AS c
+                                                     LEFT JOIN (SELECT * FROM Checks WHERE print_date >= @StartDate AND print_date <= @EndDate) AS ch ON c.card_number = ch.card_number
+                                                     LEFT JOIN Sales AS s ON ch.check_number = s.check_number
+                                            GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic, c.phone_number, c.city, c.street, c.zip_code, c.[percent]
+                                            """);
         AppendAdditionalCriteria(commandText, parameters);
-
         await using var command = new SqlCommand(commandText.ToString(), connection);
         if (parameters != null)
         {
             GetCommandWithParameters(parameters, command);
         }
-
         await using var reader = await command.ExecuteReaderAsync();
         var customerCards = new List<CustomerCard>();
         while (await reader.ReadAsync())
@@ -162,7 +167,10 @@ public class CustomerCardRepository : ICustomerCardRepository
                 Surname = reader.GetString(reader.GetOrdinal("cust_surname")),
                 Name = reader.GetString(reader.GetOrdinal("cust_name")),
                 Phone = reader.GetString(reader.GetOrdinal("phone_number")),
-                Percentage = reader.GetInt32(reader.GetOrdinal("percent"))
+                Percentage = reader.GetInt32(reader.GetOrdinal("percent")),
+                ProductsNumber = reader.IsDBNull(reader.GetOrdinal("total_units_bought"))
+                    ? 0
+                    : reader.GetInt32(reader.GetOrdinal("total_units_bought"))
             };
             if (!reader.IsDBNull(3))
                 customerCard.Patronymic = reader.GetString(reader.GetOrdinal("cust_patronymic"));

@@ -11,4 +11,5 @@ public class CustomerCard
     public string? Street { get; set; }
     public string? Index { get; set; }
     public required int Percentage { get; set; }
+    public int ProductsNumber { get; set; }
 }
