@@ -18,11 +18,31 @@ public partial class CustomerCardTable
     private string _searchTerm = string.Empty;
     private string? percentageValue;
     private Option<int?> selectedPercentageOption;
+
+    private DateTime? _dateFromValue = null;
+    private DateTime? _dateToValue = null;
+    
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<CustomerCard>? _items = Enumerable.Empty<CustomerCard>().AsQueryable();
     static List<Option<int?>> PercentageOptions = new() { };
     private static readonly HttpClient Client = new HttpClient();
 
+    private DateTime? DateFromValue
+    {
+        get => _dateFromValue;
+        set { 
+            _dateFromValue = value;
+            _ = GetCustomerCardAsync();
+        }
+    }
+    private DateTime? DateToValue
+    {
+        get => _dateToValue;
+        set { _dateToValue = value;
+            _ = GetCustomerCardAsync();
+        }
+    }
+    
     private int SortType
     {
         get => _sortType;
@@ -92,10 +112,12 @@ public partial class CustomerCardTable
 
     private async Task GetCustomerCardAsync()
     {
+        var formattedFromDate = _dateFromValue?.ToString("yyyy-MM-dd HH:mm:ss");
+        var formattedToDate = _dateToValue?.ToString("yyyy-MM-dd HH:mm:ss");
         var sortType = _sortType == 0 ? "asc" : "desc";
         var response =
             await Client.GetAsync(
-                $"https://localhost:5001/api/customer-card/?SortBy=cust_surname,cust_name,cust_patronymic&SortOrder={sortType}&StartSurname={_searchTerm}&Percentage={selectedPercentageOption?.Value}");
+                $"https://localhost:5001/api/customer-card/?SortBy=cust_surname,cust_name,cust_patronymic&SortOrder={sortType}&StartSurname={_searchTerm}&Percentage={selectedPercentageOption?.Value}&StartDate={formattedFromDate}&EndDate={formattedToDate}");
         if (response.IsSuccessStatusCode)
         {
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -245,10 +267,29 @@ public partial class CustomerCardTable
 
     #endregion
 
+    private async Task SetTodayDate()
+    {
+        _dateFromValue = DateTime.Now.Date;
+        _dateToValue = DateTime.Now.Date.AddDays(1).AddTicks(-1);
+        await GetCustomerCardAsync();
+    }
+    private async Task ResetDate()
+    {
+        _dateFromValue = null;
+        _dateToValue = null;
+        await GetCustomerCardAsync();
+    }
+    
     private async Task PrintTable()
     {
         var printer = new TablePrinter<CustomerCard>(_items);
         var tableContent = printer.PrintTable();
         await IJS.InvokeVoidAsync("printComponent", tableContent, "Customer cards");
+    }
+    
+    private async Task ShowInformationAsync()
+    {
+        var dialog = await DialogService.ShowInfoAsync("Для кожної карти клієнта вивести кількість одиниць товарів, куплених за вказаний період");
+        var result = await dialog.Result;
     }
 }

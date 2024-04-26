@@ -4,9 +4,11 @@
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
 @using System.ComponentModel
+@using Blazored.LocalStorage
 @inject IDialogService DialogService
+@inject User User
 @implements IDialogContentComponent<Check>
-
+@inject ILocalStorageService LocalStorage
  @* Header *@
 <FluentDialogHeader ShowDismiss="true">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
@@ -25,16 +27,7 @@
 
  @* Body *@
 <FluentDialogBody>
-    <FluentCombobox Style="width: 100%" Items="@_employeeList"
-                                Label="Employee:"
-                                OptionValue="@(employee => employee.Id.ToString())"
-                                OptionText="@(employee => employee.Surname)"
-                                @bind-SelectedOption="@Employee">
-                    <OptionTemplate Context="optionContext">
-                        @optionContext.Surname
-                    </OptionTemplate>
-                </FluentCombobox>
-    <br/><br/>
+<FluentTextField Value="@($"{User.Data?.Surname} {User.Data?.Name} {User.Data?.Patronymic}")" ReadOnly="true" Style="width: 100%"> Employee: </FluentTextField>    <br/><br/>
      <FluentCombobox Style="width: 100%" Items="@_customerList"
                                     Label="Customer:"
                                     OptionValue="@(customerCard => customerCard.Id.ToString())"
@@ -87,7 +80,7 @@
 @code {
 
     string? stringValue;
-    private const string EmployeeApiUrl = "https://localhost:5001/api/employees";
+
     private const string CustomerApiUrl = "https://localhost:5001/api/customer-card";
     private const string StoreProductApiUrl = "https://localhost:5001/api/store-products";
     [Parameter] public Check Content { get; set; } = default!;
@@ -96,9 +89,7 @@
     public FluentDialog Dialog { get; set; } = default!;
     private static readonly HttpClient Client = new();
     private int _maxProductNumber;
-
-    private Employee? Employee { get; set; }
-    private List<Employee>? _employeeList = [];
+    
 
     private CustomerCard? CustomerCard { get; set; }
     private List<CustomerCard>? _customerList = [];
@@ -111,19 +102,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await InitializeEmployeeListAsync();
+        User.Data = await LocalStorage.GetItemAsync<Employee?>("UserData");
         await InitializeCustomerListAsync();
         await InitializeStoreProductListAsync();
         CheckStoreProductAndActIfNeeded();
-        CheckEmployeeListAndActIfNeeded();
-        SetEmployee();
         SetCustomerCard();
     }
-
-    private async Task InitializeEmployeeListAsync()
-    {
-        _employeeList = await GetEmployeeList();
-    }
+    
 
     private async Task InitializeCustomerListAsync()
     {
@@ -136,13 +121,7 @@
         var data = await GetStoreProductList();
         if (data != null) _storeProductsList = data.Where(x => x.Quantity > 0);
     }
-
-    private async void CheckEmployeeListAndActIfNeeded()
-    {
-        if (_employeeList != null && _employeeList.Any()) return;
-        await ShowEmployeeErrorAsync();
-        await Dialog.CancelAsync();
-    }
+    
 
     private async void CheckStoreProductAndActIfNeeded()
     {
@@ -150,24 +129,6 @@
         await ShowStoreProductErrorAsync();
         await Dialog.CancelAsync();
     }
-
-    private void SetEmployee()
-    {
-        Employee = Content.IdEmployee != Guid.Empty
-            ? GetMatchingEmployeeFromList()
-            : GetFirstEmployeeFromList();
-    }
-
-    private Employee GetMatchingEmployeeFromList()
-    {
-        return _employeeList.First(x => x.Id == Content.IdEmployee);
-    }
-
-    private Employee GetFirstEmployeeFromList()
-    {
-        return _employeeList.ElementAtOrDefault(0);
-    }
-
 
     private void SetCustomerCard()
     {
@@ -182,31 +143,13 @@
         return _customerList.FirstOrDefault(x => x.Id == Content.IdCardCustomer);
     }
 
-
-    private async Task ShowEmployeeErrorAsync()
-    {
-        var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 employee");
-        var result = await dialog.Result;
-    }
-
+    
     private async Task ShowStoreProductErrorAsync()
     {
         var dialog = await DialogService.ShowErrorAsync("Before doing this, create at least 1 product in the store");
         var result = await dialog.Result;
     }
-
-    private async Task<List<Employee>?> GetEmployeeList()
-    {
-        var response = await Client.GetAsync(EmployeeApiUrl);
-        if (!response.IsSuccessStatusCode)
-        {
-            Console.WriteLine($"Error: {response.StatusCode}");
-            return null;
-        }
-
-        var content = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<List<Employee>>(JObject.Parse(content)["items"].ToString());
-    }
+    
 
     private async Task<List<CustomerCard>?> GetCustomerList()
     {
@@ -236,7 +179,7 @@
 
     private async Task SaveAsync()
     {
-        if (Employee != null) Content.IdEmployee = Employee.Id;
+        Content.IdEmployee = User.Data.Id;
         if (CustomerCard.Id == Guid.Empty) Content.IdCardCustomer = null;
         else Content.IdCardCustomer = CustomerCard.Id;
         await Dialog.CloseAsync(Content);

@@ -49,6 +49,7 @@ public class ApiEndpoints
         public const string GetAll = Base;
         public const string Update = $"{Base}/{{id:guid}}";
         public const string Delete = $"{Base}/{{id:guid}}";
+        public const string GetCashiersServedAllCustomers = $"{Base}/GetCashiersServedAllCustomers";
     }
 
     public static class Categories

@@ -24,6 +24,16 @@
     }
     <FluentTextField @bind-Value="SearchTerm" Placeholder="Search by surname"></FluentTextField>
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
+    <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"/>
+    <br/>
+    <br/>
+    <br/>
+    <FluentButton OnClick="@ShowInformationAsync" IconEnd="@(new Icons.Regular.Size16.Question())"></FluentButton>
+    <span>Select dates</span>
+        <FluentDatePicker @bind-Value="@DateFromValue"/>
+        <FluentDatePicker @bind-Value="@DateToValue"/>
+        <FluentButton Icon="CalendarToday" OnClick="@(SetTodayDate)">Today</FluentButton>
+    <FluentButton Icon="CalendarToday" OnClick="@(ResetDate)">Reset Date</FluentButton>
 </FluentToolbar>
 <FluentDataGrid Items="@_items" ResizableColumns="true" Virtualize="true" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1.1fr 1fr 1.2fr 1fr 1.2fr 0.9fr 1fr 1fr 0.6fr"
                 Style="height: 600px; width: 1500px; overflow:auto;">
@@ -36,6 +46,7 @@
     <PropertyColumn Property="@(c => c.City)"/>
     <PropertyColumn Property="@(c => c.Street)"/>
     <PropertyColumn Property="@(c => c.Index)"/>
+    <PropertyColumn Property="@(c => c.ProductNumber)"/>
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
         @if (IsManager)

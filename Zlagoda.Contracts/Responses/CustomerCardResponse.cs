@@ -10,4 +10,6 @@ public class CustomerCardResponse {
     public string? Street { get; set; }
     public string? Index { get; set; }
     public required int Percentage { get; set; }
+    
+    public required int ProductNumber { get; init; }
 }

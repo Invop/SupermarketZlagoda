@@ -10,4 +10,5 @@ public interface IEmployeeService
     Task<IEnumerable<Employee>> GetAllAsync(EmployeeQueryParameters? parameters);
     Task<Employee?> UpdateAsync(Employee employee);
     Task<bool> DeleteByIdAsync(Guid id);
+    Task<IEnumerable<Employee>> GetCashiersServedAllCustomers();
 }

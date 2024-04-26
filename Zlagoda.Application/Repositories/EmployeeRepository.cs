@@ -216,4 +216,50 @@ public class EmployeeRepository : IEmployeeRepository
         var result = await command.ExecuteScalarAsync();
         return Convert.ToInt32(result) > 0;
     }
+
+    public async Task<IEnumerable<Employee>> GetCashiersServedAllCustomers()
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var commandText = new StringBuilder("""
+                                            SELECT *
+                                            FROM Employees AS Empl
+                                            WHERE NOT EXISTS (
+                                                            SELECT Cc.card_number
+                                                            FROM Customer_Cards AS Cc
+                                                            WHERE NOT EXISTS (
+                                                                            SELECT *
+                                                                            FROM Checks AS ch
+                                                                            WHERE ch.id_employee = Empl.id_employee 
+                                                                              AND ch.card_number = Cc.card_number
+                                                                )
+                                                            )
+                                            """);
+        await using var command = new SqlCommand(commandText.ToString(), connection);
+        await using var reader = await command.ExecuteReaderAsync();
+        var employees = new List<Employee>();
+        while (await reader.ReadAsync())
+        {
+            var employee = new Employee
+            {
+                Id = reader.GetGuid(reader.GetOrdinal("id_employee")),
+                Surname = reader.GetString(reader.GetOrdinal("empl_surname")),
+                Name = reader.GetString(reader.GetOrdinal("empl_name")),
+                Role = reader.GetString(reader.GetOrdinal("empl_role")),
+                Salary = reader.GetDecimal(reader.GetOrdinal("salary")),
+                DateOfBirth = reader.GetDateTime(reader.GetOrdinal("date_of_birth")),
+                DateOfStart = reader.GetDateTime(reader.GetOrdinal("date_of_start")),
+                PhoneNumber = reader.GetString(reader.GetOrdinal("phone_number")),
+                City = reader.GetString(reader.GetOrdinal("city")),
+                Street = reader.GetString(reader.GetOrdinal("street")),
+                ZipCode = reader.GetString(reader.GetOrdinal("zip_code")),
+                UserLogin = reader.GetString(reader.GetOrdinal("user_login")),
+                UserPassword = reader.GetString(reader.GetOrdinal("user_password"))
+            };
+            if (!reader.IsDBNull(3))
+                employee.Patronymic = reader.GetString(reader.GetOrdinal("empl_patronymic"));
+            employees.Add(employee);
+        }
+
+        return employees;
+    }
 }

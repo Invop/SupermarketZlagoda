@@ -237,7 +237,7 @@ public static class ContractMapping
 
     public static CustomerCardResponse MapToProductResponse(this CustomerCard customerCard)
     {
-        return new CustomerCardResponse()
+        return new CustomerCardResponse
         {
             Id = customerCard.Id,
             Surname = customerCard.Surname,
@@ -247,7 +247,8 @@ public static class ContractMapping
             City = customerCard.City,
             Street = customerCard.Street,
             Index = customerCard.Index,
-            Percentage = customerCard.Percentage
+            Percentage = customerCard.Percentage,
+            ProductNumber = customerCard.ProductsNumber
         };
     }
 
