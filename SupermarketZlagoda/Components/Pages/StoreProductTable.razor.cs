@@ -255,6 +255,8 @@ public partial class StoreProductTable
 
     private async Task OpenAddPromoStoreProductDialog(StoreProduct context)
     {
+        if (context.Quantity <= 0) return;
+
         StoreProduct promoStoreProduct = new StoreProduct
         {
             UpcProm = context.Upc,
