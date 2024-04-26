@@ -92,6 +92,19 @@ public partial class StoreProductTable
         await GetStoreProductsAsync();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var userRole = await localStorage.ContainKeyAsync("IsManager");
+            if (userRole)
+            {
+                User.IsManager = await localStorage.GetItemAsync<bool>("IsManager");
+                StateHasChanged();
+            }
+        }
+    }
+
     private string GenerateQueryStringFromCategoryOptions()
     {
         return string.Join("&",

@@ -1,9 +1,11 @@
 ﻿@page "/store-products"
+@using Blazored.LocalStorage
 @inject IDialogService DialogService
 @inject IJSRuntime IJS
 @inject User User
+@inject ILocalStorageService localStorage
 <FluentToolbar id="toolbar-fluent-components">
-    @if (IsManager)
+    @if (User.IsManager)
     {
         <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new store product</FluentButton>
     }
@@ -37,7 +39,7 @@
             <FluentIcon Value="new Icons.Regular.Size32.CheckmarkCircle()"/>
         }
     </TemplateColumn>
-    @if (IsManager)
+    @if (User.IsManager)
     {
         <TemplateColumn Title="Actions" Align="@Align.End">
             @if (!context.IsPromotional)
