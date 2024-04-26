@@ -18,14 +18,16 @@
                       OptionText="@(i => i.Text.ToString())"
                       OptionValue="@(i => i.Value.ToString())"
                       @bind-SelectedOption="@selectedEmployeeOption"
-                      ValueChanged="@OnSelectedEmployeeChanged"/>
+                      ValueChanged="@OnSelectedEmployeeChanged"
+                      Disabled="@WithProductsFromAllCategories"/>
     }
     <FluentDivider Style="height: 30px;" Role="DividerRole.Separator" Orientation="Orientation.Vertical"></FluentDivider>
     <span>Select dates</span>
-    <FluentDatePicker @bind-Value="@DateFromValue"/>
-    <FluentDatePicker @bind-Value="@DateToValue"/>
-    <FluentButton Icon="CalendarToday" OnClick="@(SetTodayDate)">Today</FluentButton>
-    <FluentButton Icon="CalendarToday" OnClick="@(ResetDate)">Reset Date</FluentButton>
+    <FluentDatePicker @bind-Value="@DateFromValue" Disabled="@WithProductsFromAllCategories"/>
+    <FluentDatePicker @bind-Value="@DateToValue" Disabled="@WithProductsFromAllCategories"/>
+    <FluentButton Icon="CalendarToday" OnClick="@(SetTodayDate)" Disabled="@WithProductsFromAllCategories">Today</FluentButton>
+    <FluentButton Icon="CalendarToday" OnClick="@(ResetDate)" Disabled="@WithProductsFromAllCategories">Reset Date</FluentButton>
+    <FluentCheckbox @bind-Value="@WithProductsFromAllCategories">With products from all categories</FluentCheckbox>
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
 
 </FluentToolbar>

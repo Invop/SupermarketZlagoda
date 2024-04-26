@@ -4,19 +4,40 @@
 
 <FluentToolbar id="toolbar-fluent-components">
     <FluentButton Appearance="Appearance.Accent" OnClick="@(OpenCreateDialogAsync)">Add new category</FluentButton>
-    <FluentRadioGroup @bind-Value="SortType">
+    <FluentRadioGroup @bind-Value="SortType" Disabled="@WithCounts">
         <FluentRadio Value="@(0)" Checked="true">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowDown()"/></FluentRadio>
         <FluentRadio Value="@(1)">Sort by name<FluentIcon Value="new Icons.Regular.Size16.ArrowUp()"/></FluentRadio>
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Print())" OnClick="@PrintTable"/>
     </FluentRadioGroup>
+    <FluentCheckbox @bind-Value="@WithCounts">With products counts</FluentCheckbox>
+    @if (WithCounts)
+    {
+        <FluentNumberField Label="Min store products count:" Min="0" @bind-Value="@(MinStoreProdCount)" Size="5"/>
+    }
 </FluentToolbar>
-<FluentDataGrid Items="@_items" ItemSize="54" Pagination="@_pagination" GridTemplateColumns="1fr 1fr 1fr" Style="height: 600px; width: 1000px; overflow:auto;">
+<FluentDataGrid ResizableColumns="true" Items="@_items" ItemSize="54" Pagination="@_pagination"
+                Class="@(WithCounts? "with-counts" : "without-counts")"
+                GridTemplateColumns="@(WithCounts? "1.5fr 1fr 1fr 1fr 1fr" : "1.5fr 1fr 1fr")"
+                Style="height: 600px; overflow:auto;">
     <PropertyColumn Property="@(c => c.Id)" />
-    <PropertyColumn Property="@(c => c.Name)" Align="Align.Center" />
+    <PropertyColumn Property="@(c => c.Name)"/>
+    @if (WithCounts)
+    {
+        <PropertyColumn Property="@(c => c.CountStoreProducts)" Title="StoreProducts"/>
+        <PropertyColumn Property="@(c => c.CountPromoProducts)" Title="PromoProducts"/>
+    }
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenEditDialogAsync(context))"/>
         <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => OpenDeleteDialogAsync(context))" />
     </TemplateColumn>
+    <style>
+        .with-counts {
+            width: 1200px;
+        }
+        .without-counts {
+            width: 1000px;
+        }
+    </style>
 </FluentDataGrid>
 <FluentPaginator State="@_pagination">
     <SummaryTemplate>
