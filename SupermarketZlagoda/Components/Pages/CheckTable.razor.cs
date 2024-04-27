@@ -100,8 +100,8 @@ public partial class CheckTable
                 .DeserializeObject<List<Employee>>(JObject.Parse(responseJson)["items"].ToString());
             foreach (var employee in employees)
             {
-                _employees[employee.Id] = employee.Surname;
-                _employeesOptions.Add(new SelectOption(employee.Id, employee.Surname));
+                _employees[employee.Id] = $"{employee.Surname} {employee.Name} {employee.Patronymic}";
+                _employeesOptions.Add(new SelectOption(employee.Id, $"{employee.Surname} {employee.Name} {employee.Patronymic}"));
             }
         }
         else
@@ -121,8 +121,8 @@ public partial class CheckTable
             
             foreach (var customerCard in customers)
             {
-                _customerCards[customerCard.Id] = customerCard.Surname;
-                _customerCardsOptions.Add(new SelectOption(customerCard.Id, customerCard.Surname));
+                _customerCards[customerCard.Id] = $"{customerCard.Surname} {customerCard.Name} {customerCard.Patronymic}";
+                _customerCardsOptions.Add(new SelectOption(customerCard.Id, $"{customerCard.Surname} {customerCard.Name} {customerCard.Patronymic}"));
             }
         }
         else
