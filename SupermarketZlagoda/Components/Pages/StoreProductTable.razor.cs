@@ -119,22 +119,6 @@ public partial class StoreProductTable
 
     #region Api
 
-    private async Task GetAllProductNames()
-    {
-        var response = await Client.GetAsync("https://localhost:5001/api/prdoducts");
-        if (response.IsSuccessStatusCode)
-        {
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var products = JsonConvert
-                .DeserializeObject<List<Product>>(JObject.Parse(responseJson)["items"].ToString());
-            foreach (var product in products) _productNames[product.Id] = product.Name;
-        }
-        else
-        {
-            Console.WriteLine($"Error: {response.StatusCode}");
-        }
-    }
-
     private async Task GetCategoryOptions()
     {
         var response = await Client.GetAsync("https://localhost:5001/api/categories");
