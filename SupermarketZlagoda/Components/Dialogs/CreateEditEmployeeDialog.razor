@@ -1,6 +1,8 @@
-﻿@using SupermarketZlagoda.Data.Model
+﻿@using Blazored.LocalStorage
+@using SupermarketZlagoda.Data.Model
 @implements IDialogContentComponent<Employee>
-
+@inject ILocalStorageService localStorage
+@inject  User User
 @* Header *@
 <FluentDialogHeader ShowDismiss="true">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
@@ -32,9 +34,13 @@
                       Label="Role:"/>
         <FluentValidationMessage For="() => Content.Role"></FluentValidationMessage>
         <br/><br/>
-        <FluentNumberField Min="0" @bind-Value="@Content.Salary">Salary:</FluentNumberField>
-        <FluentValidationMessage For="() => Content.Salary"></FluentValidationMessage>
-        <br/><br/>
+        @if (User.Data != null && User.Data.Id != Content.Id)
+        {
+            <FluentNumberField Min="0" @bind-Value="@Content.Salary">Salary:</FluentNumberField>
+            <FluentValidationMessage For="() => Content.Salary"></FluentValidationMessage>
+            <br/>
+            <br/>
+        }
         <FluentDatePicker @bind-Value="@Content.DateOfStart"
                           Label="Date of start"/>
         <FluentValidationMessage For="() => Content.DateOfStart"></FluentValidationMessage>
@@ -114,6 +120,19 @@
     {
         _isEditDialog = !string.IsNullOrEmpty(Content.Name);
         _editContext = new EditContext(Content);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var userData = await localStorage.ContainKeyAsync("UserData");
+            if (userData)
+            {
+                User.Data = await localStorage.GetItemAsync<Employee?>("UserData");
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task SaveAsync()
