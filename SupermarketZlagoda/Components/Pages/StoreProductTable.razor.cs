@@ -18,6 +18,7 @@ public partial class StoreProductTable
     private int _sortType = 0;
     private bool _hidePromotional = false, _hideNonPromotional = false;
     private List<SelectOption> _categoryOptions = [];
+    private readonly Dictionary<Guid, string> _productNames = new();
     private readonly PaginationState _pagination = new() { ItemsPerPage = 20 };
     private IQueryable<StoreProduct>? _items = Enumerable.Empty<StoreProduct>().AsQueryable();
     private static readonly HttpClient Client = new HttpClient();
@@ -117,6 +118,22 @@ public partial class StoreProductTable
     }
 
     #region Api
+
+    private async Task GetAllProductNames()
+    {
+        var response = await Client.GetAsync("https://localhost:5001/api/prdoducts");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var products = JsonConvert
+                .DeserializeObject<List<Product>>(JObject.Parse(responseJson)["items"].ToString());
+            foreach (var product in products) _productNames[product.Id] = product.Name;
+        }
+        else
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
+    }
 
     private async Task GetCategoryOptions()
     {
