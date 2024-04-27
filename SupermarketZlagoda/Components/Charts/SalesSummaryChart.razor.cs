@@ -181,10 +181,11 @@ public partial class SalesSummaryChart : ComponentBase
 
     #endregion
 
-    private void ResetDateClick()
+    private async Task ResetDateClick()
     {
         _dateTimeFrom = null;
         _dateTimeTo = null;
-        _ = UpdateChartData();
+        await UpdateChartData();
+        StateHasChanged();
     }
 }
