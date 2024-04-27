@@ -185,5 +185,6 @@ public partial class SalesSummaryChart : ComponentBase
     {
         _dateTimeFrom = null;
         _dateTimeTo = null;
+        _ = UpdateChartData();
     }
 }
