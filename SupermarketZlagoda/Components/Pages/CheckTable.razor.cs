@@ -163,7 +163,7 @@ public partial class CheckTable
         var url = "https://localhost:5001/api/check/?";
         if (!_withProductsFromAllCategories)
             url +=
-                $"Employee={Guid.Parse(selectedEmployeeOption.Value)}&PrintTimeStart={formattedFromDate}&PrintTimeEnd={formattedToDate}";
+                $"Employee={Guid.Parse(selectedEmployeeOption.Value)}&PrintTimeStart={formattedFromDate}&PrintTimeEnd={formattedToDate}&StartIdCheck={CheckSearchTerm}";
         else url += "WithProductsFromAllCategories=true";
         var response = await Client.GetAsync(url);
         if (response.IsSuccessStatusCode)
